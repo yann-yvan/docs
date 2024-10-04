@@ -1,5 +1,5 @@
 {
-  "$schema": "https://mintlify.com/schema.json",
+  "$schema": "https://shortext.ny-corp.io/docs/api-docs.json",
   "name": "Starter Kit",
   "logo": {
     "dark": "/logo/dark.svg",
