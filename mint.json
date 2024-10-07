@@ -1,9 +1,14 @@
 {
-  "$schema": "https://shortext.ny-corp.io/docs/api-docs.json",
-  "name": "Starter Kit",
+  "$schema": "https://whatsapp-gateway.test/docs/api-docs.json",
+  "name": "API documentation",
   "logo": {
     "dark": "/logo/dark.svg",
     "light": "/logo/light.svg"
+  },
+  "theme": "prism",
+  "layout": "sidenav",
+  "background": {
+    "style": "windows"
   },
   "favicon": "/favicon.svg",
   "colors": {
@@ -18,20 +23,32 @@
   "topbarLinks": [
     {
       "name": "Support",
-      "url": "mailto:hi@mintlify.com"
+      "url": "mailto:hello@ny-corp.io"
     }
   ],
   "topbarCtaButton": {
     "name": "Dashboard",
-    "url": "https://dashboard.mintlify.com"
+    "url": "https://shortext.ny-corp.io/dash"
   },
   "tabs": [
     {
       "name": "API Reference",
-      "url": "api-reference"
+      "url": "api-reference",
+      "icon": "square-terminal"
     }
   ],
   "anchors": [
+    {
+      "name": "API Reference",
+      "openapi": "/api-reference/openapi.json",
+      "url": "api-reference",
+      "icon": "square-terminal"
+    },
+    {
+      "name": "sample Reference",
+      "url": "api-reference",
+      "icon": "square-terminal"
+    },
     {
       "name": "Documentation",
       "icon": "book-open-cover",
@@ -75,17 +92,15 @@
       ]
     },
     {
-      "group": "Endpoint Examples",
+      "group": "Messages",
       "pages": [
-        "api-reference/endpoint/get",
-        "api-reference/endpoint/create",
-        "api-reference/endpoint/delete"
+        "api-reference/endpoint/create"
       ]
     }
   ],
   "footerSocials": {
-    "x": "https://x.com/mintlify",
-    "github": "https://github.com/mintlify",
-    "linkedin": "https://www.linkedin.com/company/mintsearch"
+    "website": "https://shortext.ny-corp.io",
+    "github": "https://github.com/yann-yvan",
+    "linkedin": "https://www.linkedin.com/company/ny-corp"
   }
 }

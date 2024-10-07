@@ -1,4 +1,59 @@
 ---
-title: 'Create Plant'
-openapi: 'POST /plants'
+title: 'Send Message'
+openapi: 'POST /messages/send'
 ---
+
+<Tabs>
+    <Tab title="Text">
+        Text messages are messages containing only a text body and an optional link preview.
+        <Card title="Text Message" img="/images/text-message.png">
+
+        </Card>
+
+        ## Link Preview
+
+        You can have the WhatsApp client attempt to render a preview of the first URL in the body text string, if it
+        contains one. URLs must begin with http:// or https://. If multiple URLs are in the body text string, only the
+        first URL will be rendered.
+
+        <Note>If omitted, or if unable to retrieve a link preview, a clickable link will be rendered instead.</Note>
+    </Tab>
+
+    <Tab title="Interactive Button Reply">
+        <Card title="Interactive Button Reply">
+            Interactive reply buttons messages allow you to send up to three predefined replies for users to choose from.
+            <img height="200" src="/images/interactive-button-reply.png" />
+        </Card>
+
+        <Card title="User respond to interactive button">
+            Users can respond to a message by selecting one of the predefined buttons, which triggers a messages webhook describing their selection.
+            <img height="150" src="/images/interactive-button-sample-response.png" />
+        </Card>
+    </Tab>
+
+    <Tab title="Interactive List Messages">
+        <Card title="Interactive Button Reply">
+            Interactive list messages allow you to present WhatsApp users with a list of options to choose from (options are defined as rows in the request payload):
+            <img height="200" src="/images/interactive-list.png" />
+        </Card>
+
+        <Card title="User respond to interactive button">
+            When a user taps the button in the message, it displays a modal that lists the options available:
+            <img height="150" src="/images/interactive-list-modal.png" />
+        </Card>
+
+        <Card title="User respond to interactive button">
+            Users can then choose one option and their selection will be sent as a reply:
+            <img height="150" src="/images/interactive-list-reply.png" />
+        </Card>
+
+        <Note>Interactive list messages support up to 10 sections, with up to 10 rows per section, and can include an optional header and footer.</Note>
+    </Tab>
+    <Tab title="Third Tab">
+        💪 Here's content that's only inside the third Tab.
+    </Tab>
+    <Tab title="Third Tab">
+        💪 Here's content that's only inside the third Tab.
+    </Tab>
+</Tabs>
+

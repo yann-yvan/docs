@@ -1,94 +1,41 @@
 {
-  "openapi": "3.0.1",
+  "openapi": "3.0.0",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
-    "license": {
-      "name": "MIT"
-    },
-    "version": "1.0.0"
+    "title": "Shortext API",
+    "description": "This is my API",
+    "version": "1.0"
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
-    }
-  ],
-  "security": [
-    {
-      "bearerAuth": []
+      "url": "https://whatsapp-gateway.test/api"
     }
   ],
   "paths": {
-    "/plants": {
-      "get": {
-        "description": "Returns all plants from the system that the user has access to",
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "The maximum number of results to return",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Plant response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      },
+    "/messages/send": {
       "post": {
-        "description": "Creates a new plant in the store",
+        "tags": [
+          "Messages"
+        ],
+        "summary": "Send a message",
+        "description": "Envoie un message au destinataire via l'API Shortext",
+        "operationId": "sendMessage",
         "requestBody": {
-          "description": "Plant to add to the store",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewPlant"
+                "$ref": "#/components/schemas/SendMessageRequest"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
-            "description": "plant response",
+            "description": "Message sent successfully",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Plant"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "#/components/schemas/SendMessageResponse"
                 }
               }
             }
@@ -96,35 +43,17 @@
         }
       }
     },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of plant to delete",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
+    "/up": {
+      "get": {
+        "tags": [
+          "health"
         ],
+        "summary": "Health Check",
+        "description": "Check if the service is up",
+        "operationId": "HealthCheck",
         "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
-          },
-          "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
+          "200": {
+            "description": "The data"
           }
         }
       }
@@ -132,64 +61,446 @@
   },
   "components": {
     "schemas": {
-      "Plant": {
+      "SendMessageRequest": {
         "required": [
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
-          },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
-          }
-        }
-      },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
-          },
-          {
-            "required": [
-              "id"
-            ],
-            "type": "object",
-            "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
-              }
-            }
-          }
-        ]
-      },
-      "Error": {
-        "required": [
-          "error",
+          "channel",
+          "contact",
+          "from",
           "message"
         ],
-        "type": "object",
         "properties": {
-          "error": {
-            "type": "integer",
-            "format": "int32"
+          "channel": {
+            "type": "string",
+            "enum": [
+              "whatsapp"
+            ]
+          },
+          "contact": {
+            "required": [
+              "phone",
+              "profile"
+            ],
+            "properties": {
+              "phone": {
+                "description": "For channel whatsapp -> E.164 format without leading +",
+                "type": "string",
+                "example": "1234567890"
+              },
+              "profile": {
+                "required": [
+                  "lastname"
+                ],
+                "properties": {
+                  "lastname": {
+                    "type": "string",
+                    "example": "Yoan"
+                  },
+                  "firstname": {
+                    "type": "string",
+                    "example": "André"
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "celia@home.io"
+                  },
+                  "address": {
+                    "type": "string",
+                    "example": "Place to be"
+                  },
+                  "preferred_language": {
+                    "type": "string",
+                    "enum": [
+                      "en",
+                      "fr"
+                    ],
+                    "example": "en"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          },
+          "from": {
+            "description": "the id of the sender business number",
+            "type": "string",
+            "example": "1234567890"
           },
           "message": {
-            "type": "string"
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "text",
+                  "media",
+                  "interactive",
+                  "template"
+                ],
+                "example": "text"
+              },
+              "content": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/TextMessageContent"
+                  },
+                  {
+                    "$ref": "#/components/schemas/MediaMessageContent"
+                  },
+                  {
+                    "$ref": "#/components/schemas/InteractiveButtonMessageContent"
+                  }
+                ]
+              }
+            },
+            "type": "object"
           }
-        }
-      }
-    },
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer"
+        },
+        "type": "object"
+      },
+      "SendMessageResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "success"
+          },
+          "message_id": {
+            "type": "string",
+            "example": "abc123"
+          },
+          "recipient": {
+            "properties": {
+              "phone_number": {
+                "type": "string",
+                "example": "1234567890"
+              }
+            },
+            "type": "object"
+          },
+          "data": {
+            "properties": {
+              "sent_at": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2024-10-05T10:01:00Z"
+              },
+              "delivered_at": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2024-10-05T10:05:00Z"
+              },
+              "read_at": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2024-10-05T10:07:00Z"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "MediaMessageContent": {
+        "properties": {
+          "media_type": {
+            "type": "string",
+            "enum": [
+              "image",
+              "video",
+              "document"
+            ],
+            "example": "image"
+          },
+          "media_url": {
+            "type": "string",
+            "example": "https://example.com/image.jpg"
+          },
+          "caption": {
+            "type": "string",
+            "example": "Voici une image"
+          }
+        },
+        "type": "object"
+      },
+      "ResponseCode": {
+        "description": "Standard response codes defined by the system / Codes de réponse standard définis par le système.",
+        "type": "integer",
+        "enum": [
+          -1,
+          -2,
+          -3,
+          -4,
+          -5,
+          1000,
+          -1001,
+          -1002,
+          -1003,
+          -1004,
+          -1005,
+          -1006,
+          -1007,
+          -1008,
+          -1009,
+          -1010,
+          -1100,
+          -1101,
+          -1102,
+          -1103,
+          1104,
+          -1105
+        ],
+        "example": 1000
+      },
+      "ResponseCodeDescriptions": {
+        "description": "Explanation of the response codes used in the API. All code values are returned as absolute values. / Explication des codes de réponse utilisés dans l'API. Toutes les valeurs des codes sont renvoyées en valeurs absolues.",
+        "properties": {
+          "TOKEN_EXPIRED": {
+            "description": "The token has expired / Le token a expiré.",
+            "type": "integer",
+            "example": 1
+          },
+          "TOKEN_BLACK_LISTED": {
+            "description": "The token is blacklisted / Le token est dans la liste noire.",
+            "type": "integer",
+            "example": 2
+          },
+          "TOKEN_INVALID": {
+            "description": "The token is invalid / Le token est invalide.",
+            "type": "integer",
+            "example": 3
+          },
+          "TOKEN_NOT_FOUND": {
+            "description": "The token was not found / Le token n'a pas été trouvé.",
+            "type": "integer",
+            "example": 4
+          },
+          "TOKEN_USER_NOT_FOUND": {
+            "description": "The user associated with the token was not found / L'utilisateur associé au token n'a pas été trouvé.",
+            "type": "integer",
+            "example": 5
+          },
+          "REQUEST_SUCCESS": {
+            "description": "The request was successful / La requête a réussi.",
+            "type": "integer",
+            "example": 1000
+          },
+          "REQUEST_FAILURE": {
+            "description": "The request failed / La requête a échoué.",
+            "type": "integer",
+            "example": 1001
+          },
+          "REQUEST_VALIDATION_ERROR": {
+            "description": "Request validation error / Erreur de validation de la requête.",
+            "type": "integer",
+            "example": 1002
+          },
+          "REQUEST_EXPIRED": {
+            "description": "The request has expired / La requête a expiré.",
+            "type": "integer",
+            "example": 1003
+          },
+          "REQUEST_TRYING_TO_INSERT_DUPLICATE": {
+            "description": "Trying to insert a duplicate entry / Tentative d'insertion d'un doublon.",
+            "type": "integer",
+            "example": 1004
+          },
+          "REQUEST_NOT_AUTHORIZED": {
+            "description": "The request is not authorized / La requête n'est pas autorisée.",
+            "type": "integer",
+            "example": 1005
+          },
+          "REQUEST_EXCEPTION": {
+            "description": "An exception occurred while processing the request / Une exception s'est produite lors du traitement de la requête.",
+            "type": "integer",
+            "example": 1006
+          },
+          "REQUEST_NOT_FOUND": {
+            "description": "The request was not found / La requête n'a pas été trouvée.",
+            "type": "integer",
+            "example": 1007
+          },
+          "REQUEST_WRONG_JSON_FORMAT": {
+            "description": "Incorrect JSON format in the request / Format JSON incorrect dans la requête.",
+            "type": "integer",
+            "example": 1008
+          },
+          "REQUEST_SERVICE_NOT_AVAILABLE": {
+            "description": "The service is not available / Le service n'est pas disponible.",
+            "type": "integer",
+            "example": 1009
+          },
+          "REQUEST_EMERGENCY": {
+            "description": "Emergency request / Requête d'urgence.",
+            "type": "integer",
+            "example": 1010
+          },
+          "AUTH_ACCOUNT_NOT_VERIFY": {
+            "description": "The account is not verified / Le compte n'est pas vérifié.",
+            "type": "integer",
+            "example": 1100
+          },
+          "AUTH_WRONG_USERNAME": {
+            "description": "Incorrect username / Nom d'utilisateur incorrect.",
+            "type": "integer",
+            "example": 1101
+          },
+          "AUTH_WRONG_PASSWORD": {
+            "description": "Incorrect password / Mot de passe incorrect.",
+            "type": "integer",
+            "example": 1102
+          },
+          "AUTH_WRONG_CREDENTIALS": {
+            "description": "Incorrect credentials / Identifiants incorrects.",
+            "type": "integer",
+            "example": 1103
+          },
+          "AUTH_ACCOUNT_VERIFIED": {
+            "description": "The account is verified / Le compte est vérifié.",
+            "type": "integer",
+            "example": 1104
+          },
+          "AUTH_NOT_EXISTS": {
+            "description": "The account does not exist / Le compte n'existe pas.",
+            "type": "integer",
+            "example": 1105
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponse": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "code": {
+            "type": "integer",
+            "example": 1000
+          },
+          "message": {
+            "type": "string",
+            "example": "Request success"
+          },
+          "body": {
+            "type": "object",
+            "example": {
+              "key": "value"
+            },
+            "nullable": true
+          },
+          "token": {
+            "description": "present only on auth route",
+            "type": "string",
+            "nullable": true
+          },
+          "trace_id": {
+            "description": "present only when success=false",
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "type": "object"
+      },
+      "InteractiveButtonMessageContent": {
+        "title": "Interactive Button Reply Message",
+        "properties": {
+          "type": {
+            "description": "Get the validation rules that apply to the request.",
+            "type": "string",
+            "enum": [
+              "button"
+            ],
+            "example": "button"
+          },
+          "header": {
+            "description": "Text header doesn't allow formating like *<HEADER>* or any other format supported by WhatsApp",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "text",
+                  "image",
+                  "video",
+                  "document"
+                ],
+                "example": "text"
+              },
+              "text": {
+                "type": "string",
+                "example": "Sélectionnez une option"
+              }
+            },
+            "type": "object",
+            "nullable": true
+          },
+          "body": {
+            "properties": {
+              "text": {
+                "type": "string",
+                "example": "Voici deux options"
+              }
+            },
+            "type": "object"
+          },
+          "footer": {
+            "properties": {
+              "text": {
+                "type": "string",
+                "example": "Sélectionnez une option"
+              }
+            },
+            "type": "string",
+            "nullable": true
+          },
+          "buttons": {
+            "type": "array",
+            "items": {
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "example": "btn_1"
+                },
+                "title": {
+                  "type": "string",
+                  "example": "Option 1"
+                }
+              },
+              "type": "object"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "TextMessageContent": {
+        "title": "Text Message",
+        "description": "WhatsApp allow text message only when there is already an open session between the contact and the business number",
+        "required": [
+          "text"
+        ],
+        "properties": {
+          "text": {
+            "description": "for embedded url please use this format ex: https://shortext.io",
+            "type": "string",
+            "maxLength": 4096,
+            "example": "Ceci est un message texte."
+          },
+          "preview_url": {
+            "type": "boolean",
+            "default": true,
+            "example": true
+          }
+        },
+        "type": "object"
       }
     }
-  }
+  },
+  "tags": [
+    {
+      "name": "Messages",
+      "description": "Messages"
+    },
+    {
+      "name": "health",
+      "description": "health"
+    }
+  ]
 }
