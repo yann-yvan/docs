@@ -1,5 +1,5 @@
 {
-  "$schema": "https://whatsapp-gateway.test/docs/api-docs.json",
+  "$schema": "https://shortext.ny-corp.io/docs/api-docs.json",
   "name": "API documentation",
   "logo": {
     "dark": "/logo/dark.svg",
@@ -94,7 +94,7 @@
     {
       "group": "Messages",
       "pages": [
-        "api-reference/endpoint/create"
+        "api-reference/endpoint/message"
       ]
     }
   ],

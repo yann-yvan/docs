@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "https://whatsapp-gateway.test/api"
+      "url": "https://shortext.ny-corp.io/api"
     }
   ],
   "paths": {
@@ -31,7 +31,7 @@
         },
         "responses": {
           "200": {
-            "description": "Message sent successfully",
+            "description": "ButtonReplyMessage sent successfully",
             "content": {
               "application/json": {
                 "schema": {
@@ -144,7 +144,16 @@
                     "$ref": "#/components/schemas/TextMessageContent"
                   },
                   {
-                    "$ref": "#/components/schemas/MediaMessageContent"
+                    "$ref": "#/components/schemas/ImageMessageContent"
+                  },
+                  {
+                    "$ref": "#/components/schemas/VideoMessageContent"
+                  },
+                  {
+                    "$ref": "#/components/schemas/DocumentMessageContent"
+                  },
+                  {
+                    "$ref": "#/components/schemas/AudioMessageContent"
                   },
                   {
                     "$ref": "#/components/schemas/InteractiveButtonMessageContent"
@@ -195,28 +204,6 @@
               }
             },
             "type": "object"
-          }
-        },
-        "type": "object"
-      },
-      "MediaMessageContent": {
-        "properties": {
-          "media_type": {
-            "type": "string",
-            "enum": [
-              "image",
-              "video",
-              "document"
-            ],
-            "example": "image"
-          },
-          "media_url": {
-            "type": "string",
-            "example": "https://example.com/image.jpg"
-          },
-          "caption": {
-            "type": "string",
-            "example": "Voici une image"
           }
         },
         "type": "object"
@@ -400,6 +387,29 @@
         },
         "type": "object"
       },
+      "AudioMessageContent": {
+        "title": "Audio Message",
+        "description": "Audio messages display an audio icon and a link to an audio file. When the WhatsApp user taps the icon, the WhatsApp client loads and plays the audio file.",
+        "required": [
+          "media_type",
+          "media_url"
+        ],
+        "properties": {
+          "media_type": {
+            "description": "Get the validation rules that apply to the request.",
+            "type": "string",
+            "enum": [
+              "audio"
+            ],
+            "example": "audio"
+          },
+          "media_url": {
+            "type": "string",
+            "example": "https://example.com/image.jpg"
+          }
+        },
+        "type": "object"
+      },
       "InteractiveButtonMessageContent": {
         "title": "Interactive Button Reply Message",
         "properties": {
@@ -466,6 +476,94 @@
               },
               "type": "object"
             }
+          }
+        },
+        "type": "object"
+      },
+      "ImageMessageContent": {
+        "title": "Image Message",
+        "description": "Image messages are messages that display a single image and an optional caption.",
+        "required": [
+          "media_type",
+          "media_url"
+        ],
+        "properties": {
+          "media_type": {
+            "description": "Get the validation rules that apply to the request.",
+            "type": "string",
+            "enum": [
+              "image"
+            ],
+            "example": "image"
+          },
+          "media_url": {
+            "type": "string",
+            "example": "https://example.com/image.jpg"
+          },
+          "caption": {
+            "type": "string",
+            "maxLength": 1024,
+            "example": "Voici une image"
+          }
+        },
+        "type": "object"
+      },
+      "DocumentMessageContent": {
+        "title": "Document Message",
+        "description": "Document messages are messages that display a document icon, linked to a document, that a WhatsApp user can tap to download.",
+        "required": [
+          "media_type",
+          "media_url"
+        ],
+        "properties": {
+          "media_type": {
+            "type": "string",
+            "enum": [
+              "document"
+            ],
+            "example": "document"
+          },
+          "media_url": {
+            "type": "string",
+            "example": "https://example.com/document.pdf"
+          },
+          "name": {
+            "description": "Document filename, with extension. The WhatsApp client will use an appropriate file type icon based on the extension.",
+            "type": "string",
+            "maxLength": 30,
+            "example": "Facture.pdf"
+          },
+          "caption": {
+            "type": "string",
+            "maxLength": 1024,
+            "example": "Voici une image"
+          }
+        },
+        "type": "object"
+      },
+      "VideoMessageContent": {
+        "title": "Video Message",
+        "description": "Video messages display a thumbnail preview of a video image with an optional caption. When the WhatsApp user taps the preview, it loads the video and displays it to the user.",
+        "required": [
+          "media_type",
+          "media_url"
+        ],
+        "properties": {
+          "media_type": {
+            "type": "string",
+            "enum": [
+              "video"
+            ],
+            "example": "video"
+          },
+          "media_url": {
+            "type": "string",
+            "example": "https://example.com/video.mp4"
+          },
+          "caption": {
+            "type": "string",
+            "maxLength": 1024,
+            "example": "Voici une image"
           }
         },
         "type": "object"
