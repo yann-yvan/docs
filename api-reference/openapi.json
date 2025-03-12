@@ -417,7 +417,8 @@
             "description": "Get the validation rules that apply to the request.",
             "type": "string",
             "enum": [
-              "button"
+              "button",
+              "payment"
             ],
             "example": "button"
           },
@@ -472,6 +473,43 @@
                 "title": {
                   "type": "string",
                   "example": "Option 1"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "payment_detail": {
+            "type": "array",
+            "items": {
+              "properties": {
+                "amount": {
+                  "type": "number",
+                  "format": "float",
+                  "example": "100"
+                },
+                "currency": {
+                  "type": "string",
+                  "example": "XAF"
+                },
+                "order_id": {
+                  "type": "string",
+                  "example": "ORDER001"
+                },
+                "callback_url": {
+                  "type": "string",
+                  "example": "https://shortext.ny-corp.io/callback"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "action": {
+            "type": "array",
+            "items": {
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "example": "https://shortext.ny-corp.io"
                 }
               },
               "type": "object"
