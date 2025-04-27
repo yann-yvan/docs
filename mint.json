@@ -57,12 +57,12 @@
     {
       "name": "Community",
       "icon": "slack",
-      "url": "https://mintlify.com/community"
+      "url": "https://shortext.ny-corp.io/community"
     },
     {
       "name": "Blog",
       "icon": "newspaper",
-      "url": "https://mintlify.com/blog"
+      "url": "https://shortext.ny-corp.io/blogs"
     }
   ],
   "navigation": [
@@ -100,7 +100,7 @@
   ],
   "footerSocials": {
     "website": "https://shortext.ny-corp.io",
-    "github": "https://github.com/yann-yvan",
-    "linkedin": "https://www.linkedin.com/company/ny-corp"
+    "github": "https://github.com/yann-yvan/shortext-sdk-php",
+    "linkedin": "https://www.linkedin.com/showcase/shortext"
   }
 }
