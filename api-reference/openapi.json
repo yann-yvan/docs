@@ -42,10 +42,22 @@
         "operationId": "getBalance",
         "responses": {
           "200": {
-            "description": "Expected response to a valid request"
-          },
-          "default": {
-            "description": "unexpected error"
+            "description": "The data",
+            "content": {
+              "application/json": {
+                "schema": {},
+                "example": {
+                  "balance": {
+                    "amount": 634.1987,
+                    "currency": "EUR"
+                  },
+                  "local_balance": {
+                    "amount": 416618.8856,
+                    "currency": "XAF"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
