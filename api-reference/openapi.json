@@ -8,9 +8,53 @@
   "servers": [
     {
       "url": "https://shortext.ny-corp.io/api"
+    },
+    {
+      "url": "https://whatsapp-gateway.test/api"
     }
   ],
   "paths": {
+    "/agent/search": {
+      "get": {
+        "tags": [
+          "Agents"
+        ],
+        "summary": "Search agents",
+        "operationId": "searchAgent",
+        "responses": {
+          "200": {
+            "description": "The data"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/business-manager/balance": {
+      "get": {
+        "tags": [
+          "Business - Manager"
+        ],
+        "summary": "get business balane",
+        "operationId": "getBalance",
+        "responses": {
+          "200": {
+            "description": "Expected response to a valid request"
+          },
+          "default": {
+            "description": "unexpected error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/messages/send": {
       "post": {
         "tags": [
@@ -40,7 +84,51 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/ticket/search": {
+      "get": {
+        "tags": [
+          "Tickets"
+        ],
+        "summary": "Search a ticket",
+        "operationId": "searchTicket",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "required": false,
+            "example": "STT-XLWY6P"
+          },
+          {
+            "name": "agent",
+            "in": "query",
+            "required": false,
+            "example": "AGI-XLWY6P"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "example": "open"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The data"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/up": {
@@ -168,9 +256,9 @@
       },
       "SendMessageResponse": {
         "properties": {
-          "status": {
-            "type": "string",
-            "example": "success"
+          "success": {
+            "type": "boolean",
+            "example": "true"
           },
           "message_id": {
             "type": "string",
@@ -627,12 +715,31 @@
         },
         "type": "object"
       }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "description": "Basic Auth",
+        "scheme": "bearer"
+      }
     }
   },
   "tags": [
     {
+      "name": "Agents",
+      "description": "Agents"
+    },
+    {
+      "name": "Business - Manager",
+      "description": "Business - Manager"
+    },
+    {
       "name": "Messages",
       "description": "Messages"
+    },
+    {
+      "name": "Tickets",
+      "description": "Tickets"
     },
     {
       "name": "health",
