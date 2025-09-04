@@ -104,18 +104,27 @@
             "name": "code",
             "in": "query",
             "required": false,
+            "schema": {
+              "type": "string"
+            },
             "example": "STT-XLWY6P"
           },
           {
             "name": "agent",
             "in": "query",
             "required": false,
+            "schema": {
+              "type": "string"
+            },
             "example": "AGI-XLWY6P"
           },
           {
             "name": "status",
             "in": "query",
             "required": false,
+            "schema": {
+              "type": "string"
+            },
             "example": "open"
           }
         ],
