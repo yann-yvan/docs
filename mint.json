@@ -22,8 +22,12 @@
   },
   "topbarLinks": [
     {
-      "name": "Support",
+      "name": "Mail Us",
       "url": "mailto:hello@ny-corp.io"
+    },
+    {
+      "name": "WhatsApp Us",
+      "url": "https://shortext.ny-corp.io/237657482849"
     }
   ],
   "topbarCtaButton": {
@@ -45,16 +49,6 @@
       "icon": "square-terminal"
     },
     {
-      "name": "sample Reference",
-      "url": "api-reference",
-      "icon": "square-terminal"
-    },
-    {
-      "name": "Documentation",
-      "icon": "book-open-cover",
-      "url": "https://mintlify.com/docs"
-    },
-    {
       "name": "Community",
       "icon": "slack",
       "url": "https://shortext.ny-corp.io/community"
@@ -66,25 +60,7 @@
     }
   ],
   "navigation": [
-    {
-      "group": "Get Started",
-      "pages": [
-        "introduction",
-        "quickstart",
-        "development"
-      ]
-    },
-    {
-      "group": "Essentials",
-      "pages": [
-        "essentials/markdown",
-        "essentials/code",
-        "essentials/images",
-        "essentials/settings",
-        "essentials/navigation",
-        "essentials/reusable-snippets"
-      ]
-    },
+
     {
       "group": "API Documentation",
       "pages": [

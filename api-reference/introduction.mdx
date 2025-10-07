@@ -1,23 +1,18 @@
 ---
 title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+description: 'Section for showcasing API endpoints'
 ---
-
-<Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
-</Note>
 
 ## Welcome
 
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
+For SWAGGER lover, we are using the following OpenAPI specification.
 
 <Card
-  title="Shortext Endpoints"
-  icon="leaf"
-  href="https://shortext.ny-corp.io/api/docs"
+    title="Shortext Endpoints"
+    icon="leaf"
+    href="https://shortext.ny-corp.io/api/docs"
 >
-  View the OpenAPI specification file
+    View the OpenAPI specification file
 </Card>
 
 ## Authentication
@@ -31,3 +26,72 @@ All API endpoints are authenticated using Bearer tokens and picked up from the s
   }
 ]
 ```
+
+## API Response Schema
+
+All API endpoints return code 200 with this json structure the content of the response will always be accessible by the *body* key
+
+<Note>
+    trace_id : present only when success=false. Can be used for support request
+</Note>
+
+```json
+{
+  "success": true,
+  "message": "Request success.",
+  "code": 1000,
+  "body": "< CAN BE NULL, A STRING OR JSON OBJECT OR JSON ARRAY>",
+  "trace_id": ""
+}
+```
+
+## Response schema for pagination
+
+All items will be accessible from the data. To navigate to any page juste append **?page=page-number** on the path
+> example : [https://shortext.ny-corp.io/api/agent/search?page=1](https://shortext.ny-corp.io/api/agent/search?page=1)
+
+```json
+{
+    "current_page": 1,
+    "data": [
+
+    ],
+    "first_page_url": "https://shortext.ny-corp.io/api/agent/search?page=1",
+    "from": 1,
+    "last_page": 1,
+    "last_page_url": "https://shortext.ny-corp.io/api/agent/search?page=1",
+    "next_page_url": null,
+    "path": "https://shortext.ny-corp.io/api/agent/search",
+    "per_page": 50,
+    "prev_page_url": null,
+    "to": 8,
+    "total": 8
+}
+```
+
+## Response Code
+
+| Code | Description                                                                                                         |
+|------|---------------------------------------------------------------------------------------------------------------------|
+| 1    | The token has expired / Le token a expiré.                                                                          |
+| 2    | The token is blacklisted / Le token est dans la liste noire.                                                        |
+| 3    | The token is invalid / Le token est invalide.                                                                       |
+| 4    | The token was not found / Le token n'a pas été trouvé.                                                              |
+| 5    | The user associated with the token was not found / L'utilisateur associé au token n'a pas été trouvé                |
+| 1000 | The request was successful / La requête a réussi.                                                                   |
+| 1001 | The request failed / La requête a échoué.                                                                           |
+| 1002 | Request validation error / Erreur de validation de la requête.                                                      |
+| 1003 | The request has expired / La requête a expiré.                                                                      |
+| 1004 | Trying to insert a duplicate entry / Tentative d'insertion d'un doublon.                                            |
+| 1005 | The request is not authorized / La requête n'est pas autorisée.                                                     |
+| 1006 | An exception occurred while processing the request / Une exception s'est produite lors du traitement de la requête. |
+| 1007 | The request was not found / La requête n'a pas été trouvée.                                                         |
+| 1008 | Incorrect JSON format in the request / Format JSON incorrect dans la requête.                                       |
+| 1009 | The service is not available / Le service n'est pas disponible.                                                     |
+| 1010 | Emergency request / Requête d'urgence.                                                                              |
+| 1100 | The account is not verified / Le compte n'est pas vérifié.                                                          |
+| 1101 | Incorrect username / Nom d'utilisateur incorrect.                                                                   |
+| 1102 | Incorrect password / Mot de passe incorrect.                                                                        |
+| 1103 | Incorrect credentials / Identifiants incorrects.                                                                    |
+| 1104 | The account is verified / Le compte est vérifié.                                                                    |
+| 1105 | The account does not exist / Le compte n'existe pas.                                                                |

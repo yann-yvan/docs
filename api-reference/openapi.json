@@ -23,7 +23,24 @@
         "operationId": "searchAgent",
         "responses": {
           "200": {
-            "description": "The data"
+            "description": "The data",
+            "content": {
+              "application/json": {
+                "schema": {},
+                "example": [
+                  {
+                    "id": 19,
+                    "webhook": null,
+                    "use_ai": true,
+                    "name": "Shortext",
+                    "token": null,
+                    "created_at": "2025-07-23T21:48:35.000000Z",
+                    "updated_at": "2025-07-23T21:48:35.000000Z",
+                    "hashid": "AGI-XXXXX"
+                  }
+                ]
+              }
+            }
           }
         },
         "security": [
@@ -142,7 +159,38 @@
         ],
         "responses": {
           "200": {
-            "description": "The data"
+            "description": "The data",
+            "content": {
+              "application/json": {
+                "schema": {},
+                "example": [
+                  {
+                    "id": 62,
+                    "app_id": 1,
+                    "contact_detail_id": 2728,
+                    "whatsapp_session_id": 6023,
+                    "ticket_status_id": 7,
+                    "position": 1,
+                    "subject": "Problème technique lors de la recherche d'offres en marketing et commerce",
+                    "description": "L'utilisateur Angèle recherche des opportunités en marketing et commerce, mais un problème technique (timeout lors de la recherche) empêche de fournir les résultats. Une assistance est nécessaire pour résoudre ce problème et fournir des offres pertinentes.",
+                    "ticket_sla_policy_id": 5,
+                    "responded_at": null,
+                    "response_due_at": "2025-05-19T08:00:21.000000Z",
+                    "resolved_at": null,
+                    "resolved_due_at": "2025-05-19T15:00:22.000000Z",
+                    "closed_at": null,
+                    "is_response_breached": true,
+                    "is_resolve_breached": true,
+                    "satisfaction_requested": false,
+                    "satisfaction_rating": null,
+                    "meta": null,
+                    "created_at": "2025-05-16T19:02:22.000000Z",
+                    "updated_at": "2025-09-10T15:16:42.000000Z",
+                    "hashid": "STT-XLWY6P"
+                  }
+                ]
+              }
+            }
           }
         },
         "security": [
