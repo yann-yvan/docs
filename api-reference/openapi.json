@@ -55,7 +55,7 @@
         "tags": [
           "Business - Manager"
         ],
-        "summary": "get business balane",
+        "summary": "get business balance",
         "operationId": "getBalance",
         "responses": {
           "200": {
@@ -152,6 +152,17 @@
             "in": "query",
             "required": false,
             "schema": {
+              "description": "Use code value from status",
+              "type": "string"
+            },
+            "example": "open"
+          },
+          {
+            "name": "priority",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "description": "Use priority value from SLA",
               "type": "string"
             },
             "example": "open"
@@ -187,6 +198,102 @@
                     "created_at": "2025-05-16T19:02:22.000000Z",
                     "updated_at": "2025-09-10T15:16:42.000000Z",
                     "hashid": "STT-XLWY6P"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/ticket/sla/search": {
+      "get": {
+        "tags": [
+          "Tickets"
+        ],
+        "summary": "Search ticket sla records",
+        "operationId": "searchTicketSla",
+        "parameters": [
+          {
+            "name": "agent",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "AGI-XLWY6P"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The data",
+            "content": {
+              "application/json": {
+                "schema": {},
+                "example": [
+                  {
+                    "id": 60,
+                    "app_id": 19,
+                    "label": "Medium",
+                    "priority": "medium",
+                    "response_time": 60,
+                    "resolve_time": 480,
+                    "created_at": "2025-04-25T17:19:30.000000Z",
+                    "updated_at": "2025-04-25T17:19:30.000000Z"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/ticket/status/search": {
+      "get": {
+        "tags": [
+          "Tickets"
+        ],
+        "summary": "Search ticket status records",
+        "operationId": "searchTicketStatus",
+        "parameters": [
+          {
+            "name": "agent",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "AGI-XLWY6P"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The data",
+            "content": {
+              "application/json": {
+                "schema": {},
+                "example": [
+                  {
+                    "id": 1,
+                    "app_id": null,
+                    "name": "Open",
+                    "code": "open",
+                    "position": 1,
+                    "is_active": true,
+                    "is_terminal": false,
+                    "is_resolved": false,
+                    "created_at": "2025-04-25T17:19:31.000000Z",
+                    "updated_at": "2025-04-25T17:19:31.000000Z"
                   }
                 ]
               }
