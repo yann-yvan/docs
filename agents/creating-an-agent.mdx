@@ -1,0 +1,134 @@
+---
+title: Creating and Configuring Your First Agent
+description: Learn how to create, personalize, and test your first AI-powered agent in Shortext.
+---
+
+
+In Shortext, an **Agent** is your AI-powered assistant — the entity that interacts with users, handles messages, and triggers automations or API calls.
+This guide will show you how to create, configure, and test your first Agent.
+
+---
+
+## 🧩 Step 1 — Access the Agents Section
+
+From your main dashboard, click **“Agents”** in the left navigation sidebar.
+
+<img src="/images/agents/agents-list.png" alt="Agents list screen"/>
+
+Here you can view all your existing agents or create new ones.
+
+---
+
+## ⚙️ Step 2 — Create a New Agent
+
+Click **“New Agent”** (or **“Create Agent”**) in the top right corner.
+
+<img src="/images/agents/new-agent-form.png" alt="Agent creation form"/>
+
+Fill in the required details:
+- **Agent Name** → e.g. “Support Assistant” or “Recruitment Bot”
+- **Description** → A short sentence describing what this agent does.
+- **Language** → The default language for conversations (English, French, etc.)
+- **Active Status** → Whether the agent is live or in test mode.
+
+<Note type="tip">
+    Choose a meaningful name — it will appear in analytics and user session tracking.
+</Note>
+
+---
+
+## 🧠 Step 3 — Define the Agent’s Personality
+
+Every agent can have its own **personality** and **tone of voice**.
+
+<img src="/images/agents/agent-personality.png" alt="Agent personality configuration"/>
+
+You can define:
+- **Tone** → friendly, professional, neutral, etc.
+- **Behavioral Instructions** → custom rules that guide how the agent responds.
+- **Context Memory** → whether the agent remembers past interactions.
+
+Example:
+
+```json
+{
+  "tone": "friendly",
+  "style": "concise and helpful",
+  "instructions": [
+    "Always greet the user warmly.",
+    "Keep messages short and easy to understand.",
+    "If the question is unclear, ask for clarification."
+  ]
+}
+```
+
+<Note type="info">You can update an agent’s personality anytime without losing its previous conversation data. </Note>
+
+---
+
+## 🔗 Step 4 — Configure Channels
+
+Each agent can be connected to one or more messaging channels.
+
+<img src="/images/agents/channel-setup.png" alt="Agent channel configuration"/>
+
+Supported channels include:
+
+* WhatsApp Business API
+* Telegram
+* Web Chat (optional)
+
+Select the channel(s) the agent should respond on, and provide any necessary credentials (like your WhatsApp phone number or API token).
+
+<Note type="warning"> If you’re using WhatsApp, make sure your number is already verified and linked to a WhatsApp
+    Business Account. </Note>
+
+---
+
+## 🧰 Step 5 — Connect APIs or Automations (Optional)
+
+Agents can perform external actions by calling APIs or triggering automations.
+This allows your bot to fetch data, send updates, or perform business logic dynamically.
+
+<img src="/images/agents/api-configuration.png" alt="Agent API configuration"/>
+
+Examples:
+* Fetch a user profile from your CRM
+* Send payment confirmation
+* Log a new support ticket
+
+Configuration details are covered in:
+👉 API Configuration & Testing →
+
+---
+
+## 🧪 Step 6 — Test Your Agent
+
+Once your agent is configured, you can test it directly within Shortext.
+
+<img src="/images/agents/test-chat.png" alt="Agent test chat interface"/>
+Testing Options:
+
+* **Internal Sandbox Chat** — Send messages to see how the agent responds.
+* **Live Channel Test** — If linked to WhatsApp, send a real message from your number.
+* **Debug Console** — Inspect the raw message exchange and AI reasoning (if available).
+
+<Note type="success"> Testing helps fine-tune your prompts, responses, and API actions before going live. </Note>
+
+---
+
+## 🚀 Step 7 — Activate Your Agent
+
+Once satisfied with your test results, toggle the “Active” switch.
+Your agent is now live and ready to handle conversations from your users.
+
+<img src="/images/agents/agent-active.png" alt="Agent activation toggle"/>
+🧭 What’s Next
+
+Now that your first agent is up and running, continue with:
+Customizing Personality and Responses →
+Connecting WhatsApp →
+Testing APIs with Your Agent →
+
+<Note type="info"> Agents are central to Shortext — once created, you can link them to automations, monitoring tools,
+    or even ticketing systems to extend their capabilities. </Note>

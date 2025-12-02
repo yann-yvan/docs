@@ -60,7 +60,26 @@
     }
   ],
   "navigation": [
-
+    {
+      "group": "Introduction",
+      "pages": [
+        "introduction/what-is-shortext"
+      ]
+    },
+    {
+      "group": "Getting Started",
+      "pages": [
+        "getting-started/creating-an-account",
+        "getting-started/platform-overview"
+      ]
+    },
+    {
+      "group": "Agents",
+      "pages": [
+        "agents/creating-an-agent",
+        "agents/tools-configuration"
+      ]
+    },
     {
       "group": "API Documentation",
       "pages": [
@@ -77,6 +96,7 @@
   "footerSocials": {
     "website": "https://shortext.ny-corp.io",
     "github": "https://github.com/yann-yvan/shortext-sdk-php",
-    "linkedin": "https://www.linkedin.com/showcase/shortext"
+    "linkedin": "https://www.linkedin.com/showcase/shortext",
+    "facebook": "https://facebook.com/shortext"
   }
 }
