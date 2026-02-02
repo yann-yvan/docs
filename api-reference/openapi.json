@@ -155,7 +155,20 @@
               "description": "Use code value from status",
               "type": "string"
             },
-            "example": "open"
+            "examples": {
+              "open": {
+                "summary": "Use to filter only result with this value",
+                "value": "open"
+              },
+              "!open": {
+                "summary": "Use <strong>!</strong> to exclude results with this value",
+                "value": "!open"
+              },
+              "!open,closed": {
+                "summary": "Use <strong>,</strong> to set multiple value each value can have or not the <strong>!</strong> exclude mark",
+                "value": "!open,closed"
+              }
+            }
           },
           {
             "name": "priority",
@@ -165,7 +178,20 @@
               "description": "Use priority value from SLA",
               "type": "string"
             },
-            "example": "open"
+            "examples": {
+              "medium": {
+                "summary": "Use to filter only result with this value",
+                "value": "medium"
+              },
+              "!medium": {
+                "summary": "Use <strong>!</strong> to exclude results with this value",
+                "value": "!medium"
+              },
+              "!medium,low": {
+                "summary": "Use <strong>,</strong> to set multiple value each value can have or not the <strong>!</strong> exclude mark",
+                "value": "!medium,low"
+              }
+            }
           }
         ],
         "responses": {
@@ -197,7 +223,17 @@
                     "meta": null,
                     "created_at": "2025-05-16T19:02:22.000000Z",
                     "updated_at": "2025-09-10T15:16:42.000000Z",
-                    "hashid": "STT-XLWY6P"
+                    "hashid": "STT-XLWY6P",
+                    "ticket_status": {
+                      "id": 7,
+                      "name": "Resolved",
+                      "code": "resolved"
+                    },
+                    "ticket_sla_policy": {
+                      "id": 5,
+                      "label": "Medium",
+                      "priority": "medium"
+                    }
                   }
                 ]
               }
