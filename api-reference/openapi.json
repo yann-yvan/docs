@@ -180,7 +180,7 @@
             },
             "examples": {
               "medium": {
-                "summary": "Use to filter only result with this value",
+                "description": "Use to filter only result with this value",
                 "value": "medium"
               },
               "!medium": {
