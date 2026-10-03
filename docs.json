@@ -1,0 +1,123 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "maple",
+  "name": "API documentation",
+  "colors": {
+    "primary": "#0D9373",
+    "light": "#07C983",
+    "dark": "#0D9373"
+  },
+  "favicon": "/favicon.svg",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "anchors": [
+          {
+            "anchor": "Documentation",
+            "icon": "book-open",
+            "groups": [
+              {
+                "group": "Introduction",
+                "pages": [
+                  "introduction/what-is-shortext"
+                ]
+              },
+              {
+                "group": "Getting Started",
+                "pages": [
+                  "getting-started/creating-an-account",
+                  "getting-started/platform-overview"
+                ]
+              },
+              {
+                "group": "Agents",
+                "pages": [
+                  "agents/creating-an-agent",
+                  "agents/tools-configuration"
+                ]
+              }
+            ]
+          },
+          {
+            "anchor": "API Reference",
+            "openapi": {
+              "source": "/api-reference/openapi.json",
+              "directory": "api-reference"
+            },
+            "icon": "square-terminal"
+          },
+          {
+            "anchor": "Community",
+            "href": "https://shortext.ny-corp.io/community",
+            "icon": "slack"
+          },
+          {
+            "anchor": "Blog",
+            "href": "https://shortext.ny-corp.io/blogs",
+            "icon": "newspaper"
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "anchors": [
+          {
+            "anchor": "API Reference",
+            "openapi": {
+              "source": "/api-reference/openapi.json",
+              "directory": "api-reference"
+            },
+            "icon": "square-terminal",
+            "groups": [
+              {
+                "group": "API Documentation",
+                "pages": [
+                  "api-reference/introduction"
+                ]
+              },
+              {
+                "group": "Messages",
+                "pages": [
+                  "api-reference/endpoint/message"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "background": {
+    "decoration": "windows"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Mail Us",
+        "href": "mailto:hello@ny-corp.io"
+      },
+      {
+        "label": "WhatsApp Us",
+        "href": "https://shortext.ny-corp.io/237657482849"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Dashboard",
+      "href": "https://shortext.ny-corp.io/dash"
+    }
+  },
+  "footer": {
+    "socials": {
+      "website": "https://shortext.ny-corp.io",
+      "github": "https://github.com/yann-yvan/shortext-sdk-php",
+      "linkedin": "https://www.linkedin.com/showcase/shortext",
+      "facebook": "https://facebook.com/shortext"
+    }
+  }
+}
