@@ -10,7 +10,7 @@
       "url": "https://shortext.ny-corp.io/api"
     },
     {
-      "url": "https://unduly-loving-moccasin.ngrok-free.app/api"
+      "url": "https://whatsapp-gateway.test/api"
     }
   ],
   "paths": {
@@ -356,17 +356,26 @@
               "schema": {
                 "properties": {
                   "content": {
+                    "description": "The content of the knowledge base you want to create for this contact",
+                    "required": [
+                      "content"
+                    ],
                     "type": "string",
                     "example": "This contact has a negative balance of 10000 USD"
                   },
                   "agent": {
+                    "description": "The agent allow to access that knowledge base",
+                    "required": [
+                      "agent"
+                    ],
                     "type": "string",
                     "example": "AGI-XLWY6P"
                   },
                   "contact": {
                     "required": [
                       "identifier",
-                      "profile"
+                      "profile",
+                      "channel"
                     ],
                     "properties": {
                       "identifier": {
