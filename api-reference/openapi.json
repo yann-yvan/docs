@@ -153,11 +153,6 @@
             "required": false,
             "schema": {
               "description": "Use code value from status to filter tickets by status",
-              "properties": {
-                "only": {
-                  "description": "Use to filter only result with this value"
-                }
-              },
               "type": "string"
             },
             "examples": {
@@ -348,6 +343,93 @@
         ]
       }
     },
+    "/contact/knowledge/add": {
+      "post": {
+        "tags": [
+          "Knowledge"
+        ],
+        "summary": "Manage contact knowledge",
+        "operationId": "manageContactKnowledge",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "content": {
+                    "type": "string",
+                    "example": "This contact has a negative balance of 10000 USD"
+                  },
+                  "agent": {
+                    "type": "string",
+                    "example": "AGI-XLWY6P"
+                  },
+                  "contact": {
+                    "required": [
+                      "identifier",
+                      "profile"
+                    ],
+                    "properties": {
+                      "identifier": {
+                        "description": "For channel whatsapp -> E.164 format without leading +",
+                        "type": "string",
+                        "example": "1234567890"
+                      },
+                      "channel": {
+                        "type": "string",
+                        "enum": [
+                          "whatsapp",
+                          "mail"
+                        ]
+                      },
+                      "profile": {
+                        "description": "Use code value from status to filter tickets by status",
+                        "required": [
+                          "lastname"
+                        ],
+                        "properties": {
+                          "lastname": {
+                            "type": "string"
+                          },
+                          "firstname": {
+                            "type": "string"
+                          },
+                          "email": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The data",
+            "content": {
+              "application/json": {
+                "schema": {},
+                "example": [
+                  {
+                    "created_at": "2026-10-03T00:04:48.000000Z"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/up": {
       "get": {
         "tags": [
@@ -377,16 +459,18 @@
           "channel": {
             "type": "string",
             "enum": [
-              "whatsapp"
+              "whatsapp",
+              "email",
+              "messenger"
             ]
           },
           "contact": {
             "required": [
-              "phone",
+              "identifier",
               "profile"
             ],
             "properties": {
-              "phone": {
+              "identifier": {
                 "description": "For channel whatsapp -> E.164 format without leading +",
                 "type": "string",
                 "example": "1234567890"
@@ -427,7 +511,7 @@
             "type": "object"
           },
           "from": {
-            "description": "the id of the sender business number",
+            "description": "the id of the sender",
             "type": "string",
             "example": "1234567890"
           },
@@ -746,9 +830,9 @@
                 ],
                 "example": "text"
               },
-              "text": {
+              "value": {
                 "type": "string",
-                "example": "Sélectionnez une option"
+                "example": "text or url to the media file"
               }
             },
             "type": [
@@ -763,7 +847,7 @@
                 "example": "Voici deux options"
               }
             },
-            "type": "object"
+            "type": "string"
           },
           "footer": {
             "properties": {
@@ -967,6 +1051,10 @@
     {
       "name": "Tickets",
       "description": "Tickets"
+    },
+    {
+      "name": "Knowledge",
+      "description": "Knowledge"
     },
     {
       "name": "health",
