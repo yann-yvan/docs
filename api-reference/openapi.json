@@ -104,7 +104,7 @@
         },
         "responses": {
           "200": {
-            "description": "ButtonReplyMessage sent successfully",
+            "description": "Message sent. The stored message is returned in body.",
             "content": {
               "application/json": {
                 "schema": {
@@ -439,6 +439,43 @@
         ]
       }
     },
+    "/messages/inbound": {
+      "post": {
+        "tags": [
+          "Messages"
+        ],
+        "summary": "Submit an inbound message",
+        "description": "Submit a message written by one of **your** users and let the Shortext agent answer it.\n\n**Reply modes**\n- `sync`: the request waits for the agent reply (max ~25 s) and returns it in `body.replies`.\n  On timeout `body.status` is `pending` and the reply is delivered to your webhook.\n- `async`: the request returns immediately with `accepted`; replies are delivered to your webhook.\n\n**Idempotency**: `message.id` is your own message id. Sending the same id again returns\n`duplicate` with the original message, without a second reply.\n\n**Webhook**: replies (async, sync timeout, human agent answers) are POSTed to the endpoint\nwebhook with the `ShortextWebhookEvent` body, signed with\n`X-Shortext-Signature: sha256=hex(hmac_sha256(secret, \"{X-Shortext-Timestamp}.{raw_body}\"))`.",
+        "operationId": "receiveInboundMessage",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InboundMessageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Message stored. See body.status for the reply outcome.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InboundMessageResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/up": {
       "get": {
         "tags": [
@@ -469,9 +506,9 @@
             "type": "string",
             "enum": [
               "whatsapp",
-              "email",
-              "messenger"
-            ]
+              "mail"
+            ],
+            "example": "whatsapp"
           },
           "contact": {
             "required": [
@@ -491,25 +528,31 @@
                 "properties": {
                   "lastname": {
                     "type": "string",
+                    "maxLength": 250,
                     "example": "Yoan"
                   },
                   "firstname": {
                     "type": "string",
+                    "maxLength": 250,
                     "example": "André"
                   },
                   "email": {
                     "type": "string",
+                    "format": "email",
                     "example": "celia@home.io"
                   },
                   "address": {
                     "type": "string",
+                    "maxLength": 250,
                     "example": "Place to be"
                   },
                   "preferred_language": {
                     "type": "string",
                     "enum": [
                       "en",
-                      "fr"
+                      "fr",
+                      "es",
+                      "de"
                     ],
                     "example": "en"
                   }
@@ -520,11 +563,15 @@
             "type": "object"
           },
           "from": {
-            "description": "the id of the sender",
+            "description": "Identifier of the sending channel (WhatsApp phone id, mailbox username)",
             "type": "string",
             "example": "1234567890"
           },
           "message": {
+            "required": [
+              "type",
+              "content"
+            ],
             "properties": {
               "type": {
                 "type": "string",
@@ -557,48 +604,6 @@
                     "$ref": "#/components/schemas/InteractiveButtonMessageContent"
                   }
                 ]
-              }
-            },
-            "type": "object"
-          }
-        },
-        "type": "object"
-      },
-      "SendMessageResponse": {
-        "properties": {
-          "success": {
-            "type": "boolean",
-            "example": "true"
-          },
-          "message_id": {
-            "type": "string",
-            "example": "abc123"
-          },
-          "recipient": {
-            "properties": {
-              "phone_number": {
-                "type": "string",
-                "example": "1234567890"
-              }
-            },
-            "type": "object"
-          },
-          "data": {
-            "properties": {
-              "sent_at": {
-                "type": "string",
-                "format": "date-time",
-                "example": "2024-10-05T10:01:00Z"
-              },
-              "delivered_at": {
-                "type": "string",
-                "format": "date-time",
-                "example": "2024-10-05T10:05:00Z"
-              },
-              "read_at": {
-                "type": "string",
-                "format": "date-time",
-                "example": "2024-10-05T10:07:00Z"
               }
             },
             "type": "object"
@@ -752,41 +757,323 @@
         "type": "object"
       },
       "ApiResponse": {
+        "description": "Standard lite-api envelope. Every endpoint answers with it; only `body` changes.",
+        "required": [
+          "success",
+          "code",
+          "message"
+        ],
         "properties": {
           "success": {
             "type": "boolean",
-            "example": false
+            "example": true
           },
           "code": {
-            "type": "integer",
-            "example": 1000
+            "$ref": "#/components/schemas/ResponseCode"
           },
           "message": {
             "type": "string",
             "example": "Request success"
           },
           "body": {
+            "description": "Endpoint-specific payload, null on most errors",
             "type": [
               "object",
               "null"
-            ],
-            "example": {
-              "key": "value"
-            }
+            ]
           },
           "token": {
-            "description": "present only on auth route",
+            "description": "Present only on authentication routes",
             "type": [
               "string",
               "null"
             ]
           },
           "trace_id": {
-            "description": "present only when success=false",
+            "description": "Present only when success=false. Give it to support.",
             "type": [
               "string",
               "null"
             ]
+          }
+        },
+        "type": "object"
+      },
+      "SendMessageResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponse"
+          },
+          {
+            "properties": {
+              "body": {
+                "description": "The stored outbound message",
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        ]
+      },
+      "MessageV2": {
+        "description": "A message as exposed by the API v2 and the webhooks. Same grammar as the requests.",
+        "properties": {
+          "id": {
+            "description": "Shortext message id",
+            "type": "string",
+            "example": "msg.Xk29aB"
+          },
+          "conversation_id": {
+            "type": "string",
+            "example": "cnv.7Hq2Lm"
+          },
+          "direction": {
+            "type": "string",
+            "enum": [
+              "inbound",
+              "outbound"
+            ]
+          },
+          "channel": {
+            "type": "string",
+            "example": "shortext"
+          },
+          "channel_id": {
+            "description": "Channel identifier (the `to` / `from` value)",
+            "type": "string",
+            "example": "ste_8k2m4q9x1v7c3n5b6z0p2r4t"
+          },
+          "contact": {
+            "properties": {
+              "identifier": {
+                "description": "Your own user id on the shortext channel",
+                "type": "string",
+                "example": "user-42"
+              },
+              "identifier_type": {
+                "type": "string",
+                "example": "external_id"
+              },
+              "profile": {
+                "properties": {
+                  "lastname": {
+                    "type": "string",
+                    "example": "Awa"
+                  },
+                  "firstname": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "preferred_language": {
+                    "type": "string",
+                    "example": "fr"
+                  }
+                },
+                "type": "object"
+              },
+              "country": {
+                "description": "Only when known",
+                "type": [
+                  "object",
+                  "null"
+                ]
+              }
+            },
+            "type": "object"
+          },
+          "message": {
+            "properties": {
+              "id": {
+                "description": "Your message.id for inbound messages, Shortext id otherwise",
+                "type": "string",
+                "example": "client-msg-001"
+              },
+              "type": {
+                "type": "string",
+                "example": "text"
+              },
+              "content": {
+                "description": "Same shape as message.content in requests",
+                "type": "object",
+                "example": {
+                  "text": "Oui, nous livrons à Douala."
+                }
+              }
+            },
+            "type": "object"
+          },
+          "status": {
+            "type": "string",
+            "example": "sent"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "type": "object"
+      },
+      "InboundMessageRequest": {
+        "required": [
+          "channel",
+          "to",
+          "contact",
+          "message"
+        ],
+        "properties": {
+          "channel": {
+            "description": "Only native channels accept inbound messages",
+            "type": "string",
+            "enum": [
+              "shortext"
+            ],
+            "example": "shortext"
+          },
+          "to": {
+            "description": "Endpoint ID shown in the Shortext dashboard",
+            "type": "string",
+            "example": "ste_8k2m4q9x1v7c3n5b6z0p2r4t"
+          },
+          "contact": {
+            "required": [
+              "identifier"
+            ],
+            "properties": {
+              "identifier": {
+                "description": "Your own user id. Unique per endpoint.",
+                "type": "string",
+                "maxLength": 150,
+                "example": "user-42"
+              },
+              "profile": {
+                "properties": {
+                  "lastname": {
+                    "type": "string",
+                    "maxLength": 250,
+                    "example": "Awa"
+                  },
+                  "firstname": {
+                    "type": "string",
+                    "maxLength": 250
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "preferred_language": {
+                    "type": "string",
+                    "enum": [
+                      "en",
+                      "fr",
+                      "es",
+                      "de"
+                    ]
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          },
+          "message": {
+            "required": [
+              "id",
+              "type",
+              "content"
+            ],
+            "properties": {
+              "id": {
+                "description": "Your own message id, used for idempotency",
+                "type": "string",
+                "maxLength": 100,
+                "example": "client-msg-001"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "text"
+                ],
+                "example": "text"
+              },
+              "content": {
+                "$ref": "#/components/schemas/TextMessageContent"
+              },
+              "metadata": {
+                "description": "Free context stored with the message (page, cart...)",
+                "type": "object",
+                "example": {
+                  "page": "/checkout"
+                }
+              }
+            },
+            "type": "object"
+          },
+          "reply_mode": {
+            "description": "Defaults to the endpoint setting",
+            "type": "string",
+            "enum": [
+              "sync",
+              "async"
+            ],
+            "example": "sync"
+          }
+        },
+        "type": "object"
+      },
+      "InboundMessageResult": {
+        "properties": {
+          "status": {
+            "description": "completed: replies included | pending: sync timeout, reply via webhook | accepted: async | no_auto_reply: stored without automatic reply (human handover, balance, no agent) | duplicate: message.id already received",
+            "type": "string",
+            "enum": [
+              "completed",
+              "pending",
+              "accepted",
+              "no_auto_reply",
+              "duplicate"
+            ]
+          },
+          "message": {
+            "$ref": "#/components/schemas/MessageV2"
+          },
+          "replies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MessageV2"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "InboundMessageResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponse"
+          },
+          {
+            "properties": {
+              "body": {
+                "$ref": "#/components/schemas/InboundMessageResult"
+              }
+            },
+            "type": "object"
+          }
+        ]
+      },
+      "ShortextWebhookEvent": {
+        "description": "Body POSTed to the endpoint webhook. Headers: X-Shortext-Event, X-Shortext-Timestamp, X-Shortext-Signature, X-Shortext-Delivery, X-Shortext-Version.",
+        "properties": {
+          "event": {
+            "type": "string",
+            "enum": [
+              "message.created",
+              "endpoint.ping"
+            ]
+          },
+          "data": {
+            "$ref": "#/components/schemas/MessageV2"
           }
         },
         "type": "object"
@@ -1039,7 +1326,7 @@
     "securitySchemes": {
       "bearerAuth": {
         "type": "http",
-        "description": "Basic Auth",
+        "description": "Company API token (Laravel Sanctum), sent as \"Authorization: Bearer <token>\"",
         "scheme": "bearer"
       }
     }
