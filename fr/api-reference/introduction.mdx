@@ -25,7 +25,7 @@ Envoyez `Accept: application/json` et, avec un corps, `Content-Type: application
 
 ## Enveloppe de réponse
 
-Toutes les réponses ont le statut HTTP **200**, que la requête ait réussi ou non (seule exception : une version d'API retirée, voir [Versionnement](/fr/api-reference/versioning)). Le résultat est dans le corps :
+Toutes les réponses ont le statut HTTP **200**, que la requête ait réussi ou non. Il y a deux exceptions : une requête au-delà de la [limite de débit](#limites-de-débit) (HTTP 429) et une version d'API retirée (HTTP 410, voir [Versionnement](/fr/api-reference/versioning)). Le résultat est toujours dans le corps :
 
 ```json Succès
 {
@@ -86,9 +86,31 @@ Suivez `next_page_url` jusqu'à ce qu'il vaille `null`.
 
 ## Limites de débit
 
-{/* TODO: documenter les limites de débit de l'API (requêtes par minute et par clé) et la réponse quand elles sont dépassées. */}
+| Appelant | Limite |
+| --- | --- |
+| Requêtes authentifiées | **300 requêtes par minute et par entreprise**, partagées par toutes ses clés API et par la v1.0 et la v2.0 |
+| Routes publiques (par exemple `GET /api/versions`) | 60 requêtes par minute et par adresse IP |
 
-Les limites de débit ne sont pas encore documentées. Gardez une intégration raisonnable : relancez les requêtes échouées avec un délai croissant et n'interrogez pas l'API en boucle quand un [webhook](/fr/api-reference/webhooks) vous donne l'information.
+Chaque réponse indique où vous en êtes :
+
+| En-tête | Signification |
+| --- | --- |
+| `X-RateLimit-Limit` | Le nombre de requêtes autorisées par minute. |
+| `X-RateLimit-Remaining` | Les requêtes restantes dans la minute en cours. |
+
+Au-delà de la limite, l'API répond avec le statut HTTP **429**, un en-tête `Retry-After` (en secondes) et l'enveloppe habituelle :
+
+```json
+{
+  "success": false,
+  "message": "Too many requests: retry in 42 seconds",
+  "code": 1001,
+  "body": null,
+  "trace_id": "..."
+}
+```
+
+Attendez `Retry-After` secondes avant d'envoyer d'autres requêtes. Étalez les traitements par lots dans le temps, et utilisez les [webhooks](/fr/api-reference/webhooks) plutôt que d'interroger l'API en boucle.
 
 ## Contenu de l'API
 
@@ -101,5 +123,9 @@ Les limites de débit ne sont pas encore documentées. Gardez une intégration r
 | Modèles | Lister les modèles WhatsApp que vous pouvez envoyer |
 | Webhooks | Gérer les endpoints, les tester, lire et relancer les livraisons |
 | Sessions hébergées | Laisser vos clients connecter leur numéro WhatsApp ou leur boîte mail sur une page Shortext |
+| Tickets | Ouvrir, modifier, commenter et répondre aux tickets ; gérer les statuts et les politiques de SLA de chaque agent |
+| Connaissances | Alimenter la base de connaissances d'un agent (Markdown ou PDF) et ce qu'il sait des contacts |
+| Liens dynamiques | Créer des liens courts qui ouvrent votre application, enregistrer les applications, lire les clics |
+| Facturation | Lire le solde et les mouvements du portefeuille de l'entreprise |
 
 La liste complète se trouve dans **Endpoints**, générée à partir de la spécification OpenAPI.

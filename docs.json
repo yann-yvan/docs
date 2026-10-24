@@ -122,6 +122,10 @@
                       "api-reference/guides/send-a-template",
                       "api-reference/guides/handover",
                       "api-reference/guides/connect-whatsapp",
+                      "api-reference/guides/manage-tickets",
+                      "api-reference/guides/agent-knowledge",
+                      "api-reference/guides/dynamic-links",
+                      "api-reference/guides/balance",
                       "api-reference/guides/migrate-to-v2"
                     ]
                   },
@@ -249,6 +253,10 @@
                       "fr/api-reference/guides/send-a-template",
                       "fr/api-reference/guides/handover",
                       "fr/api-reference/guides/connect-whatsapp",
+                      "fr/api-reference/guides/manage-tickets",
+                      "fr/api-reference/guides/agent-knowledge",
+                      "fr/api-reference/guides/dynamic-links",
+                      "fr/api-reference/guides/balance",
                       "fr/api-reference/guides/migrate-to-v2"
                     ]
                   },

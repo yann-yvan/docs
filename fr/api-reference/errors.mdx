@@ -3,7 +3,7 @@ title: Erreurs
 description: Les codes d'erreur de l'API Shortext et la conduite à tenir pour chacun.
 ---
 
-Les erreurs reviennent en HTTP 200 (sauf une version retirée, qui répond 410), avec `success: false`, un `code` et un `message`. Utilisez le `code` dans votre logique ; affichez ou journalisez le `message` ; transmettez le `trace_id` au support si vous avez besoin d'aide.
+Les erreurs reviennent en HTTP 200 (sauf la limite de débit, qui répond 429, et une version retirée, qui répond 410), avec `success: false`, un `code` et un `message`. Utilisez le `code` dans votre logique ; affichez ou journalisez le `message` ; transmettez le `trace_id` au support si vous avez besoin d'aide.
 
 ## Codes
 
@@ -15,7 +15,7 @@ Les erreurs reviennent en HTTP 200 (sauf une version retirée, qui répond 410),
 | `3` | Le jeton est invalide | Vérifiez l'en-tête `Authorization`. |
 | `4` | Jeton introuvable | Envoyez `Authorization: Bearer {clé}` avec une clé valide. |
 | `5` | Aucune entreprise pour ce jeton | Utilisez une clé API d'entreprise. |
-| `1001` | La requête a échoué | Lisez `message`, par exemple un canal qui a refusé le message. Réessayez plus tard si c'est temporaire. |
+| `1001` | La requête a échoué | Lisez `message`, par exemple un canal qui a refusé le message. Avec HTTP 429, vous avez dépassé la [limite de débit](/fr/api-reference/introduction#limites-de-débit) : attendez `Retry-After` secondes. |
 | `1002` | Erreur de validation | Corrigez la requête : `body` liste les erreurs par champ. |
 | `1003` | La requête a expiré | Recommencez l'opération. |
 | `1004` | Doublon | La ressource existe déjà. |
@@ -45,6 +45,7 @@ Certaines règles métier répondent aussi `1002` avec un message explicite, par
 
 ## Relancer une requête
 
+- En cas de HTTP 429, attendez le nombre de secondes indiqué par l'en-tête `Retry-After`, puis relancez.
 - Relancez `1006` et `1009` avec un délai exponentiel.
 - Ne relancez pas `1002`, `1005` ou `1007` sans modification : ils échoueront de nouveau.
 - Les requêtes `POST` qui créent quelque chose (un message, une conversation) ne sont pas idempotentes, sauf l'appel [entrant Shortext](/fr/api-reference/shortext-endpoint#idempotence), qui dédoublonne sur `message.id`.

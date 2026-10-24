@@ -1,0 +1,84 @@
+---
+title: Dynamic links
+description: Create short links that open your mobile app on the right screen, fall back to a web page elsewhere, and count their clicks.
+---
+
+A dynamic link is a short URL, such as `https://shortext.ny-corp.io/s/promo-oct`, that you share in messages, campaigns or emails. On a phone with your app installed, it opens the app on the screen you chose; without the app, it leads to the store; on a computer, it opens a web page. The endpoints need a key with **Manage dynamic links**.
+
+## 1. Register your apps
+
+`POST /deep-links/platforms` registers an app, once per platform:
+
+```json
+{
+  "agent_id": "AGI-XXXXX",
+  "platform": "android",
+  "app_name": "Acme Shop",
+  "app_identifier": "com.example.shop",
+  "android_sha256_fingerprint": "14:6D:E9:83:C5:73:06:50:D8:EE:B9:95:2F:34:FC:64:16:A0:83:42:E6:1D:BE:A8:8A:04:96:B2:3F:CF:44:E5"
+}
+```
+
+| Field | Description |
+| --- | --- |
+| `agent_id` | Required. The agent the app belongs to. |
+| `platform` | Required: `android` or `ios`. It cannot change. |
+| `app_name` | Required. |
+| `app_identifier` | Required: the Android package name or the iOS bundle id. |
+| `android_sha256_fingerprint` | Required for Android: the SHA-256 fingerprint of your signing certificate. |
+| `ios_team_id` | Required for iOS: your Apple team id. |
+
+## 2. Serve the verification file
+
+Phones only open links in your app if your domain proves the app is yours. `GET /deep-links/platforms/{id}/verification-file` returns the file to publish:
+
+```json
+{
+  "filename": "assetlinks.json",
+  "content": [ { "relation": ["delegate_permission/common.handle_all_urls"], "target": { "namespace": "android_app", "package_name": "com.example.shop", "sha256_cert_fingerprints": ["14:6D:..."] } } ]
+}
+```
+
+Serve `content` as JSON at `https://<your app domain>/.well-known/<filename>`: `assetlinks.json` for Android, `apple-app-site-association` for iOS.
+
+## 3. Create a link
+
+`POST /deep-links`
+
+```json
+{
+  "name": "October promotion",
+  "short_code": "promo-oct",
+  "deep_link": "acmeshop://promotions/october",
+  "fallback_url": "https://www.example.com/promotions/october",
+  "android_platform_id": "...",
+  "ios_platform_id": "...",
+  "expire_at": "2026-11-01T00:00:00+00:00"
+}
+```
+
+| Field | Description |
+| --- | --- |
+| `name` | Required, unique in your company. |
+| `short_code` | The path of the short URL. Generated when you do not give one. |
+| `deep_link` | Required. Opened in the app when it is installed. |
+| `fallback_url` | Required. Opened on a computer, or when no app matches. |
+| `android_platform_id`, `ios_platform_id` | The apps the link opens; at least one. |
+| `description`, `expire_at` | Optional. |
+
+The response gives the `link` to share, for example `https://shortext.ny-corp.io/s/promo-oct`.
+
+<Warning>Changing `short_code` changes the link: the previous URL stops working. Deleting a link deletes its click history.</Warning>
+
+## 4. Follow the clicks
+
+`GET /deep-links/{id}` gives the total number of `clicks`; `GET /deep-links/{id}/clicks` lists them, most recent first, with the device, the OS version, the browser, the referrer, the country and the time.
+
+## Other endpoints
+
+| Endpoint | Use |
+| --- | --- |
+| `GET /deep-links` | Your links, most recent first; search names with `name`. |
+| `PATCH /deep-links/{id}` | Update a link. |
+| `GET /deep-links/platforms` | Your apps, filterable by `agent_id` and `platform`. |
+| `DELETE /deep-links/platforms/{id}` | Remove an app; refused while links open it. |

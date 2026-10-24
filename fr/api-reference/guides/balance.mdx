@@ -1,0 +1,51 @@
+---
+title: Solde et mouvements du portefeuille
+description: Lisez le solde de votre entreprise et les mouvements de son portefeuille, pour suivre vos dépenses ou rapprocher votre comptabilité.
+---
+
+Shortext débite le portefeuille de votre entreprise pour les messages, l'usage de l'IA et les abonnements, et le crédite quand vous le rechargez. Les endpoints demandent une clé avec **Voir les rapports financiers**.
+
+## Solde
+
+`GET /balance`
+
+```json
+{
+  "balance": { "amount": 590.88, "currency": "EUR" },
+  "local_balance": { "amount": 387590, "currency": "XAF" },
+  "threshold": { "amount": 50, "currency": "EUR" },
+  "low": false
+}
+```
+
+| Champ | Description |
+| --- | --- |
+| `balance` | Le solde, dans la devise de facturation. |
+| `local_balance` | Le même montant converti dans la devise du pays de votre entreprise, à titre indicatif. `null` s'il n'est pas disponible. |
+| `threshold` | En dessous de ce montant, votre entreprise est invitée à recharger. |
+| `low` | `true` quand le solde est sous le seuil. |
+
+<Tip>Vérifiez `low` depuis une tâche quotidienne et alertez votre équipe financière avant que vos agents ne cessent de répondre faute de crédit.</Tip>
+
+## Mouvements du portefeuille
+
+`GET /balance/transactions` liste les mouvements réglés, les plus récents d'abord, 50 par page :
+
+```json
+{
+  "current_page": 1,
+  "data": [
+    { "id": "...", "amount": -0.10613, "currency": "EUR", "description": "WhatsApp conversation", "created_at": "2026-10-24T09:12:44+00:00" },
+    { "id": "...", "amount": 100, "currency": "EUR", "description": "Top-up", "created_at": "2026-10-23T16:02:10+00:00" }
+  ],
+  "per_page": 50,
+  "total": 2
+}
+```
+
+`amount` est négatif pour un débit et positif pour un crédit. Un débit n'apparaît qu'une fois réglé.
+
+| Filtre | Description |
+| --- | --- |
+| `type` | `debit` ou `credit`. |
+| `from`, `to` | Une période. |

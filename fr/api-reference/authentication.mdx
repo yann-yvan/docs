@@ -34,16 +34,19 @@ Une clé absente ou invalide obtient `success: false` avec le `code` `4`.
 
 ## Permissions
 
-Une clé ne fait que ce que ses permissions autorisent. Il y en a quatre :
+Une clé ne fait que ce que ses permissions autorisent. Il y en a sept :
 
 | Permission | Capacité | Donne accès à | Par défaut |
 | --- | --- | --- | --- |
 | Envoyer des messages | `permissions.send_messages` | Démarrer des conversations, répondre, prendre en main, rendre la main, assigner ; lister les modèles | Oui |
 | Voir les messages | `permissions.view_messages` | Lister et lire les conversations et leurs messages, lister les membres assignables | Oui |
-| Gérer les liens dynamiques | `permissions.manage_dynamic_links` | Liens profonds (v1.0) | Oui |
+| Gérer les liens dynamiques | `permissions.manage_dynamic_links` | Les liens dynamiques et les applications qu'ils ouvrent | Oui |
 | Gérer les intégrations | `permissions.manage_integrations` | Agents, canaux, endpoints Shortext, webhooks, sessions hébergées | Non |
+| Gérer les tickets | `permissions.manage_tickets` | Les tickets, leurs statuts et les politiques de SLA | Non |
+| Gérer les bases de connaissances | `permissions.manage_knowledge_base` | Les documents de connaissances des agents et ce qu'ils savent des contacts | Non |
+| Voir les rapports financiers | `permissions.view_financial_reports` | Le solde de l'entreprise et les mouvements de son portefeuille | Non |
 
-Donnez à chaque clé le minimum nécessaire : un service qui n'envoie que des notifications a besoin d'**Envoyer des messages**, un back-office qui configure des agents a besoin de **Gérer les intégrations**.
+Donnez à chaque clé le minimum nécessaire : un service qui n'envoie que des notifications a besoin d'**Envoyer des messages**, un back-office qui configure des agents a besoin de **Gérer les intégrations**, une intégration de helpdesk a besoin de **Gérer les tickets**. Les permissions non cochées par défaut doivent être ajoutées explicitement à la création ou à la modification de la clé.
 
 Une requête sans la permission requise obtient le `code` `1005` et un message qui nomme la permission manquante :
 

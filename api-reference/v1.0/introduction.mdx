@@ -29,9 +29,9 @@ The same envelope as v2.0: HTTP 200 with `success`, `code`, `message`, `body` an
 | --- | --- | --- |
 | `POST /messages/send` | Send a message to a contact | `POST /conversations`, `POST /conversations/{id}/messages` |
 | `GET /agent/search` | List agents | `GET /agents` |
-| `GET /business-manager/balance` | Company balance | None yet |
-| `GET /ticket/search`, `/ticket/sla/search`, `/ticket/status/search` | Tickets, SLAs and statuses | None yet |
-| `POST /contact/knowledge/add` | Add knowledge about a contact | None yet |
+| `GET /business-manager/balance` | Company balance | `GET /balance` |
+| `GET /ticket/search`, `/ticket/sla/search`, `/ticket/status/search` | Tickets, SLAs and statuses | `GET /tickets`, `/agents/{agent}/sla-policies`, `/agents/{agent}/ticket-statuses` |
+| `POST /contact/knowledge/add` | Add knowledge about a contact | `POST /agents/{agent}/contact-knowledge` |
 | `POST /v1.0/messages/inbound` | Shortext endpoint inbound messages | Still current, see [Shortext endpoint](/api-reference/shortext-endpoint) |
 
 The reference of each endpoint is in **Endpoints**.

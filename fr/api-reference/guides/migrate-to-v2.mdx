@@ -29,6 +29,8 @@ description: La v1.0 est historique et sera retirée. Ce qui change en v2.0 et c
 | Canaux | Non disponible | Lister, rattacher aux agents, endpoints Shortext |
 | Webhooks | Non disponible | Webhooks signés avec relances |
 | Sessions hébergées | Non disponible | Connecter le WhatsApp et les boîtes mail de vos clients |
+| Tickets | Recherche uniquement | Ouvrir, modifier, commenter, répondre ; statuts et politiques de SLA par agent |
+| Connaissances | Connaissances de contact uniquement (ajout) | Documents des agents (Markdown, PDF) et connaissances de contact : lister, lire, modifier, supprimer |
 
 ## Correspondance des endpoints
 
@@ -37,11 +39,15 @@ description: La v1.0 est historique et sera retirée. Ce qui change en v2.0 et c
 | `POST /messages/send` | `POST /conversations` (premier message) ou `POST /conversations/{id}/messages` (réponse) |
 | `GET /agent/search` | `GET /agents` |
 | `POST /v1.0/messages/inbound` (Shortext) | Inchangé : toujours `POST /api/v1.0/messages/inbound`, voir [Endpoint Shortext](/fr/api-reference/shortext-endpoint) |
-| `GET /business-manager/balance` | Pas encore d'équivalent v2.0 : continuez avec la v1.0 |
-| `GET /ticket/search`, `/ticket/sla/search`, `/ticket/status/search` | Pas encore d'équivalent v2.0 ; retrouvez la conversation d'un ticket avec `GET /conversations?ticket_id=` |
-| `POST /contact/knowledge/add` | Pas encore d'équivalent v2.0 : continuez avec la v1.0 |
+| `GET /business-manager/balance` | `GET /balance` (et `GET /balance/transactions`), voir [Solde](/fr/api-reference/guides/balance) |
+| `GET /ticket/search` | `GET /tickets`, voir [Gérer les tickets](/fr/api-reference/guides/manage-tickets) |
+| `GET /ticket/sla/search` | `GET /agents/{agent}/sla-policies` |
+| `GET /ticket/status/search` | `GET /agents/{agent}/ticket-statuses` |
+| `POST /contact/knowledge/add` | `POST /agents/{agent}/contact-knowledge`, voir [Connaissances de l'agent](/fr/api-reference/guides/agent-knowledge) |
+| `POST /deep-link/add` | `POST /deep-links`, voir [Liens dynamiques](/fr/api-reference/guides/dynamic-links) |
+| `GET /deep-link/platform/search` | `GET /deep-links/platforms` |
 
-{/* TODO: confirmer ce qui est prévu en v2.0 pour le solde, les tickets et les connaissances de contact avant la dépréciation de la v1.0. */}
+<Note>Les équivalents v2.0 demandent la permission correspondante sur la clé : **Gérer les tickets**, **Gérer les bases de connaissances**, **Voir les rapports financiers** ou **Gérer les liens dynamiques**. Voir [Authentification](/fr/api-reference/authentication).</Note>
 
 ## Exemple : envoyer un message
 
@@ -94,7 +100,7 @@ La réponse v2.0 vous donne la `conversation` (gardez son `id` pour répondre ou
 
 <Steps>
   <Step title="Vérifiez vos clés">
-    Appelez `GET /api/v2.0/me` avec chaque clé et vérifiez `body.token.abilities`. Ajoutez **Envoyer des messages**, **Voir les messages** ou **Gérer les intégrations** dans **Développeur > API Keys** si besoin.
+    Appelez `GET /api/v2.0/me` avec chaque clé et vérifiez `body.token.abilities`. Ajoutez les permissions dont vos appels ont besoin (**Envoyer des messages**, **Voir les messages**, **Gérer les intégrations**, **Gérer les tickets**...) dans **Développeur > API Keys**.
   </Step>
   <Step title="Changez l'URL de base">
     Faites pointer votre client vers `https://shortext.ny-corp.io/api/v2.0`.

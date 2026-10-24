@@ -1,0 +1,51 @@
+---
+title: Balance and wallet movements
+description: Read the balance of your company and the movements of its wallet, to monitor your spending or reconcile your accounting.
+---
+
+Shortext debits your company's wallet for messages, AI usage and subscriptions, and credits it when you top up. The endpoints need a key with **View financial reports**.
+
+## Balance
+
+`GET /balance`
+
+```json
+{
+  "balance": { "amount": 590.88, "currency": "EUR" },
+  "local_balance": { "amount": 387590, "currency": "XAF" },
+  "threshold": { "amount": 50, "currency": "EUR" },
+  "low": false
+}
+```
+
+| Field | Description |
+| --- | --- |
+| `balance` | The balance, in the billing currency. |
+| `local_balance` | The same amount converted to the currency of your company's country, for information. `null` when not available. |
+| `threshold` | Under this amount, your company is warned to top up. |
+| `low` | `true` when the balance is under the threshold. |
+
+<Tip>Check `low` from a daily job and alert your finance team before your agents stop answering for lack of credit.</Tip>
+
+## Wallet movements
+
+`GET /balance/transactions` lists the settled movements, most recent first, 50 per page:
+
+```json
+{
+  "current_page": 1,
+  "data": [
+    { "id": "...", "amount": -0.10613, "currency": "EUR", "description": "WhatsApp conversation", "created_at": "2026-10-24T09:12:44+00:00" },
+    { "id": "...", "amount": 100, "currency": "EUR", "description": "Top-up", "created_at": "2026-10-23T16:02:10+00:00" }
+  ],
+  "per_page": 50,
+  "total": 2
+}
+```
+
+`amount` is negative for a debit and positive for a credit. A debit only appears once it is settled.
+
+| Filter | Description |
+| --- | --- |
+| `type` | `debit` or `credit`. |
+| `from`, `to` | A date range. |

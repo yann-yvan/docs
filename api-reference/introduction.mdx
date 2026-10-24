@@ -25,7 +25,7 @@ Send `Accept: application/json` and, with a body, `Content-Type: application/jso
 
 ## Response envelope
 
-Every response has the HTTP status **200**, whether the request succeeded or not (the only exception is a removed API version, see [Versioning](/api-reference/versioning)). The outcome is in the body:
+Every response has the HTTP status **200**, whether the request succeeded or not. There are two exceptions: a request beyond the [rate limit](#rate-limits) (HTTP 429) and a removed API version (HTTP 410, see [Versioning](/api-reference/versioning)). The outcome is always in the body:
 
 ```json Success
 {
@@ -86,9 +86,31 @@ Follow `next_page_url` until it is `null`.
 
 ## Rate limits
 
-{/* TODO: document the rate limits of the API (requests per minute per key) and the response when they are exceeded. */}
+| Caller | Limit |
+| --- | --- |
+| Authenticated requests | **300 requests per minute per company**, shared by all its API keys and by v1.0 and v2.0 |
+| Public routes (for example `GET /api/versions`) | 60 requests per minute per IP address |
 
-Rate limits are not documented yet. Keep your integration reasonable: retry failed requests with a backoff and do not poll when a [webhook](/api-reference/webhooks) gives you the information.
+Every response tells you where you stand:
+
+| Header | Meaning |
+| --- | --- |
+| `X-RateLimit-Limit` | The number of requests allowed per minute. |
+| `X-RateLimit-Remaining` | The requests left in the current minute. |
+
+Beyond the limit, the API answers with the HTTP status **429**, a `Retry-After` header (in seconds) and the usual envelope:
+
+```json
+{
+  "success": false,
+  "message": "Too many requests: retry in 42 seconds",
+  "code": 1001,
+  "body": null,
+  "trace_id": "..."
+}
+```
+
+Wait for `Retry-After` seconds before sending more requests. Spread batch jobs over time, and use [webhooks](/api-reference/webhooks) instead of polling.
 
 ## What is in the API
 
@@ -101,5 +123,9 @@ Rate limits are not documented yet. Keep your integration reasonable: retry fail
 | Templates | List the WhatsApp templates you can send |
 | Webhooks | Manage endpoints, test them, read and retry deliveries |
 | Hosted sessions | Let your clients connect their WhatsApp number or mailbox on a Shortext page |
+| Tickets | Open, update, comment and answer tickets; manage the statuses and SLA policies of each agent |
+| Knowledge | Feed the knowledge base of an agent (Markdown or PDF) and what it knows about contacts |
+| Dynamic links | Create short links that open your app, register the apps, read the clicks |
+| Billing | Read the balance and the wallet movements of the company |
 
 The full list is in **Endpoints**, generated from the OpenAPI specification.

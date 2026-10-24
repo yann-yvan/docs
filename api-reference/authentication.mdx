@@ -34,16 +34,19 @@ A missing or invalid key gets `success: false` with `code` `4`.
 
 ## Permissions
 
-A key only does what its permissions allow. There are four:
+A key only does what its permissions allow. There are seven:
 
 | Permission | Ability | Gives access to | Default |
 | --- | --- | --- | --- |
 | Send messages | `permissions.send_messages` | Start conversations, reply, take over, hand back, assign; list templates | Yes |
 | View messages | `permissions.view_messages` | List and read conversations and their messages, list assignees | Yes |
-| Manage dynamic links | `permissions.manage_dynamic_links` | Deep links (v1.0) | Yes |
+| Manage dynamic links | `permissions.manage_dynamic_links` | Dynamic links and the apps they open | Yes |
 | Manage integrations | `permissions.manage_integrations` | Agents, channels, Shortext endpoints, webhooks, hosted sessions | No |
+| Manage tickets | `permissions.manage_tickets` | Tickets, their statuses and SLA policies | No |
+| Manage knowledge bases | `permissions.manage_knowledge_base` | The knowledge documents of the agents and what they know about contacts | No |
+| View financial reports | `permissions.view_financial_reports` | The balance of the company and the movements of its wallet | No |
 
-Give each key the smallest set it needs: a service that only sends notifications needs **Send messages**, a back-office that configures agents needs **Manage integrations**.
+Give each key the smallest set it needs: a service that only sends notifications needs **Send messages**, a back-office that configures agents needs **Manage integrations**, a helpdesk integration needs **Manage tickets**. The permissions that are not checked by default must be added explicitly when you create or edit the key.
 
 A request without the needed permission gets `code` `1005` and a message naming the missing permission:
 

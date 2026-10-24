@@ -3,7 +3,7 @@ title: Errors
 description: Error codes of the Shortext API and what to do with them.
 ---
 
-Errors come back with HTTP 200 (except a removed version, which answers 410), `success: false`, a `code` and a `message`. Use the `code` in your logic; show or log the `message`; send the `trace_id` to support when you need help.
+Errors come back with HTTP 200 (except the rate limit, which answers 429, and a removed version, which answers 410), `success: false`, a `code` and a `message`. Use the `code` in your logic; show or log the `message`; send the `trace_id` to support when you need help.
 
 ## Codes
 
@@ -15,7 +15,7 @@ Errors come back with HTTP 200 (except a removed version, which answers 410), `s
 | `3` | The token is invalid | Check the `Authorization` header. |
 | `4` | The token was not found | Send `Authorization: Bearer {key}` with a valid key. |
 | `5` | No company for this token | Use a company API key. |
-| `1001` | The request failed | Read `message`, for example a channel that refused the message. Retry later if it is temporary. |
+| `1001` | The request failed | Read `message`, for example a channel that refused the message. With HTTP 429, you exceeded the [rate limit](/api-reference/introduction#rate-limits): wait `Retry-After` seconds. |
 | `1002` | Validation error | Fix the request: `body` lists the errors per field. |
 | `1003` | The request has expired | Start the operation again. |
 | `1004` | Duplicate | The resource already exists. |
@@ -45,6 +45,7 @@ Some business rules also answer `1002` with an explicit message, for example a t
 
 ## Retrying
 
+- On HTTP 429, wait the number of seconds given by the `Retry-After` header, then retry.
 - Retry `1006` and `1009` with an exponential backoff.
 - Do not retry `1002`, `1005` or `1007` unchanged: they fail again.
 - `POST` requests that create something (a message, a conversation) are not idempotent, except the [Shortext inbound](/api-reference/shortext-endpoint#idempotency) call, which deduplicates on `message.id`.

@@ -1,0 +1,90 @@
+---
+title: Connaissances de l'agent
+description: Alimentez la base de connaissances d'un agent avec des documents Markdown ou PDF, et indiquez-lui ce qu'il doit savoir sur certains contacts.
+---
+
+Un agent répond à partir de ses instructions et de ses **connaissances** : des documents qu'il consulte avant de répondre, et des notes sur certains contacts. Vos systèmes peuvent tenir les deux à jour. Les endpoints demandent une clé avec **Gérer les bases de connaissances**, et portent sur un agent : `/agents/{agent}/...` avec l'identifiant de l'agent (`AGI-XXXXX`).
+
+## Documents
+
+### Ajouter un document
+
+`POST /agents/{agent}/knowledge`, soit en JSON avec un contenu Markdown :
+
+```bash
+curl -X POST https://shortext.ny-corp.io/api/v2.0/agents/AGI-XXXXX/knowledge \
+  -H "Authorization: Bearer $SHORTEXT_API_KEY" \
+  -H "Accept: application/json" -H "Content-Type: application/json" \
+  -d '{
+    "title": "Livraison et retours",
+    "content": "## Livraison\nLes commandes partent sous 48 heures...\n\n## Retours\nLes clients disposent de 14 jours..."
+  }'
+```
+
+soit en envoyant un PDF (10 Mo au maximum) en `multipart/form-data` ; son texte devient le contenu, et son titre est utilisé si vous n'en envoyez pas :
+
+```bash
+curl -X POST https://shortext.ny-corp.io/api/v2.0/agents/AGI-XXXXX/knowledge \
+  -H "Authorization: Bearer $SHORTEXT_API_KEY" \
+  -H "Accept: application/json" \
+  -F "title=Catalogue produits 2026" \
+  -F "file=@catalogue-2026.pdf"
+```
+
+L'agent utilise le document immédiatement. La réponse le décrit :
+
+```json
+{
+  "id": "KNB-XXXXX",
+  "title": "Catalogue produits 2026",
+  "excerpt": "Notre gamme 2026 comprend...",
+  "characters": 18240,
+  "source": "pdf",
+  "file_url": "https://...",
+  "created_at": "2026-10-24T09:12:44+00:00",
+  "updated_at": "2026-10-24T09:12:44+00:00"
+}
+```
+
+### Rester dans votre forfait
+
+Votre forfait fixe le nombre de caractères de documents que chaque agent peut contenir. `GET /agents/{agent}/knowledge/usage` indique où vous en êtes :
+
+```json
+{ "used": 18240, "limit": 100000, "remaining": 81760 }
+```
+
+Un document qui dépasserait la limite est refusé.
+
+### Lire, modifier, supprimer
+
+| Endpoint | Usage |
+| --- | --- |
+| `GET /agents/{agent}/knowledge` | Les documents, les plus récents d'abord, 50 par page, sans leur contenu complet. Recherchez dans les titres et les contenus avec `search`. |
+| `GET /agents/{agent}/knowledge/{id}` | Un document, avec son `content` complet. |
+| `PATCH /agents/{agent}/knowledge/{id}` | Modifier `title` ou `content` ; l'agent utilise le nouveau contenu immédiatement. |
+| `DELETE /agents/{agent}/knowledge/{id}` | L'agent cesse de l'utiliser immédiatement. |
+
+<Tip>Gardez des documents ciblés : un sujet par document, des titres clairs, des paragraphes courts. L'agent y trouve plus facilement le bon passage que dans un document énorme.</Tip>
+
+## Connaissances de contact
+
+Les connaissances de contact sont ce que l'agent doit savoir sur **un contact** : comment s'adresser à lui, son statut, une préférence. L'agent les utilise dès le prochain message de ce contact.
+
+`POST /agents/{agent}/contact-knowledge`
+
+```json
+{
+  "contact": "237699999999",
+  "content": "Préfère qu'on l'appelle Mme Ndongo ; cliente VIP depuis 2023."
+}
+```
+
+| Champ | Description |
+| --- | --- |
+| `contact` | Le numéro de téléphone, l'adresse e-mail ou, sur un endpoint Shortext, l'identifiant utilisateur fourni par votre serveur. Le contact doit avoir déjà écrit à votre entreprise. |
+| `content` | Jusqu'à 5 000 caractères. |
+
+`GET /agents/{agent}/contact-knowledge?contact=237699999999` liste ce que l'agent sait d'un contact ; `PATCH` et `DELETE /agents/{agent}/contact-knowledge/{id}` modifient ou suppriment une entrée.
+
+<Warning>Ne stockez que ce dont l'agent a besoin pour servir le contact, et respectez vos obligations en matière de vie privée : les connaissances de contact sont des données personnelles.</Warning>

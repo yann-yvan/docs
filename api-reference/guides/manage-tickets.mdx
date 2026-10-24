@@ -1,0 +1,137 @@
+---
+title: Manage tickets
+description: Open tickets on conversations, move them through their statuses, add notes, answer the contact, and set up statuses and SLA policies.
+---
+
+Tickets track a customer request until it is solved, as on the tickets board of the dashboard (see [Tickets](/inbox/tickets)). All the endpoints below need a key with **Manage tickets**.
+
+## How tickets are organized
+
+- A ticket is opened **on a conversation**: it follows the contact of that conversation, and it belongs to the **agent** of the conversation's channel.
+- Each agent has its own **statuses** (the columns of its board) and **SLA policies** (its priorities).
+- Tickets refer to a status by its `code` (for example `in_progress`) and to a priority by its `priority` code (for example `high`). Codes are slugs of the names: renaming a status or a policy changes its code. The default statuses are `open`, `pending`, `in_progress`, `resolved` and `closed`.
+
+## Open a ticket
+
+`POST /tickets`
+
+```bash
+curl -X POST https://shortext.ny-corp.io/api/v2.0/tickets \
+  -H "Authorization: Bearer $SHORTEXT_API_KEY" \
+  -H "Accept: application/json" -H "Content-Type: application/json" \
+  -d '{
+    "conversation_id": "c9Lw3nYb",
+    "subject": "Refund for order A-1042",
+    "description": "Parcel arrived damaged, customer asks for a refund.",
+    "priority": "high"
+  }'
+```
+
+| Field | Description |
+| --- | --- |
+| `conversation_id` | Required. The conversation the ticket is about; it cannot change afterwards. |
+| `subject` | Required. |
+| `description` | Optional. |
+| `status` | A status code of the agent. By default, its first open status. |
+| `priority` | An SLA policy code of the agent: it sets the due dates. `null` removes it. |
+
+The members of the agent are notified. The response is the ticket:
+
+```json
+{
+  "id": "STT-XXXXX",
+  "subject": "Refund for order A-1042",
+  "description": "Parcel arrived damaged, customer asks for a refund.",
+  "status": { "code": "open", "name": "Open", "position": 1, "active": true, "resolved": false, "terminal": false },
+  "priority": { "priority": "high", "label": "High", "response_time": 60, "resolve_time": 480 },
+  "agent": { "id": "AGI-XXXXX", "name": "Support" },
+  "conversation_id": "c9Lw3nYb",
+  "contact": { "identifier": "237699999999", "identifier_type": "phone", "profile": { "firstname": "Brice" } },
+  "response_due_at": "2026-10-24T10:12:44+00:00",
+  "resolve_due_at": "2026-10-24T17:12:44+00:00",
+  "responded_at": null,
+  "resolved_at": null,
+  "closed_at": null,
+  "response_breached": false,
+  "resolve_breached": false,
+  "satisfaction_rating": null,
+  "created_at": "2026-10-24T09:12:44+00:00",
+  "updated_at": "2026-10-24T09:12:44+00:00"
+}
+```
+
+## Find tickets
+
+`GET /tickets` lists tickets, most recent first, 50 per page. Filters:
+
+| Filter | Description |
+| --- | --- |
+| `state` | `open` (neither resolved nor closed), `resolved` or `closed`. |
+| `status` | Status codes, separated by commas. |
+| `priority` | Priority codes, separated by commas. |
+| `agent_id` | The tickets of one agent. |
+| `conversation_id` | The tickets of one conversation. |
+| `breached` | Only tickets past one of their SLA due dates. |
+| `updated_since` | Tickets updated at or after this date. |
+
+## Move, resolve, close and reopen
+
+`PATCH /tickets/{id}` changes the `subject`, `description`, `priority` or `status`. The status decides the state of the ticket:
+
+| New status | Effect |
+| --- | --- |
+| An open status | The ticket moves on the board (and is reopened if it was resolved or closed). |
+| A **resolved** status | The ticket is resolved (`resolved_at`). |
+| A **terminal** status | The ticket is closed (`closed_at`). |
+
+```bash
+curl -X PATCH https://shortext.ny-corp.io/api/v2.0/tickets/STT-XXXXX \
+  -H "Authorization: Bearer $SHORTEXT_API_KEY" \
+  -H "Accept: application/json" -H "Content-Type: application/json" \
+  -d '{ "status": "resolved" }'
+```
+
+Tickets are kept for the history: there is no deletion.
+
+## Notes and answers
+
+| Endpoint | What it does |
+| --- | --- |
+| `POST /tickets/{id}/comments` | Adds an **internal note** (`text`, up to 5,000 characters). The contact does not see it. |
+| `POST /tickets/{id}/responses` | **Answers the contact** (`text`) on the conversation of the ticket, with the ticket reference. Outside the WhatsApp 24-hour window, it is sent as a notification template. The first answer sets `responded_at`. |
+| `GET /tickets/{id}/activities` | The history, oldest first: creation, status changes, notes, answers, SLA breaches. |
+
+Each activity has a `type` (`ticket_created`, `status_changed`, `ticket_resolved`, `ticket_closed`, `ticket_reopened`, `comment`, `response`, `response_time_breached`, `resolve_time_breached`), the `text` of a note or an answer, its `author` and, for status changes, `from_status` and `status`.
+
+## Statuses of an agent
+
+`/agents/{agent}/ticket-statuses`, in board order.
+
+| Field | Description |
+| --- | --- |
+| `name` | Required on creation; its slug is the `code`. |
+| `position` | Order on the board. |
+| `active` | `true` by default. An inactive status can no longer be used. |
+| `resolved` | Tickets moved here are resolved. |
+| `terminal` | Tickets moved here are closed. |
+
+A status that tickets still use cannot be deleted: move the tickets first, or set `active` to `false`.
+
+## SLA policies of an agent
+
+`/agents/{agent}/sla-policies`, shortest response time first. A policy is a priority:
+
+| Field | Description |
+| --- | --- |
+| `label` | Required on creation, for example `High`; its slug is the `priority` code. |
+| `response_time` | Required on creation. Working minutes to give a first answer. |
+| `resolve_time` | Required on creation. Working minutes to resolve. |
+
+Times count **working minutes, Monday to Friday from 8:00 to 18:00**. New times apply to the tickets that get the priority afterwards. A policy cannot be deleted while open tickets have it.
+
+```bash
+curl -X POST https://shortext.ny-corp.io/api/v2.0/agents/AGI-XXXXX/sla-policies \
+  -H "Authorization: Bearer $SHORTEXT_API_KEY" \
+  -H "Accept: application/json" -H "Content-Type: application/json" \
+  -d '{ "label": "High", "response_time": 60, "resolve_time": 480 }'
+```

@@ -2,7 +2,7 @@
     "openapi": "3.1.0",
     "info": {
         "title": "Shortext API",
-        "description": "**Versioning**: every version is a frozen contract. A released version only receives additive changes\n(new endpoints, new optional fields, new response fields); anything breaking ships in a new version.\nResponses carry `X-Shortext-Api-Version`. When a version is scheduled for removal, responses also carry\n`Deprecation` and `Sunset` headers; after the sunset date the version answers HTTP 410.\nThe list of versions and their status is available at `GET /api/versions`.\n\n**Responses**: always HTTP 200. Check `success` and `code` (`1000` = success), see `ApiEnvelope`.\nOn failure, `trace_id` identifies the request for support.",
+        "description": "**Versioning**: every version is a frozen contract. A released version only receives additive changes\n(new endpoints, new optional fields, new response fields); anything breaking ships in a new version.\nResponses carry `X-Shortext-Api-Version`. When a version is scheduled for removal, responses also carry\n`Deprecation` and `Sunset` headers; after the sunset date the version answers HTTP 410.\nThe list of versions and their status is available at `GET /api/versions`.\n\n**Responses**: always HTTP 200. Check `success` and `code` (`1000` = success), see `ApiEnvelope`.\nOn failure, `trace_id` identifies the request for support.\n\n**Rate limit**: 300 requests per minute per company, shared by all its keys and by every API version.\nResponses carry `X-RateLimit-Limit` and `X-RateLimit-Remaining`; beyond the limit the API answers\nHTTP 429 with `Retry-After` (seconds) and the usual envelope. Prefer webhooks to polling.",
         "version": "2.0"
     },
     "servers": [
@@ -332,6 +332,846 @@
                 ]
             }
         },
+        "/agents/{agent}/knowledge": {
+            "get": {
+                "tags": [
+                    "Knowledge"
+                ],
+                "summary": "List knowledge documents",
+                "description": "Most recent first, 50 per page, without the full content. Search the titles and contents with `search`.",
+                "operationId": "listKnowledgeDocuments",
+                "parameters": [
+                    {
+                        "name": "agent",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "AGI-XXXXX"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "allOf": [
+                                                        {
+                                                            "$ref": "#/components/schemas/ApiPage"
+                                                        },
+                                                        {
+                                                            "properties": {
+                                                                "data": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "$ref": "#/components/schemas/KnowledgeDocument"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Knowledge"
+                ],
+                "summary": "Add a knowledge document",
+                "description": "Send `title` and `content` (Markdown) as JSON, or upload a PDF as multipart/form-data. Refused beyond the characters of the plan (GET /agents/{agent}/knowledge/usage). The AI uses the document at once.",
+                "operationId": "createKnowledgeDocument",
+                "parameters": [
+                    {
+                        "name": "agent",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/KnowledgeDocumentInput"
+                            }
+                        },
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/KnowledgeDocumentInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/KnowledgeDocument"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/agents/{agent}/knowledge/{id}": {
+            "get": {
+                "tags": [
+                    "Knowledge"
+                ],
+                "summary": "Get a knowledge document",
+                "operationId": "getKnowledgeDocument",
+                "parameters": [
+                    {
+                        "name": "agent",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "KNB-XXXXX"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/KnowledgeDocument"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Knowledge"
+                ],
+                "summary": "Delete a knowledge document",
+                "description": "The AI stops using it at once.",
+                "operationId": "deleteKnowledgeDocument",
+                "parameters": [
+                    {
+                        "name": "agent",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The deleted KnowledgeDocument",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/KnowledgeDocument"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Knowledge"
+                ],
+                "summary": "Update a knowledge document",
+                "description": "Partial update (PUT is accepted too); the AI uses the new content at once.",
+                "operationId": "updateKnowledgeDocument",
+                "parameters": [
+                    {
+                        "name": "agent",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/KnowledgeDocumentInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/KnowledgeDocument"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/agents/{agent}/knowledge/usage": {
+            "get": {
+                "tags": [
+                    "Knowledge"
+                ],
+                "summary": "Knowledge base usage",
+                "operationId": "getKnowledgeUsage",
+                "parameters": [
+                    {
+                        "name": "agent",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/KnowledgeUsage"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/deep-links/platforms": {
+            "get": {
+                "tags": [
+                    "Dynamic links"
+                ],
+                "summary": "List apps",
+                "description": "Filter with `agent_id` and `platform`.",
+                "operationId": "listAppPlatforms",
+                "parameters": [
+                    {
+                        "name": "agent_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "platform",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "android",
+                                "ios"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "allOf": [
+                                                        {
+                                                            "$ref": "#/components/schemas/ApiPage"
+                                                        },
+                                                        {
+                                                            "properties": {
+                                                                "data": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "$ref": "#/components/schemas/AppPlatform"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Dynamic links"
+                ],
+                "summary": "Add an app",
+                "operationId": "createAppPlatform",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AppPlatformInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/AppPlatform"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/deep-links/platforms/{id}": {
+            "get": {
+                "tags": [
+                    "Dynamic links"
+                ],
+                "summary": "Get an app",
+                "operationId": "getAppPlatform",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/AppPlatform"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Dynamic links"
+                ],
+                "summary": "Delete an app",
+                "description": "Refused while dynamic links open this app.",
+                "operationId": "deleteAppPlatform",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The deleted AppPlatform",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/AppPlatform"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Dynamic links"
+                ],
+                "summary": "Update an app",
+                "description": "Partial update (PUT is accepted too); the platform cannot change.",
+                "operationId": "updateAppPlatform",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AppPlatformInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/AppPlatform"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/deep-links/platforms/{id}/verification-file": {
+            "get": {
+                "tags": [
+                    "Dynamic links"
+                ],
+                "summary": "Domain verification file",
+                "description": "Serve `content` as JSON at `https://<your app domain>/.well-known/<filename>` so the phone opens the links in the app.",
+                "operationId": "getAppPlatformVerificationFile",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "allOf": [
+                                                        {
+                                                            "properties": {
+                                                                "filename": {
+                                                                    "type": "string",
+                                                                    "enum": [
+                                                                        "assetlinks.json",
+                                                                        "apple-app-site-association"
+                                                                    ]
+                                                                },
+                                                                "content": {
+                                                                    "type": "object"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/balance": {
+            "get": {
+                "tags": [
+                    "Billing"
+                ],
+                "summary": "Company balance",
+                "operationId": "getBalance",
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Balance"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/balance/transactions": {
+            "get": {
+                "tags": [
+                    "Billing"
+                ],
+                "summary": "Wallet movements",
+                "description": "Settled movements, most recent first, 50 per page. A debit appears once it is settled.",
+                "operationId": "listBalanceTransactions",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "`debit` or `credit`",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "debit",
+                                "credit"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        }
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "allOf": [
+                                                        {
+                                                            "$ref": "#/components/schemas/ApiPage"
+                                                        },
+                                                        {
+                                                            "properties": {
+                                                                "data": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "$ref": "#/components/schemas/BalanceTransaction"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/channels": {
             "get": {
                 "tags": [
@@ -583,6 +1423,346 @@
                                             "properties": {
                                                 "body": {
                                                     "$ref": "#/components/schemas/Channel"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/agents/{agent}/contact-knowledge": {
+            "get": {
+                "tags": [
+                    "Knowledge"
+                ],
+                "summary": "List contact knowledge",
+                "description": "Most recent first, 50 per page.",
+                "operationId": "listContactKnowledge",
+                "parameters": [
+                    {
+                        "name": "agent",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "AGI-XXXXX"
+                        }
+                    },
+                    {
+                        "name": "contact",
+                        "in": "query",
+                        "description": "Only about this contact: phone number, email address or, on a Shortext endpoint, the id your server gave",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "allOf": [
+                                                        {
+                                                            "$ref": "#/components/schemas/ApiPage"
+                                                        },
+                                                        {
+                                                            "properties": {
+                                                                "data": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "$ref": "#/components/schemas/ContactKnowledge"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Knowledge"
+                ],
+                "summary": "Add contact knowledge",
+                "description": "The contact must have written to the company. The AI uses it from the next message of this contact.",
+                "operationId": "createContactKnowledge",
+                "parameters": [
+                    {
+                        "name": "agent",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "contact",
+                                    "content"
+                                ],
+                                "properties": {
+                                    "contact": {
+                                        "description": "Phone number, email address or, on a Shortext endpoint, the id your server gave",
+                                        "type": "string"
+                                    },
+                                    "content": {
+                                        "type": "string",
+                                        "maxLength": 5000,
+                                        "example": "Prefers to be called Mrs. Ndongo; VIP customer since 2023."
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/ContactKnowledge"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/agents/{agent}/contact-knowledge/{id}": {
+            "get": {
+                "tags": [
+                    "Knowledge"
+                ],
+                "summary": "Get a contact knowledge entry",
+                "operationId": "getContactKnowledge",
+                "parameters": [
+                    {
+                        "name": "agent",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "MEM-XXXXX"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/ContactKnowledge"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Knowledge"
+                ],
+                "summary": "Delete contact knowledge",
+                "description": "The AI stops using it at once.",
+                "operationId": "deleteContactKnowledge",
+                "parameters": [
+                    {
+                        "name": "agent",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The deleted ContactKnowledge",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/ContactKnowledge"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Knowledge"
+                ],
+                "summary": "Update contact knowledge",
+                "description": "PUT is accepted too.",
+                "operationId": "updateContactKnowledge",
+                "parameters": [
+                    {
+                        "name": "agent",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "content"
+                                ],
+                                "properties": {
+                                    "content": {
+                                        "type": "string",
+                                        "maxLength": 5000
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/ContactKnowledge"
                                                 }
                                             },
                                             "type": "object"
@@ -1186,6 +2366,350 @@
                 ]
             }
         },
+        "/deep-links": {
+            "get": {
+                "tags": [
+                    "Dynamic links"
+                ],
+                "summary": "List dynamic links",
+                "description": "Most recent first, 50 per page. Search the names with `name`.",
+                "operationId": "listDeepLinks",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "allOf": [
+                                                        {
+                                                            "$ref": "#/components/schemas/ApiPage"
+                                                        },
+                                                        {
+                                                            "properties": {
+                                                                "data": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "$ref": "#/components/schemas/DeepLink"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Dynamic links"
+                ],
+                "summary": "Create a dynamic link",
+                "description": "Share `link`: it opens the app (or its store) on the phone, and fallback_url elsewhere. Serve the verification file of each app on its domain (GET /deep-links/platforms/{id}/verification-file).",
+                "operationId": "createDeepLink",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeepLinkInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/DeepLink"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/deep-links/{id}": {
+            "get": {
+                "tags": [
+                    "Dynamic links"
+                ],
+                "summary": "Get a dynamic link",
+                "operationId": "getDeepLink",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "DLK-XXXXX"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/DeepLink"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Dynamic links"
+                ],
+                "summary": "Delete a dynamic link",
+                "description": "The link stops working, with its click history.",
+                "operationId": "deleteDeepLink",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The deleted DeepLink",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/DeepLink"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Dynamic links"
+                ],
+                "summary": "Update a dynamic link",
+                "description": "Partial update (PUT is accepted too). Changing short_code changes the link: the previous one stops working.",
+                "operationId": "updateDeepLink",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeepLinkInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/DeepLink"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/deep-links/{id}/clicks": {
+            "get": {
+                "tags": [
+                    "Dynamic links"
+                ],
+                "summary": "Clicks of a dynamic link",
+                "description": "Most recent first, 50 per page.",
+                "operationId": "listDeepLinkClicks",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "allOf": [
+                                                        {
+                                                            "$ref": "#/components/schemas/ApiPage"
+                                                        },
+                                                        {
+                                                            "properties": {
+                                                                "data": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "$ref": "#/components/schemas/DeepLinkClick"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/me": {
             "get": {
                 "tags": [
@@ -1456,6 +2980,305 @@
                 ]
             }
         },
+        "/agents/{agent}/sla-policies": {
+            "get": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "List SLA policies",
+                "description": "Shortest response time first. Tickets refer to a policy by its `priority` code.",
+                "operationId": "listSlaPolicies",
+                "parameters": [
+                    {
+                        "name": "agent",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "AGI-XXXXX"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "allOf": [
+                                                        {
+                                                            "$ref": "#/components/schemas/ApiPage"
+                                                        },
+                                                        {
+                                                            "properties": {
+                                                                "data": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "$ref": "#/components/schemas/SlaPolicy"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Create an SLA policy",
+                "description": "Times are working minutes, Monday to Friday from 8:00 to 18:00.",
+                "operationId": "createSlaPolicy",
+                "parameters": [
+                    {
+                        "name": "agent",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SlaPolicyInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/SlaPolicy"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/agents/{agent}/sla-policies/{priority}": {
+            "get": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Get an SLA policy",
+                "operationId": "getSlaPolicy",
+                "parameters": [
+                    {
+                        "name": "agent",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "priority",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "high"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/SlaPolicy"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Delete an SLA policy",
+                "description": "Refused while open tickets have this priority; resolved and closed tickets lose it.",
+                "operationId": "deleteSlaPolicy",
+                "parameters": [
+                    {
+                        "name": "agent",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "priority",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The deleted SlaPolicy",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/SlaPolicy"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Update an SLA policy",
+                "description": "Partial update (PUT is accepted too). New times apply to the tickets that get this priority afterwards; renaming changes the priority code.",
+                "operationId": "updateSlaPolicy",
+                "parameters": [
+                    {
+                        "name": "agent",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "priority",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SlaPolicyInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/SlaPolicy"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/templates": {
             "get": {
                 "tags": [
@@ -1589,6 +3412,775 @@
                                             "properties": {
                                                 "body": {
                                                     "$ref": "#/components/schemas/Template"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/tickets": {
+            "get": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "List tickets",
+                "description": "Most recent first, 50 per page.",
+                "operationId": "listTickets",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "state",
+                        "in": "query",
+                        "description": "`open` (neither resolved nor closed), `resolved` or `closed`",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "open",
+                                "resolved",
+                                "closed"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Status code, several separated by commas",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "priority",
+                        "in": "query",
+                        "description": "Priority code, several separated by commas",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "agent_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "conversation_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "breached",
+                        "in": "query",
+                        "description": "Only tickets past one of their SLA due dates",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "updated_since",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "allOf": [
+                                                        {
+                                                            "$ref": "#/components/schemas/ApiPage"
+                                                        },
+                                                        {
+                                                            "properties": {
+                                                                "data": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "$ref": "#/components/schemas/Ticket"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Open a ticket",
+                "description": "Opens a ticket on a conversation: the agent of its channel owns it. Its members are notified.",
+                "operationId": "createTicket",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TicketInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Ticket"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/tickets/{id}": {
+            "get": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Get a ticket",
+                "operationId": "getTicket",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "STT-XXXXX"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Ticket"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Update a ticket",
+                "description": "Partial update (PUT is accepted too). Change `status` to move, resolve, close or reopen the ticket. `conversation_id` cannot change.",
+                "operationId": "updateTicket",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TicketInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Ticket"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/tickets/{id}/activities": {
+            "get": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Ticket activity",
+                "description": "Oldest first: status changes, internal notes, answers to the contact, SLA breaches.",
+                "operationId": "listTicketActivities",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/TicketActivity"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/tickets/{id}/comments": {
+            "post": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Add a note",
+                "description": "Internal note: the contact does not see it.",
+                "operationId": "commentTicket",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "text"
+                                ],
+                                "properties": {
+                                    "text": {
+                                        "type": "string",
+                                        "maxLength": 5000
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/TicketActivity"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/tickets/{id}/responses": {
+            "post": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Answer the contact",
+                "description": "Sent to the contact on the conversation of the ticket, with the ticket reference (a notification template outside the WhatsApp 24h window). The first answer sets responded_at.",
+                "operationId": "respondTicket",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "text"
+                                ],
+                                "properties": {
+                                    "text": {
+                                        "type": "string",
+                                        "maxLength": 5000
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/TicketActivity"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/agents/{agent}/ticket-statuses": {
+            "get": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "List ticket statuses",
+                "description": "In board order.",
+                "operationId": "listTicketStatuses",
+                "parameters": [
+                    {
+                        "name": "agent",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "AGI-XXXXX"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "allOf": [
+                                                        {
+                                                            "$ref": "#/components/schemas/ApiPage"
+                                                        },
+                                                        {
+                                                            "properties": {
+                                                                "data": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "$ref": "#/components/schemas/TicketStatus"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Create a ticket status",
+                "operationId": "createTicketStatus",
+                "parameters": [
+                    {
+                        "name": "agent",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TicketStatusInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/TicketStatus"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/agents/{agent}/ticket-statuses/{code}": {
+            "get": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Get a ticket status",
+                "operationId": "getTicketStatus",
+                "parameters": [
+                    {
+                        "name": "agent",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "code",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "in_progress"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/TicketStatus"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Delete a ticket status",
+                "description": "Refused while tickets have this status: move them first, or set `active` to false.",
+                "operationId": "deleteTicketStatus",
+                "parameters": [
+                    {
+                        "name": "agent",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "code",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The deleted TicketStatus",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/TicketStatus"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Update a ticket status",
+                "description": "Partial update (PUT is accepted too). Renaming changes the code.",
+                "operationId": "updateTicketStatus",
+                "parameters": [
+                    {
+                        "name": "agent",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "code",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TicketStatusInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/TicketStatus"
                                                 }
                                             },
                                             "type": "object"
@@ -2430,6 +5022,83 @@
     },
     "components": {
         "schemas": {
+            "Balance": {
+                "properties": {
+                    "balance": {
+                        "description": "In the billing currency",
+                        "properties": {
+                            "amount": {
+                                "description": "Balance of the actor company and the movements of its wallet (read only: top-ups happen in the dashboard)",
+                                "type": "number",
+                                "example": 590.88
+                            },
+                            "currency": {
+                                "type": "string",
+                                "example": "EUR"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "local_balance": {
+                        "description": "Converted to the currency of the company country, for information",
+                        "properties": {
+                            "amount": {
+                                "type": "number",
+                                "example": 387590
+                            },
+                            "currency": {
+                                "type": "string",
+                                "example": "XAF"
+                            }
+                        },
+                        "type": [
+                            "object",
+                            "null"
+                        ]
+                    },
+                    "threshold": {
+                        "description": "Under this amount the company is warned to top up",
+                        "properties": {
+                            "amount": {
+                                "type": "number"
+                            },
+                            "currency": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "low": {
+                        "description": "The balance is under the threshold",
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "BalanceTransaction": {
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "amount": {
+                        "description": "Negative for a debit (messages, AI, subscriptions), positive for a top-up",
+                        "type": "number",
+                        "example": -0.10613
+                    },
+                    "currency": {
+                        "type": "string",
+                        "example": "EUR"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
             "StartConversationInput": {
                 "required": [
                     "channel",
@@ -2889,6 +5558,376 @@
                 },
                 "type": "object"
             },
+            "DeepLink": {
+                "properties": {
+                    "id": {
+                        "description": "Public representation of dynamic links, the apps they open and their clicks (API v2.0)",
+                        "type": "string",
+                        "example": "DLK-XXXXX"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "short_code": {
+                        "type": "string",
+                        "example": "promo-oct"
+                    },
+                    "link": {
+                        "description": "The short URL to share",
+                        "type": "string",
+                        "example": "https://shortext.ny-corp.io/s/promo-oct"
+                    },
+                    "deep_link": {
+                        "description": "Opened in the app when it is installed",
+                        "type": "string"
+                    },
+                    "fallback_url": {
+                        "description": "Opened on a computer, or when no app matches",
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "expire_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "android_platform": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/AppPlatform"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "ios_platform": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/AppPlatform"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "clicks": {
+                        "type": "integer"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "DeepLinkInput": {
+                "properties": {
+                    "name": {
+                        "description": "Required on creation, unique in the company",
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "short_code": {
+                        "description": "Path of the short URL; generated when absent",
+                        "type": "string",
+                        "maxLength": 50,
+                        "pattern": "^[A-Za-z0-9_-]+$"
+                    },
+                    "deep_link": {
+                        "description": "Required on creation",
+                        "type": "string",
+                        "format": "uri"
+                    },
+                    "fallback_url": {
+                        "description": "Required on creation",
+                        "type": "string",
+                        "format": "uri"
+                    },
+                    "description": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 300
+                    },
+                    "expire_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "android_platform_id": {
+                        "description": "An Android app (GET /deep-links/platforms); at least one platform",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "ios_platform_id": {
+                        "description": "An iOS app; at least one platform",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "type": "object"
+            },
+            "AppPlatform": {
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "agent_id": {
+                        "type": "string"
+                    },
+                    "platform": {
+                        "type": "string",
+                        "enum": [
+                            "android",
+                            "ios"
+                        ]
+                    },
+                    "app_name": {
+                        "type": "string"
+                    },
+                    "app_identifier": {
+                        "description": "Android package name or iOS bundle id",
+                        "type": "string",
+                        "example": "com.example.shop"
+                    },
+                    "ios_team_id": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "android_sha256_fingerprint": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "store_url": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "type": "object"
+            },
+            "AppPlatformInput": {
+                "properties": {
+                    "agent_id": {
+                        "description": "Required on creation",
+                        "type": "string"
+                    },
+                    "platform": {
+                        "description": "Required on creation, cannot change",
+                        "type": "string",
+                        "enum": [
+                            "android",
+                            "ios"
+                        ]
+                    },
+                    "app_name": {
+                        "description": "Required on creation",
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "app_identifier": {
+                        "description": "Required on creation",
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "ios_team_id": {
+                        "description": "Required for iOS",
+                        "type": "string",
+                        "maxLength": 50
+                    },
+                    "android_sha256_fingerprint": {
+                        "description": "Required for Android",
+                        "type": "string",
+                        "maxLength": 255
+                    }
+                },
+                "type": "object"
+            },
+            "DeepLinkClick": {
+                "properties": {
+                    "device": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "os_version": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "browser": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "referrer": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "country": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "clicked_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "KnowledgeDocument": {
+                "properties": {
+                    "id": {
+                        "description": "Public representation of the knowledge of an agent (API v2.0): its documents and what it knows about contacts",
+                        "type": "string",
+                        "example": "KNB-XXXXX"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "excerpt": {
+                        "description": "First 200 characters",
+                        "type": "string"
+                    },
+                    "content": {
+                        "description": "Markdown; only when one document is read (GET /agents/{agent}/knowledge/{id})",
+                        "type": "string"
+                    },
+                    "characters": {
+                        "description": "Counted in the limit of the plan",
+                        "type": "integer"
+                    },
+                    "source": {
+                        "description": "`pdf` when the text comes from an uploaded PDF",
+                        "type": "string",
+                        "enum": [
+                            "text",
+                            "pdf"
+                        ]
+                    },
+                    "file_url": {
+                        "description": "The uploaded PDF",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "KnowledgeDocumentInput": {
+                "description": "JSON, or multipart/form-data to upload a PDF",
+                "properties": {
+                    "title": {
+                        "description": "Required unless a PDF gives one",
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "content": {
+                        "description": "Markdown; required unless a PDF is sent",
+                        "type": "string"
+                    },
+                    "file": {
+                        "description": "PDF (10 MB max): its text becomes the content when none is sent",
+                        "type": "string",
+                        "format": "binary"
+                    }
+                },
+                "type": "object"
+            },
+            "KnowledgeUsage": {
+                "properties": {
+                    "used": {
+                        "description": "Characters of all the documents of the agent",
+                        "type": "integer"
+                    },
+                    "limit": {
+                        "description": "Set by the plan",
+                        "type": "integer"
+                    },
+                    "remaining": {
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "ContactKnowledge": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "example": "MEM-XXXXX"
+                    },
+                    "contact": {
+                        "properties": {
+                            "identifier": {
+                                "type": "string"
+                            },
+                            "identifier_type": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "content": {
+                        "type": "string",
+                        "example": "Prefers to be called Mrs. Ndongo; VIP customer since 2023."
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
             "Message": {
                 "properties": {
                     "id": {
@@ -3123,6 +6162,312 @@
                         }
                     },
                     "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "Ticket": {
+                "properties": {
+                    "id": {
+                        "description": "Public representation of tickets, their statuses, priorities and activity (API v2.0)",
+                        "type": "string",
+                        "example": "STT-XXXXX"
+                    },
+                    "subject": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/TicketStatus"
+                    },
+                    "priority": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/SlaPolicy"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "agent": {
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "conversation_id": {
+                        "description": "Conversation of the contact the ticket is about",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "contact": {
+                        "description": "Same block as in a Conversation",
+                        "type": [
+                            "object",
+                            "null"
+                        ]
+                    },
+                    "response_due_at": {
+                        "description": "Set by the priority (SLA)",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "resolve_due_at": {
+                        "description": "Set by the priority (SLA)",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "responded_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "resolved_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "closed_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "response_breached": {
+                        "description": "Answered after response_due_at",
+                        "type": "boolean"
+                    },
+                    "resolve_breached": {
+                        "description": "Resolved after resolve_due_at",
+                        "type": "boolean"
+                    },
+                    "satisfaction_rating": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "TicketInput": {
+                "properties": {
+                    "conversation_id": {
+                        "description": "Required on creation: the ticket follows the contact of this conversation and the agent of its channel",
+                        "type": "string"
+                    },
+                    "subject": {
+                        "description": "Required on creation",
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "description": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 10000
+                    },
+                    "status": {
+                        "description": "Status code of the agent; on creation, its first open status by default. A resolved or terminal status resolves or closes the ticket, an open one reopens it.",
+                        "type": "string",
+                        "example": "in_progress"
+                    },
+                    "priority": {
+                        "description": "SLA policy code of the agent: sets the due dates; null removes it",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "high"
+                    }
+                },
+                "type": "object"
+            },
+            "TicketStatus": {
+                "properties": {
+                    "code": {
+                        "description": "Slug of the name: what tickets refer to",
+                        "type": "string",
+                        "example": "in_progress"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "In progress"
+                    },
+                    "position": {
+                        "description": "Order on the tickets board",
+                        "type": "integer"
+                    },
+                    "active": {
+                        "type": "boolean"
+                    },
+                    "resolved": {
+                        "description": "Tickets moved here are resolved",
+                        "type": "boolean"
+                    },
+                    "terminal": {
+                        "description": "Tickets moved here are closed",
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "TicketStatusInput": {
+                "properties": {
+                    "name": {
+                        "description": "Required on creation; renaming changes the code",
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "position": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "default": true
+                    },
+                    "resolved": {
+                        "type": "boolean",
+                        "default": false
+                    },
+                    "terminal": {
+                        "type": "boolean",
+                        "default": false
+                    }
+                },
+                "type": "object"
+            },
+            "SlaPolicy": {
+                "properties": {
+                    "priority": {
+                        "description": "Slug of the label: what tickets refer to",
+                        "type": "string",
+                        "example": "high"
+                    },
+                    "label": {
+                        "type": "string",
+                        "example": "High"
+                    },
+                    "response_time": {
+                        "description": "Working minutes to answer (Monday to Friday, 8:00 to 18:00)",
+                        "type": "integer",
+                        "example": 60
+                    },
+                    "resolve_time": {
+                        "description": "Working minutes to resolve",
+                        "type": "integer",
+                        "example": 480
+                    }
+                },
+                "type": "object"
+            },
+            "SlaPolicyInput": {
+                "properties": {
+                    "label": {
+                        "description": "Required on creation; renaming changes the priority code",
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "response_time": {
+                        "description": "Required on creation, working minutes",
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    "resolve_time": {
+                        "description": "Required on creation, working minutes",
+                        "type": "integer",
+                        "minimum": 1
+                    }
+                },
+                "type": "object"
+            },
+            "TicketActivity": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "example": "TLA-XXXXX"
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "ticket_created",
+                            "status_changed",
+                            "ticket_resolved",
+                            "ticket_closed",
+                            "ticket_reopened",
+                            "comment",
+                            "response",
+                            "response_time_breached",
+                            "resolve_time_breached"
+                        ]
+                    },
+                    "text": {
+                        "description": "The note or the answer",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "sent_to_contact": {
+                        "description": "An answer the contact received",
+                        "type": "boolean"
+                    },
+                    "author": {
+                        "description": "Member, AI agent or \"<company> (API)\"",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "from_status": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "status": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "created_at": {
                         "type": "string",
                         "format": "date-time"
                     }
@@ -3580,6 +6925,18 @@
             "description": "Agents"
         },
         {
+            "name": "Knowledge",
+            "description": "Knowledge"
+        },
+        {
+            "name": "Dynamic links",
+            "description": "Dynamic links"
+        },
+        {
+            "name": "Billing",
+            "description": "Billing"
+        },
+        {
             "name": "Channels",
             "description": "Channels"
         },
@@ -3590,6 +6947,10 @@
         {
             "name": "Account",
             "description": "Account"
+        },
+        {
+            "name": "Tickets",
+            "description": "Tickets"
         },
         {
             "name": "Templates",

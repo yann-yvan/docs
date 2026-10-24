@@ -1,0 +1,84 @@
+---
+title: Liens dynamiques
+description: Créez des liens courts qui ouvrent votre application mobile au bon écran, renvoient vers une page web ailleurs, et comptent leurs clics.
+---
+
+Un lien dynamique est une URL courte, comme `https://shortext.ny-corp.io/s/promo-oct`, que vous partagez dans des messages, des campagnes ou des e-mails. Sur un téléphone où votre application est installée, il l'ouvre sur l'écran choisi ; sans l'application, il mène au store ; sur un ordinateur, il ouvre une page web. Les endpoints demandent une clé avec **Gérer les liens dynamiques**.
+
+## 1. Enregistrer vos applications
+
+`POST /deep-links/platforms` enregistre une application, une fois par plateforme :
+
+```json
+{
+  "agent_id": "AGI-XXXXX",
+  "platform": "android",
+  "app_name": "Acme Shop",
+  "app_identifier": "com.example.shop",
+  "android_sha256_fingerprint": "14:6D:E9:83:C5:73:06:50:D8:EE:B9:95:2F:34:FC:64:16:A0:83:42:E6:1D:BE:A8:8A:04:96:B2:3F:CF:44:E5"
+}
+```
+
+| Champ | Description |
+| --- | --- |
+| `agent_id` | Obligatoire. L'agent auquel l'application est rattachée. |
+| `platform` | Obligatoire : `android` ou `ios`. Ne peut pas changer. |
+| `app_name` | Obligatoire. |
+| `app_identifier` | Obligatoire : le nom de package Android ou le bundle id iOS. |
+| `android_sha256_fingerprint` | Obligatoire pour Android : l'empreinte SHA-256 de votre certificat de signature. |
+| `ios_team_id` | Obligatoire pour iOS : votre identifiant d'équipe Apple. |
+
+## 2. Servir le fichier de vérification
+
+Les téléphones n'ouvrent les liens dans votre application que si votre domaine prouve que l'application vous appartient. `GET /deep-links/platforms/{id}/verification-file` renvoie le fichier à publier :
+
+```json
+{
+  "filename": "assetlinks.json",
+  "content": [ { "relation": ["delegate_permission/common.handle_all_urls"], "target": { "namespace": "android_app", "package_name": "com.example.shop", "sha256_cert_fingerprints": ["14:6D:..."] } } ]
+}
+```
+
+Servez `content` en JSON à l'adresse `https://<domaine de votre application>/.well-known/<filename>` : `assetlinks.json` pour Android, `apple-app-site-association` pour iOS.
+
+## 3. Créer un lien
+
+`POST /deep-links`
+
+```json
+{
+  "name": "Promotion d'octobre",
+  "short_code": "promo-oct",
+  "deep_link": "acmeshop://promotions/october",
+  "fallback_url": "https://www.example.com/promotions/october",
+  "android_platform_id": "...",
+  "ios_platform_id": "...",
+  "expire_at": "2026-11-01T00:00:00+00:00"
+}
+```
+
+| Champ | Description |
+| --- | --- |
+| `name` | Obligatoire, unique dans votre entreprise. |
+| `short_code` | Le chemin de l'URL courte. Généré si vous n'en donnez pas. |
+| `deep_link` | Obligatoire. Ouvert dans l'application quand elle est installée. |
+| `fallback_url` | Obligatoire. Ouvert sur un ordinateur, ou quand aucune application ne correspond. |
+| `android_platform_id`, `ios_platform_id` | Les applications ouvertes par le lien ; au moins une. |
+| `description`, `expire_at` | Facultatifs. |
+
+La réponse donne le `link` à partager, par exemple `https://shortext.ny-corp.io/s/promo-oct`.
+
+<Warning>Changer `short_code` change le lien : l'ancienne URL cesse de fonctionner. Supprimer un lien supprime l'historique de ses clics.</Warning>
+
+## 4. Suivre les clics
+
+`GET /deep-links/{id}` donne le nombre total de `clicks` ; `GET /deep-links/{id}/clicks` les liste, les plus récents d'abord, avec l'appareil, la version du système, le navigateur, le référent, le pays et l'heure.
+
+## Autres endpoints
+
+| Endpoint | Usage |
+| --- | --- |
+| `GET /deep-links` | Vos liens, les plus récents d'abord ; recherche par nom avec `name`. |
+| `PATCH /deep-links/{id}` | Modifier un lien. |
+| `GET /deep-links/platforms` | Vos applications, filtrables par `agent_id` et `platform`. |
+| `DELETE /deep-links/platforms/{id}` | Retirer une application ; refusé tant que des liens l'ouvrent. |

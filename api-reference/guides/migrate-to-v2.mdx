@@ -29,6 +29,8 @@ description: v1.0 is legacy and will be removed. What changes in v2.0 and how to
 | Channels | Not available | List, attach to agents, Shortext endpoints |
 | Webhooks | Not available | Signed webhooks with retries |
 | Hosted sessions | Not available | Connect your clients' WhatsApp and mailboxes |
+| Tickets | Search only | Open, update, comment, answer; statuses and SLA policies per agent |
+| Knowledge | Contact knowledge only (add) | Agent documents (Markdown, PDF) and contact knowledge: list, read, update, delete |
 
 ## Endpoint mapping
 
@@ -37,11 +39,15 @@ description: v1.0 is legacy and will be removed. What changes in v2.0 and how to
 | `POST /messages/send` | `POST /conversations` (first message) or `POST /conversations/{id}/messages` (reply) |
 | `GET /agent/search` | `GET /agents` |
 | `POST /v1.0/messages/inbound` (Shortext) | Unchanged: still `POST /api/v1.0/messages/inbound`, see [Shortext endpoint](/api-reference/shortext-endpoint) |
-| `GET /business-manager/balance` | No v2.0 equivalent yet: keep using v1.0 |
-| `GET /ticket/search`, `/ticket/sla/search`, `/ticket/status/search` | No v2.0 equivalent yet; find the conversation of a ticket with `GET /conversations?ticket_id=` |
-| `POST /contact/knowledge/add` | No v2.0 equivalent yet: keep using v1.0 |
+| `GET /business-manager/balance` | `GET /balance` (and `GET /balance/transactions`), see [Balance](/api-reference/guides/balance) |
+| `GET /ticket/search` | `GET /tickets`, see [Manage tickets](/api-reference/guides/manage-tickets) |
+| `GET /ticket/sla/search` | `GET /agents/{agent}/sla-policies` |
+| `GET /ticket/status/search` | `GET /agents/{agent}/ticket-statuses` |
+| `POST /contact/knowledge/add` | `POST /agents/{agent}/contact-knowledge`, see [Agent knowledge](/api-reference/guides/agent-knowledge) |
+| `POST /deep-link/add` | `POST /deep-links`, see [Dynamic links](/api-reference/guides/dynamic-links) |
+| `GET /deep-link/platform/search` | `GET /deep-links/platforms` |
 
-{/* TODO: confirm the v2.0 plans for balance, tickets and contact knowledge before v1.0 is deprecated. */}
+<Note>The v2.0 equivalents need the matching key permission: **Manage tickets**, **Manage knowledge bases**, **View financial reports** or **Manage dynamic links**. See [Authentication](/api-reference/authentication).</Note>
 
 ## Example: sending a message
 
@@ -94,7 +100,7 @@ The v2.0 response gives you the `conversation` (keep its `id` to reply or take o
 
 <Steps>
   <Step title="Check your keys">
-    Call `GET /api/v2.0/me` with each key and check `body.token.abilities`. Add **Send messages**, **View messages** or **Manage integrations** in **Developer > API Keys** where needed.
+    Call `GET /api/v2.0/me` with each key and check `body.token.abilities`. Add the permissions your calls need (**Send messages**, **View messages**, **Manage integrations**, **Manage tickets**...) in **Developer > API Keys**.
   </Step>
   <Step title="Switch the base URL">
     Point your client to `https://shortext.ny-corp.io/api/v2.0`.

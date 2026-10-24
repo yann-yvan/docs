@@ -2,7 +2,7 @@
     "openapi": "3.1.0",
     "info": {
         "title": "Shortext API",
-        "description": "Shortext API v1.0 (legacy). New integrations should use v2.0. Every response is HTTP 200: check `success` and `code`.",
+        "description": "Shortext API v1.0 (legacy). New integrations should use v2.0. Every response is HTTP 200: check `success` and `code`, except beyond the rate limit (300 requests per minute per company, shared with v2.0): HTTP 429 with `Retry-After`.",
         "version": "1.0"
     },
     "servers": [

@@ -1,0 +1,137 @@
+---
+title: Gérer les tickets
+description: Ouvrez des tickets sur des conversations, faites-les avancer dans leurs statuts, ajoutez des notes, répondez au contact, et configurez statuts et politiques de SLA.
+---
+
+Les tickets suivent une demande client jusqu'à sa résolution, comme le tableau des tickets du tableau de bord (voir [Tickets](/fr/inbox/tickets)). Tous les endpoints ci-dessous demandent une clé avec **Gérer les tickets**.
+
+## Organisation des tickets
+
+- Un ticket est ouvert **sur une conversation** : il suit le contact de cette conversation et appartient à l'**agent** du canal de la conversation.
+- Chaque agent a ses propres **statuts** (les colonnes de son tableau) et ses **politiques de SLA** (ses priorités).
+- Les tickets désignent un statut par son `code` (par exemple `in_progress`) et une priorité par son code `priority` (par exemple `high`). Les codes sont des slugs des noms : renommer un statut ou une politique change son code. Les statuts par défaut sont `open`, `pending`, `in_progress`, `resolved` et `closed`.
+
+## Ouvrir un ticket
+
+`POST /tickets`
+
+```bash
+curl -X POST https://shortext.ny-corp.io/api/v2.0/tickets \
+  -H "Authorization: Bearer $SHORTEXT_API_KEY" \
+  -H "Accept: application/json" -H "Content-Type: application/json" \
+  -d '{
+    "conversation_id": "c9Lw3nYb",
+    "subject": "Remboursement de la commande A-1042",
+    "description": "Colis arrivé endommagé, le client demande un remboursement.",
+    "priority": "high"
+  }'
+```
+
+| Champ | Description |
+| --- | --- |
+| `conversation_id` | Obligatoire. La conversation concernée ; elle ne peut plus changer ensuite. |
+| `subject` | Obligatoire. |
+| `description` | Facultatif. |
+| `status` | Un code de statut de l'agent. Par défaut, son premier statut ouvert. |
+| `priority` | Un code de politique de SLA de l'agent : il fixe les échéances. `null` la retire. |
+
+Les membres de l'agent sont notifiés. La réponse est le ticket :
+
+```json
+{
+  "id": "STT-XXXXX",
+  "subject": "Remboursement de la commande A-1042",
+  "description": "Colis arrivé endommagé, le client demande un remboursement.",
+  "status": { "code": "open", "name": "Open", "position": 1, "active": true, "resolved": false, "terminal": false },
+  "priority": { "priority": "high", "label": "High", "response_time": 60, "resolve_time": 480 },
+  "agent": { "id": "AGI-XXXXX", "name": "Support" },
+  "conversation_id": "c9Lw3nYb",
+  "contact": { "identifier": "237699999999", "identifier_type": "phone", "profile": { "firstname": "Brice" } },
+  "response_due_at": "2026-10-24T10:12:44+00:00",
+  "resolve_due_at": "2026-10-24T17:12:44+00:00",
+  "responded_at": null,
+  "resolved_at": null,
+  "closed_at": null,
+  "response_breached": false,
+  "resolve_breached": false,
+  "satisfaction_rating": null,
+  "created_at": "2026-10-24T09:12:44+00:00",
+  "updated_at": "2026-10-24T09:12:44+00:00"
+}
+```
+
+## Retrouver des tickets
+
+`GET /tickets` liste les tickets, les plus récents d'abord, 50 par page. Filtres :
+
+| Filtre | Description |
+| --- | --- |
+| `state` | `open` (ni résolu ni fermé), `resolved` ou `closed`. |
+| `status` | Codes de statut, séparés par des virgules. |
+| `priority` | Codes de priorité, séparés par des virgules. |
+| `agent_id` | Les tickets d'un agent. |
+| `conversation_id` | Les tickets d'une conversation. |
+| `breached` | Uniquement les tickets ayant dépassé l'une de leurs échéances de SLA. |
+| `updated_since` | Les tickets modifiés à partir de cette date. |
+
+## Déplacer, résoudre, fermer et rouvrir
+
+`PATCH /tickets/{id}` modifie `subject`, `description`, `priority` ou `status`. Le statut détermine l'état du ticket :
+
+| Nouveau statut | Effet |
+| --- | --- |
+| Un statut ouvert | Le ticket change de colonne (et il est rouvert s'il était résolu ou fermé). |
+| Un statut **résolu** (`resolved`) | Le ticket est résolu (`resolved_at`). |
+| Un statut **terminal** | Le ticket est fermé (`closed_at`). |
+
+```bash
+curl -X PATCH https://shortext.ny-corp.io/api/v2.0/tickets/STT-XXXXX \
+  -H "Authorization: Bearer $SHORTEXT_API_KEY" \
+  -H "Accept: application/json" -H "Content-Type: application/json" \
+  -d '{ "status": "resolved" }'
+```
+
+Les tickets sont conservés pour l'historique : il n'y a pas de suppression.
+
+## Notes et réponses
+
+| Endpoint | Effet |
+| --- | --- |
+| `POST /tickets/{id}/comments` | Ajoute une **note interne** (`text`, jusqu'à 5 000 caractères). Le contact ne la voit pas. |
+| `POST /tickets/{id}/responses` | **Répond au contact** (`text`) sur la conversation du ticket, avec la référence du ticket. Hors de la fenêtre WhatsApp de 24 heures, la réponse est envoyée sous forme de modèle de notification. La première réponse renseigne `responded_at`. |
+| `GET /tickets/{id}/activities` | L'historique, du plus ancien au plus récent : création, changements de statut, notes, réponses, dépassements de SLA. |
+
+Chaque activité a un `type` (`ticket_created`, `status_changed`, `ticket_resolved`, `ticket_closed`, `ticket_reopened`, `comment`, `response`, `response_time_breached`, `resolve_time_breached`), le `text` d'une note ou d'une réponse, son `author` et, pour les changements de statut, `from_status` et `status`.
+
+## Statuts d'un agent
+
+`/agents/{agent}/ticket-statuses`, dans l'ordre du tableau.
+
+| Champ | Description |
+| --- | --- |
+| `name` | Obligatoire à la création ; son slug est le `code`. |
+| `position` | Ordre sur le tableau. |
+| `active` | `true` par défaut. Un statut inactif ne peut plus être utilisé. |
+| `resolved` | Les tickets déplacés ici sont résolus. |
+| `terminal` | Les tickets déplacés ici sont fermés. |
+
+Un statut encore utilisé par des tickets ne peut pas être supprimé : déplacez d'abord les tickets, ou passez `active` à `false`.
+
+## Politiques de SLA d'un agent
+
+`/agents/{agent}/sla-policies`, du délai de réponse le plus court au plus long. Une politique est une priorité :
+
+| Champ | Description |
+| --- | --- |
+| `label` | Obligatoire à la création, par exemple `High` ; son slug est le code `priority`. |
+| `response_time` | Obligatoire à la création. Minutes ouvrées pour donner une première réponse. |
+| `resolve_time` | Obligatoire à la création. Minutes ouvrées pour résoudre. |
+
+Les délais comptent des **minutes ouvrées, du lundi au vendredi de 8 h à 18 h**. Les nouveaux délais s'appliquent aux tickets qui reçoivent la priorité par la suite. Une politique ne peut pas être supprimée tant que des tickets ouverts l'utilisent.
+
+```bash
+curl -X POST https://shortext.ny-corp.io/api/v2.0/agents/AGI-XXXXX/sla-policies \
+  -H "Authorization: Bearer $SHORTEXT_API_KEY" \
+  -H "Accept: application/json" -H "Content-Type: application/json" \
+  -d '{ "label": "High", "response_time": 60, "resolve_time": 480 }'
+```
