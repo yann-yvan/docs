@@ -39,7 +39,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -101,7 +101,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -150,7 +150,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -254,7 +254,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -303,7 +303,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -366,7 +366,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -430,7 +430,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -511,7 +511,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -571,7 +571,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -701,7 +701,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -763,7 +763,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -819,7 +819,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -876,7 +876,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -997,7 +997,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1044,7 +1044,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1115,7 +1115,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1154,7 +1154,7 @@
                 "operationId": "listAssignees",
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1196,7 +1196,7 @@
                 "operationId": "getMe",
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1245,7 +1245,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1365,7 +1365,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1414,7 +1414,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1514,7 +1514,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1577,7 +1577,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1615,7 +1615,7 @@
                 "operationId": "listHostedSessionPurposes",
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1662,7 +1662,7 @@
                 "operationId": "listHostedSessions",
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1724,7 +1724,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1786,7 +1786,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1834,7 +1834,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1873,7 +1873,7 @@
                 "operationId": "listWebhookEvents",
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1926,7 +1926,7 @@
                 "operationId": "listWebhooks",
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1976,7 +1976,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2038,7 +2038,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2096,7 +2096,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2197,7 +2197,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2253,7 +2253,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2324,7 +2324,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3130,7 +3130,6 @@
                 "type": "object"
             },
             "ApiEnvelope": {
-                "description": "Every response is HTTP 200. The outcome is in `success` and `code` (absolute value of the response code).",
                 "properties": {
                     "success": {
                         "type": "boolean",
@@ -3570,7 +3569,7 @@
         "securitySchemes": {
             "bearerAuth": {
                 "type": "http",
-                "description": "Company API key, sent as \"Authorization: Bearer <key>\". Create it in the dashboard (Developer > API Keys) with the permissions the integration needs.",
+                "description": "Company API key, sent as `Authorization: Bearer <key>`. Create it in the dashboard (Developer > API Keys) with the permissions the integration needs.",
                 "scheme": "bearer"
             }
         }

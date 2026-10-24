@@ -1334,7 +1334,7 @@
         "securitySchemes": {
             "bearerAuth": {
                 "type": "http",
-                "description": "Company API key, sent as \"Authorization: Bearer <key>\". Create it in the dashboard (Developer > API Keys) with the permissions the integration needs.",
+                "description": "Company API key, sent as `Authorization: Bearer <key>`. Create it in the dashboard (Developer > API Keys) with the permissions the integration needs.",
                 "scheme": "bearer"
             }
         }
