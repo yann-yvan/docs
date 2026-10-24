@@ -1,0 +1,85 @@
+<CodeGroup>
+```bash cURL
+curl -X POST https://shortext.ny-corp.io/api/v1.0/messages/inbound \
+  -H "Authorization: Bearer $SHORTEXT_API_KEY" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "channel": "shortext",
+    "to": "ste_xxx",
+    "reply_mode": "sync",
+    "contact": {
+      "identifier": "user-42",
+      "profile": { "firstname": "Awa", "email": "awa@example.com", "preferred_language": "en" }
+    },
+    "message": {
+      "id": "msg_9f8e7d",
+      "type": "text",
+      "content": { "text": "Where is my order?" }
+    }
+  }'
+```
+
+```php PHP
+<?php
+$response = (new GuzzleHttp\Client())->post('https://shortext.ny-corp.io/api/v1.0/messages/inbound', [
+    'headers' => ['Authorization' => 'Bearer ' . getenv('SHORTEXT_API_KEY'), 'Accept' => 'application/json'],
+    'json'    => [
+        'channel'    => 'shortext',
+        'to'         => 'ste_xxx',
+        'reply_mode' => 'sync',
+        'contact'    => ['identifier' => 'user-42', 'profile' => ['firstname' => 'Awa']],
+        'message'    => ['id' => 'msg_9f8e7d', 'type' => 'text', 'content' => ['text' => 'Where is my order?']],
+    ],
+]);
+$body = json_decode((string) $response->getBody(), true)['body'];
+
+if ($body['status'] === 'completed') {
+    foreach ($body['replies'] as $reply) {
+        echo $reply['message']['content']['text'], PHP_EOL;
+    }
+}
+```
+
+```javascript Node.js
+const response = await fetch("https://shortext.ny-corp.io/api/v1.0/messages/inbound", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.SHORTEXT_API_KEY}`,
+    Accept: "application/json",
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    channel: "shortext",
+    to: "ste_xxx",
+    reply_mode: "sync",
+    contact: { identifier: "user-42", profile: { firstname: "Awa" } },
+    message: { id: "msg_9f8e7d", type: "text", content: { text: "Where is my order?" } },
+  }),
+});
+const { body } = await response.json();
+
+if (body.status === "completed") {
+  body.replies.forEach((reply) => console.log(reply.message.content.text));
+}
+```
+
+```python Python
+response = requests.post(
+    "https://shortext.ny-corp.io/api/v1.0/messages/inbound",
+    headers={"Authorization": f"Bearer {os.environ['SHORTEXT_API_KEY']}", "Accept": "application/json"},
+    json={
+        "channel": "shortext",
+        "to": "ste_xxx",
+        "reply_mode": "sync",
+        "contact": {"identifier": "user-42", "profile": {"firstname": "Awa"}},
+        "message": {"id": "msg_9f8e7d", "type": "text", "content": {"text": "Where is my order?"}},
+    },
+)
+body = response.json()["body"]
+
+if body["status"] == "completed":
+    for reply in body["replies"]:
+        print(reply["message"]["content"]["text"])
+```
+</CodeGroup>

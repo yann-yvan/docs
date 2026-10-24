@@ -1,0 +1,58 @@
+---
+title: Démarrer une conversation et répondre
+description: Écrivez en premier à un contact, répondez dans une conversation existante et respectez la règle des 24 heures de WhatsApp.
+---
+
+import StartConversation from '/snippets/code/start-conversation.mdx';
+import Reply from '/snippets/code/reply.mdx';
+
+Demande une clé avec **Envoyer des messages**.
+
+## Écrire en premier à un contact
+
+`POST /conversations` envoie un premier message depuis l'un de vos canaux et ouvre la conversation (ou poursuit celle qui existe avec ce contact).
+
+| Champ | Description |
+| --- | --- |
+| `channel` | `whatsapp`, `mail` ou `shortext`. |
+| `channel_id` | Votre canal, issu de `GET /channels`. |
+| `contact` | La personne à qui vous écrivez, voir [Format des contacts](/fr/api-reference/contact-format). |
+| `message` | Ce que vous envoyez, voir [Format des messages](/fr/api-reference/message-format). |
+| `handover` | `true` si une personne suit la conversation : l'agent IA ne répondra pas au contact. Par défaut `false` : l'agent répond aux réponses. |
+
+<StartConversation />
+
+Le `body` de la réponse contient `conversation` et `message`.
+
+## La règle des 24 heures de WhatsApp
+
+WhatsApp n'accepte les messages libres (texte, média, interactif) que dans les **24 heures qui suivent le dernier message du contact**. En dehors de cette fenêtre, et pour écrire en premier, vous devez envoyer un **modèle** approuvé.
+
+| Endpoint | Hors de la fenêtre de 24 heures |
+| --- | --- |
+| `POST /conversations` avec un message qui n'est pas un modèle | Refusé avec `1002` : « Outside the 24h window opened by the contact, WhatsApp only accepts an approved template ». |
+| `POST /conversations` avec un modèle | Envoyé. |
+| `POST /conversations/{id}/messages` (réponse) | Une réponse libre est envoyée sous forme de modèle de notification, pour qu'elle atteigne le contact. |
+
+Les boîtes mail et les endpoints Shortext n'ont pas de fenêtre de ce type.
+
+<Tip>Pour décider à l'avance, regardez le dernier message entrant de la conversation (`GET /conversations/{id}/messages`) ou gardez l'heure du dernier webhook `message.received`.</Tip>
+
+## Répondre dans une conversation
+
+`POST /conversations/{id}/messages` avec un `message` :
+
+<Reply />
+
+Par défaut, une réponse **prend la conversation en main** (`handover: true`), comme quand une personne répond depuis la boîte de réception : l'agent IA cesse de répondre. Envoyez `"handover": false` pour les notifications automatiques qui ne doivent pas arrêter l'agent.
+
+## Retrouver une conversation
+
+`GET /conversations` filtre par `contact` (téléphone, e-mail ou votre propre identifiant), `channel` et `channel_id`, `agent_id`, `status` (`active`, `archived`), `assignee`, `ticket_id` et `updated_since`. Par exemple :
+
+```bash
+curl "https://shortext.ny-corp.io/api/v2.0/conversations?channel=whatsapp&contact=237699999999" \
+  -H "Authorization: Bearer $SHORTEXT_API_KEY" -H "Accept: application/json"
+```
+
+La lecture des conversations demande **Voir les messages**.

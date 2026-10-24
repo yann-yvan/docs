@@ -1,0 +1,111 @@
+---
+title: Migrer de la v1.0 à la v2.0
+description: La v1.0 est historique et sera retirée. Ce qui change en v2.0 et comment faire évoluer votre intégration.
+---
+
+<Warning>
+**La v1.0 est historique.** Elle fonctionne encore mais ne reçoit plus de nouvelles fonctionnalités, et elle sera dépréciée puis retirée. Les dates seront annoncées à l'avance par les en-têtes `Deprecation` et `Sunset` des réponses v1.0 (voir [Versionnement](/fr/api-reference/versioning)) ; après la date de retrait, tout appel v1.0 répondra HTTP 410. Passez à la v2.0 dès maintenant.
+</Warning>
+
+## Ce qui ne change pas
+
+- Les **clés API** : les mêmes clés fonctionnent sur les deux versions.
+- L'**enveloppe de réponse** : HTTP 200 avec `success`, `code`, `message` et `body`.
+- Les grammaires des **messages** et des **contacts** : `message.type` + `message.content`, `contact.identifier` + `contact.profile`.
+
+## Ce qui change
+
+| | v1.0 | v2.0 |
+| --- | --- | --- |
+| URL de base | `https://shortext.ny-corp.io/api` | `https://shortext.ny-corp.io/api/v2.0` |
+| Permissions des clés | Non vérifiées | Vérifiées à chaque requête, voir [Authentification](/fr/api-reference/authentication) |
+| Envoi | `POST /messages/send`, un appel par message, sans conversation | `POST /conversations` pour démarrer, `POST /conversations/{id}/messages` pour répondre |
+| Canal d'envoi | `from` | `channel_id` |
+| Profil du contact | `lastname` obligatoire | Tous les champs du profil sont facultatifs |
+| Modèles | Envoyés tels quels à WhatsApp | Vérifiés d'abord (existence, approbation, variables), formes courtes `body: { nom: valeur }` et `header: { url }` |
+| Règle des 24 heures | Les erreurs viennent de WhatsApp | `1002` explicite avant l'envoi |
+| Agents | `GET /agent/search` | Gestion complète : `GET`, `POST`, `PATCH`, `DELETE /agents`, restauration |
+| Conversations | Non disponible | Lister, lire, répondre, prise en main, assignation |
+| Canaux | Non disponible | Lister, rattacher aux agents, endpoints Shortext |
+| Webhooks | Non disponible | Webhooks signés avec relances |
+| Sessions hébergées | Non disponible | Connecter le WhatsApp et les boîtes mail de vos clients |
+
+## Correspondance des endpoints
+
+| v1.0 | v2.0 |
+| --- | --- |
+| `POST /messages/send` | `POST /conversations` (premier message) ou `POST /conversations/{id}/messages` (réponse) |
+| `GET /agent/search` | `GET /agents` |
+| `POST /v1.0/messages/inbound` (Shortext) | Inchangé : toujours `POST /api/v1.0/messages/inbound`, voir [Endpoint Shortext](/fr/api-reference/shortext-endpoint) |
+| `GET /business-manager/balance` | Pas encore d'équivalent v2.0 : continuez avec la v1.0 |
+| `GET /ticket/search`, `/ticket/sla/search`, `/ticket/status/search` | Pas encore d'équivalent v2.0 ; retrouvez la conversation d'un ticket avec `GET /conversations?ticket_id=` |
+| `POST /contact/knowledge/add` | Pas encore d'équivalent v2.0 : continuez avec la v1.0 |
+
+{/* TODO: confirmer ce qui est prévu en v2.0 pour le solde, les tickets et les connaissances de contact avant la dépréciation de la v1.0. */}
+
+## Exemple : envoyer un message
+
+<CodeGroup>
+```json v1.0 POST /api/messages/send
+{
+  "channel": "whatsapp",
+  "from": "532867649916076",
+  "contact": {
+    "identifier": "237699999999",
+    "profile": { "lastname": "Mbarga" }
+  },
+  "message": {
+    "type": "template",
+    "content": {
+      "template_name": "order_update",
+      "language": "fr",
+      "body": [
+        { "type": "text", "parameter_name": "name", "text": "Brice" },
+        { "type": "text", "parameter_name": "order", "text": "A-1042" }
+      ]
+    }
+  }
+}
+```
+
+```json v2.0 POST /api/v2.0/conversations
+{
+  "channel": "whatsapp",
+  "channel_id": "532867649916076",
+  "contact": {
+    "identifier": "237699999999",
+    "profile": { "lastname": "Mbarga" }
+  },
+  "message": {
+    "type": "template",
+    "content": {
+      "template_name": "order_update",
+      "language": "fr",
+      "body": { "name": "Brice", "order": "A-1042" }
+    }
+  }
+}
+```
+</CodeGroup>
+
+La réponse v2.0 vous donne la `conversation` (gardez son `id` pour répondre ou prendre en main) et le `message`.
+
+## Liste de contrôle
+
+<Steps>
+  <Step title="Vérifiez vos clés">
+    Appelez `GET /api/v2.0/me` avec chaque clé et vérifiez `body.token.abilities`. Ajoutez **Envoyer des messages**, **Voir les messages** ou **Gérer les intégrations** dans **Développeur > API Keys** si besoin.
+  </Step>
+  <Step title="Changez l'URL de base">
+    Faites pointer votre client vers `https://shortext.ny-corp.io/api/v2.0`.
+  </Step>
+  <Step title="Remplacez les appels d'envoi">
+    `from` devient `channel_id` ; les réponses vont sur `POST /conversations/{id}/messages`.
+  </Step>
+  <Step title="Remplacez l'interrogation par des webhooks">
+    Abonnez-vous à `message.*` et `conversation.*` au lieu d'interroger l'API.
+  </Step>
+  <Step title="Surveillez les en-têtes">
+    Journalisez `X-Shortext-Api-Version`, `Deprecation` et `Sunset` dans votre client pour ne manquer aucune annonce.
+  </Step>
+</Steps>

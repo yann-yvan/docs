@@ -1,0 +1,55 @@
+---
+title: WhatsApp
+description: Connect WhatsApp Business numbers with Meta embedded signup, and understand the 24-hour window.
+---
+
+Shortext uses the official WhatsApp Business Platform (Cloud API). You connect your numbers by logging in to Meta from Shortext: no token to copy, no webhook to configure.
+
+## Before you start
+
+- A Facebook account with access to your company's **Meta Business** portfolio (or the right to create one).
+- A phone number that can receive an SMS or a call to verify it, and that is **not** registered in the WhatsApp or WhatsApp Business app (or that you are ready to migrate).
+- A payment method in Meta Business for the conversations Meta bills.
+
+## Connect a number
+
+<Steps>
+  <Step title="Start the connection">
+    Open **Communication > Channels > WhatsApp Business** and click **Connect WhatsApp Business account**.
+
+    {/* TODO screenshot: WhatsApp channels list with the Connect WhatsApp Business account button (Filament 4). */}
+  </Step>
+  <Step title="Log in to Meta">
+    A Shortext page opens the Meta signup window. Log in with Facebook, choose or create your business portfolio and your WhatsApp Business account, then add and verify your number.
+
+    {/* TODO screenshot: the Shortext connect page and the Meta embedded signup window. */}
+  </Step>
+  <Step title="Back to Shortext">
+    When Meta is done, you come back to the dashboard. Your numbers are listed in the WhatsApp channels, and Shortext syncs their templates.
+  </Step>
+  <Step title="Choose the agent">
+    Open the number and choose the agent that answers on it.
+  </Step>
+</Steps>
+
+<Tip>Your clients can connect **their own** numbers to your Shortext company through the same Meta flow, from your product, with a [hosted session](/api-reference/hosted-sessions).</Tip>
+
+## The 24-hour window
+
+WhatsApp protects users from unsolicited messages:
+
+- When a contact writes to you, a **24-hour window** opens. During that window, your agent and your team can send any message: text, media, interactive.
+- Outside the window, a business can only send an **approved template**. This is also how you write first to a contact.
+
+In practice:
+
+| Situation | What you can send |
+| --- | --- |
+| The contact wrote less than 24 hours ago | Anything |
+| The contact never wrote, or wrote more than 24 hours ago | An approved template only |
+
+When your team replies from the Inbox outside the window, Shortext sends the reply as a notification template so it still reaches the contact. Through the API, starting a conversation with free text outside the window is refused: use a template. See [Start a conversation](/api-reference/guides/start-a-conversation).
+
+## Templates
+
+Templates are created and approved per WhatsApp Business account. See [WhatsApp templates](/channels/whatsapp-templates).

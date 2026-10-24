@@ -1,0 +1,52 @@
+<CodeGroup>
+```bash cURL
+curl -X POST https://shortext.ny-corp.io/api/v2.0/conversations/$CONVERSATION_ID/messages \
+  -H "Authorization: Bearer $SHORTEXT_API_KEY" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": { "type": "text", "content": { "text": "Your order A-1042 has left our warehouse." } },
+    "handover": false
+  }'
+```
+
+```php PHP
+<?php
+$response = (new GuzzleHttp\Client())->post("https://shortext.ny-corp.io/api/v2.0/conversations/{$conversationId}/messages", [
+    'headers' => ['Authorization' => 'Bearer ' . getenv('SHORTEXT_API_KEY'), 'Accept' => 'application/json'],
+    'json'    => [
+        'message'  => ['type' => 'text', 'content' => ['text' => 'Your order A-1042 has left our warehouse.']],
+        'handover' => false,
+    ],
+]);
+$result = json_decode((string) $response->getBody(), true);
+```
+
+```javascript Node.js
+const response = await fetch(`https://shortext.ny-corp.io/api/v2.0/conversations/${conversationId}/messages`, {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.SHORTEXT_API_KEY}`,
+    Accept: "application/json",
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    message: { type: "text", content: { text: "Your order A-1042 has left our warehouse." } },
+    handover: false,
+  }),
+});
+const result = await response.json();
+```
+
+```python Python
+response = requests.post(
+    f"https://shortext.ny-corp.io/api/v2.0/conversations/{conversation_id}/messages",
+    headers={"Authorization": f"Bearer {os.environ['SHORTEXT_API_KEY']}", "Accept": "application/json"},
+    json={
+        "message": {"type": "text", "content": {"text": "Your order A-1042 has left our warehouse."}},
+        "handover": False,
+    },
+)
+result = response.json()
+```
+</CodeGroup>

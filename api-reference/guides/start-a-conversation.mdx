@@ -1,0 +1,58 @@
+---
+title: Start a conversation and reply
+description: Write first to a contact, reply in an existing conversation, and respect the WhatsApp 24-hour rule.
+---
+
+import StartConversation from '/snippets/code/start-conversation.mdx';
+import Reply from '/snippets/code/reply.mdx';
+
+Requires a key with **Send messages**.
+
+## Write first to a contact
+
+`POST /conversations` sends a first message from one of your channels and opens the conversation (or continues the existing one with this contact).
+
+| Field | Description |
+| --- | --- |
+| `channel` | `whatsapp`, `mail` or `shortext`. |
+| `channel_id` | Your channel, from `GET /channels`. |
+| `contact` | Who you write to, see [Contact format](/api-reference/contact-format). |
+| `message` | What you send, see [Message format](/api-reference/message-format). |
+| `handover` | `true` if a human follows the conversation: the AI agent will not answer the contact. Default `false`: the agent answers the replies. |
+
+<StartConversation />
+
+The response `body` holds `conversation` and `message`.
+
+## The WhatsApp 24-hour rule
+
+WhatsApp only accepts free-form messages (text, media, interactive) within **24 hours after the contact's last message**. Outside that window, and to write first, you must send an approved **template**.
+
+| Endpoint | Outside the 24-hour window |
+| --- | --- |
+| `POST /conversations` with a non-template message | Refused with `1002`: "Outside the 24h window opened by the contact, WhatsApp only accepts an approved template". |
+| `POST /conversations` with a template | Sent. |
+| `POST /conversations/{id}/messages` (reply) | A free-form reply is sent as a notification template, so it reaches the contact. |
+
+Mailboxes and Shortext endpoints have no such window.
+
+<Tip>To decide in advance, look at the conversation's last inbound message (`GET /conversations/{id}/messages`) or keep the time of the last `message.received` webhook.</Tip>
+
+## Reply in a conversation
+
+`POST /conversations/{id}/messages` with a `message`:
+
+<Reply />
+
+By default a reply **takes the conversation over** (`handover: true`), as when a person answers in the Inbox: the AI agent stops answering. Send `"handover": false` for automatic notifications that should not stop the agent.
+
+## Find a conversation
+
+`GET /conversations` filters by `contact` (phone, email or your own id), `channel` and `channel_id`, `agent_id`, `status` (`active`, `archived`), `assignee`, `ticket_id` and `updated_since`. For example:
+
+```bash
+curl "https://shortext.ny-corp.io/api/v2.0/conversations?channel=whatsapp&contact=237699999999" \
+  -H "Authorization: Bearer $SHORTEXT_API_KEY" -H "Accept: application/json"
+```
+
+Reading conversations requires **View messages**.

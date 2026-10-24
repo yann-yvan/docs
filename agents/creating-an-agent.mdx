@@ -1,134 +1,61 @@
 ---
-title: Creating and Configuring Your First Agent
-description: Learn how to create, personalize, and test your first AI-powered agent in Shortext.
+title: Create an agent
+description: Create an agent, write its instructions, attach it to channels and stay within your plan's agent limit.
 ---
 
+An agent answers your customers on the channels attached to it. You can create agents from the dashboard or with the API (`POST /agents`, see the [API Reference](/api-reference/introduction)).
 
-In Shortext, an **Agent** is your AI-powered assistant — the entity that interacts with users, handles messages, and triggers automations or API calls.
-This guide will show you how to create, configure, and test your first Agent.
+## Create the agent
 
----
+<Steps>
+  <Step title="Open the agents">
+    In the sidebar, open **Communication > AI Agents** and create a new agent.
 
-## 🧩 Step 1 — Access the Agents Section
+    {/* TODO screenshot: AI Agents list and the creation form (Filament 4). */}
+  </Step>
 
-From your main dashboard, click **“Agents”** in the left navigation sidebar.
+  <Step title="Name it and choose how it answers">
+    - **Name**: shown to your team in the Inbox, the analytics and the API.
+    - **Agent enabled**: an agent that is not enabled keeps storing messages but does not answer.
+    - **Use AI**: the AI answers by following the instructions. When it is off, the agent sends the **inactive message** instead, for example "Our team will get back to you during opening hours."
+  </Step>
 
-<img src="/images/agents/agents-list.png" alt="Agents list screen"/>
+  <Step title="Write the instructions">
+    The instructions are the system prompt of the AI (up to 15,000 characters). Describe who the agent is, what it may answer, how it should sound and when it must hand over to a human. For example:
 
-Here you can view all your existing agents or create new ones.
+    ```text
+    You are the support assistant of Acme, an online shop.
+    Answer in the customer's language, in short messages.
+    You can track orders with the get_order tool. Never promise a refund:
+    when a customer asks for one, tell them a person from the team will follow up.
+    ```
 
----
+    You can change the instructions at any time; conversations already in progress keep their history.
+  </Step>
 
-## ⚙️ Step 2 — Create a New Agent
+  <Step title="Give it tools and knowledge (optional)">
+    - **Tools** let the agent call your own APIs, for example to look up an order. See [Tools](/agents/tools-configuration).
+    - **Knowledge bases** are documents the agent searches before answering: FAQs, policies, product sheets.
+  </Step>
 
-Click **“New Agent”** (or **“Create Agent”**) in the top right corner.
+  <Step title="Attach channels">
+    An agent only answers on the channels attached to it. Connect a channel and choose this agent, or move an existing channel to it. See [Channels](/channels/overview).
+  </Step>
+</Steps>
 
-<img src="/images/agents/new-agent-form.png" alt="Agent creation form"/>
+## Test before going live
 
-Fill in the required details:
-- **Agent Name** → e.g. “Support Assistant” or “Recruitment Bot”
-- **Description** → A short sentence describing what this agent does.
-- **Language** → The default language for conversations (English, French, etc.)
-- **Active Status** → Whether the agent is live or in test mode.
+Before attaching a production channel, test the agent on a test number or mailbox: write to it as a customer would, check the answers and the tool calls in the logs, and refine the instructions.
 
-<Note type="tip">
-    Choose a meaningful name — it will appear in analytics and user session tracking.
-</Note>
+## Agent limit of your plan
 
----
+Your plan sets the number of agents your company can have. Once the limit is reached, creating an agent (or restoring a deleted one) is refused, in the dashboard and in the API, where the response has `code` `1005` and `body.limit` gives the limit of your plan.
 
-## 🧠 Step 3 — Define the Agent’s Personality
+To free a slot, delete an agent you no longer use. To get more agents, upgrade your plan from **Billing**.
 
-Every agent can have its own **personality** and **tone of voice**.
+{/* TODO: number of agents included in each plan. */}
 
-<img src="/images/agents/agent-personality.png" alt="Agent personality configuration"/>
+## Deactivate or delete an agent
 
-You can define:
-- **Tone** → friendly, professional, neutral, etc.
-- **Behavioral Instructions** → custom rules that guide how the agent responds.
-- **Context Memory** → whether the agent remembers past interactions.
-
-Example:
-
-```json
-{
-  "tone": "friendly",
-  "style": "concise and helpful",
-  "instructions": [
-    "Always greet the user warmly.",
-    "Keep messages short and easy to understand.",
-    "If the question is unclear, ask for clarification."
-  ]
-}
-```
-
-<Note type="info">You can update an agent’s personality anytime without losing its previous conversation data. </Note>
-
----
-
-## 🔗 Step 4 — Configure Channels
-
-Each agent can be connected to one or more messaging channels.
-
-<img src="/images/agents/channel-setup.png" alt="Agent channel configuration"/>
-
-Supported channels include:
-
-* WhatsApp Business API
-* Telegram
-* Web Chat (optional)
-
-Select the channel(s) the agent should respond on, and provide any necessary credentials (like your WhatsApp phone number or API token).
-
-<Note type="warning"> If you’re using WhatsApp, make sure your number is already verified and linked to a WhatsApp
-    Business Account. </Note>
-
----
-
-## 🧰 Step 5 — Connect APIs or Automations (Optional)
-
-Agents can perform external actions by calling APIs or triggering automations.
-This allows your bot to fetch data, send updates, or perform business logic dynamically.
-
-<img src="/images/agents/api-configuration.png" alt="Agent API configuration"/>
-
-Examples:
-* Fetch a user profile from your CRM
-* Send payment confirmation
-* Log a new support ticket
-
-Configuration details are covered in:
-👉 API Configuration & Testing →
-
----
-
-## 🧪 Step 6 — Test Your Agent
-
-Once your agent is configured, you can test it directly within Shortext.
-
-<img src="/images/agents/test-chat.png" alt="Agent test chat interface"/>
-Testing Options:
-
-* **Internal Sandbox Chat** — Send messages to see how the agent responds.
-* **Live Channel Test** — If linked to WhatsApp, send a real message from your number.
-* **Debug Console** — Inspect the raw message exchange and AI reasoning (if available).
-
-<Note type="success"> Testing helps fine-tune your prompts, responses, and API actions before going live. </Note>
-
----
-
-## 🚀 Step 7 — Activate Your Agent
-
-Once satisfied with your test results, toggle the “Active” switch.
-Your agent is now live and ready to handle conversations from your users.
-
-<img src="/images/agents/agent-active.png" alt="Agent activation toggle"/>
-🧭 What’s Next
-
-Now that your first agent is up and running, continue with:
-Customizing Personality and Responses →
-Connecting WhatsApp →
-Testing APIs with Your Agent →
-
-<Note type="info"> Agents are central to Shortext — once created, you can link them to automations, monitoring tools,
-    or even ticketing systems to extend their capabilities. </Note>
+- **Deactivate** it (turn off **Agent enabled**) to stop it answering while keeping its channels.
+- **Delete** it when you no longer need it. An agent that still has channels cannot be deleted: move or detach its channels first. Its tickets, tools and history are kept, and a deleted agent can be restored as long as your plan allows it.

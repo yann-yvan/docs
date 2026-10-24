@@ -1,0 +1,134 @@
+---
+title: Webhooks
+description: Recevez les événements Shortext en temps réel sur votre propre endpoint HTTPS, signés et relancés.
+---
+
+import VerifySignature from '/snippets/code/verify-signature.mdx';
+
+Les webhooks envoient des événements à votre serveur au moment où ils se produisent : un contact écrit, un message est remis, une personne prend une conversation en main, un client termine la connexion de son numéro WhatsApp. Préférez-les à l'interrogation répétée de l'API.
+
+## Créer un endpoint
+
+Créez les endpoints dans le tableau de bord (**Développeur > Webhooks**) ou par l'API (`POST /webhooks`, permission **Gérer les intégrations**) :
+
+```json
+{
+  "url": "https://example.com/webhooks/shortext",
+  "events": ["message.*", "conversation.handover", "conversation.released"],
+  "filters": { "app": "AGI-XXXXX" },
+  "description": "Synchronisation CRM"
+}
+```
+
+| Champ | Description |
+| --- | --- |
+| `url` | Une URL **HTTPS** publique. Les adresses privées et locales sont refusées. |
+| `events` | Des types exacts (`message.received`), un préfixe générique (`message.*`) ou `*` pour tout. |
+| `filters` | Facultatif. Ne recevoir que les événements dont le contexte correspond : `app` (un identifiant d'agent), `channel` (`whatsapp`, `mail`, `shortext`), `channel_id`. |
+| `description` | Facultatif, pour vous. |
+
+La réponse contient le **`secret` de signature, affiché une seule fois**. Conservez-le avec vos autres secrets.
+
+<Note>Un endpoint reçoit les charges utiles dans la version de l'API utilisée pour le créer (`api_version`) : une nouvelle version de l'API ne change donc jamais ce que vous recevez.</Note>
+
+## Événements
+
+`GET /webhooks/events` renvoie le catalogue.
+
+| Événement | Quand |
+| --- | --- |
+| `message.received` | Un contact a envoyé un message à l'un de vos agents. |
+| `message.sent` | Un message a été envoyé à un contact (par l'agent IA, un membre de votre équipe ou l'API). |
+| `message.status` | Le statut d'un message a changé (remis, lu, échec...). |
+| `conversation.handover` | Une personne a pris une conversation en main : l'agent cesse de répondre. |
+| `conversation.released` | Une conversation a été rendue à l'agent. |
+| `channel.connected` | Un canal (numéro WhatsApp, boîte mail, endpoint Shortext) a été connecté. |
+| `channel.agent_changed` | Un canal a été rattaché à un agent, déplacé vers un autre ou détaché. |
+| `agent.created` | Un agent a été créé. |
+| `agent.updated` | Un agent a été modifié (paramètres ou instructions). |
+| `agent.deleted` | Un agent a été supprimé. |
+| `hosted_session.completed` | Une [session hébergée](/fr/api-reference/hosted-sessions) a abouti : `result` contient ce qu'elle a produit. |
+| `hosted_session.failed` | Une session hébergée a échoué : `error` dit pourquoi. |
+| `webhook.test` | Envoyé à la demande pour vérifier un endpoint. |
+
+De nouveaux types d'événements peuvent apparaître à tout moment : ignorez ceux que vous ne traitez pas.
+
+## Charge utile
+
+Chaque livraison est un `POST` avec un corps JSON :
+
+```json
+{
+  "id": "evt_01JB8Z6X4Q2W3E5R7T9Y1U3I5O",
+  "type": "message.received",
+  "api_version": "v2.0",
+  "created_at": "2026-10-24T09:12:44+00:00",
+  "data": {
+    "id": "msg-hashid",
+    "conversation_id": "conv-hashid",
+    "direction": "inbound",
+    "channel": "whatsapp",
+    "channel_id": "532867649916076",
+    "contact": { "identifier": "237699999999", "identifier_type": "phone", "profile": { "firstname": "Brice" } },
+    "message": { "id": "wamid.HBgM...", "type": "text", "content": { "text": "Bonjour, où en est ma commande ?" } },
+    "status": "received",
+    "created_at": "2026-10-24T09:12:44+00:00"
+  }
+}
+```
+
+`data` dépend du type :
+
+| Événements | `data` |
+| --- | --- |
+| `message.*` | Un message, comme dans [Format des messages](/fr/api-reference/message-format#les-messages-dans-les-réponses-et-les-webhooks). |
+| `conversation.*` | `conversation_id`, `channel`, `channel_id` et `contact.identifier`. |
+| `channel.*` | Un canal, tel que renvoyé par `GET /channels` ; `channel.agent_changed` ajoute `previous_agent`. |
+| `agent.*` | Un agent, tel que renvoyé par `GET /agents/{id}` (sans ses canaux). |
+| `hosted_session.*` | Une session hébergée, telle que renvoyée par `GET /hosted-sessions/{id}`. |
+
+## En-têtes
+
+| En-tête | Valeur |
+| --- | --- |
+| `X-Shortext-Event` | Le type d'événement, par exemple `message.received`. |
+| `X-Shortext-Delivery` | L'identifiant de la livraison (un uuid). Une nouvelle livraison en a un nouveau. |
+| `X-Shortext-Timestamp` | L'heure Unix de signature de la requête. |
+| `X-Shortext-Signature` | `sha256=` suivi du HMAC hexadécimal de la requête. |
+| `X-Shortext-Api-Version` | La version de la charge utile, par exemple `v2.0`. |
+
+## Vérifier la signature
+
+Vérifiez chaque requête avant de lui faire confiance :
+
+```text
+attendu = "sha256=" + hex(hmac_sha256(secret, "{X-Shortext-Timestamp}.{corps brut}"))
+```
+
+1. Lisez le corps **brut**, avant toute analyse JSON : le réencoder change les octets et casse la signature.
+2. Rejetez les requêtes dont l'horodatage s'écarte de plus de 5 minutes de votre horloge (rejeu).
+3. Comparez `attendu` avec `X-Shortext-Signature` en temps constant.
+
+<VerifySignature />
+
+## Répondre et dédoublonner
+
+- Répondez avec n'importe quel statut **2xx** en moins de **10 secondes**. Faites le traitement après avoir répondu, dans une file.
+- Tout le reste (autre statut, délai dépassé, redirection, erreur réseau) est un échec et sera relancé.
+- Un même événement peut arriver plusieurs fois. Dédoublonnez sur l'`id` de l'événement (`evt_...`), identique lors des relances et des nouvelles livraisons.
+- Les événements peuvent arriver dans le désordre : appuyez-vous sur `created_at` et sur l'API quand l'ordre compte.
+
+## Relances
+
+Une livraison échouée est relancée avec un délai croissant : après 10 secondes, 1 minute, 5 minutes, 30 minutes, 2 heures, 6 heures et 12 heures, soit 8 tentatives sur environ **21 heures**. Après la dernière, la livraison est marquée en échec.
+
+Un endpoint qui échoue sans interruption pendant **72 heures** est **désactivé** : `is_enabled` passe à `false` et `disabled_reason` en donne la raison. Corrigez votre serveur, puis réactivez l'endpoint (`PUT /webhooks/{id}` avec `"is_enabled": true`).
+
+## Tester, inspecter et relivrer
+
+| Endpoint | Usage |
+| --- | --- |
+| `POST /webhooks/{id}/test` | Envoyer un événement `webhook.test` immédiatement (sans relance) et obtenir la réponse de votre serveur. |
+| `GET /webhooks/{id}/deliveries` | Les livraisons des **30 derniers jours**, filtrables par `status` (`pending`, `succeeded`, `failed`), avec les tentatives, le statut de réponse, les 2 000 premiers caractères de votre réponse et la charge utile. |
+| `POST /webhooks/{id}/deliveries/{delivery}/retry` | Mettre en file une nouvelle livraison du même événement (même `id` d'événement). |
+| `POST /webhooks/{id}/rotate-secret` | Générer un nouveau secret. L'ancien cesse de fonctionner **immédiatement** : déployez d'abord le nouveau. |

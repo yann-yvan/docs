@@ -1,0 +1,41 @@
+---
+title: Boîte mail
+description: Connectez une boîte mail en IMAP et SMTP pour qu'un agent réponde à vos e-mails.
+---
+
+Toute boîte mail proposant IMAP (lecture) et SMTP (envoi) peut être connectée : votre propre serveur de messagerie, un hébergeur, Google Workspace ou Microsoft 365 avec un mot de passe d'application. Shortext lit les nouveaux e-mails, l'agent y répond par e-mail, et les fils apparaissent dans la boîte de réception comme n'importe quelle conversation.
+
+## Connecter une boîte mail
+
+<Steps>
+  <Step title="Ajoutez la boîte">
+    Ouvrez **Communication > Canaux > Mail Inbox** et ajoutez une boîte mail.
+
+    {/* TODO capture : formulaire de création d'une boîte mail avec les sections IMAP et SMTP (Filament 4). */}
+  </Step>
+  <Step title="Renseignez les paramètres IMAP">
+    Hôte, port, chiffrement (SSL/TLS ou STARTTLS), nom d'utilisateur, mot de passe et dossier à lire (en général `INBOX`).
+  </Step>
+  <Step title="Renseignez les paramètres SMTP">
+    Hôte, port, chiffrement, nom d'utilisateur et mot de passe, et l'expéditeur : **e-mail d'expédition** et **nom d'expédition**.
+  </Step>
+  <Step title="Enregistrez">
+    Shortext vérifie les connexions IMAP et SMTP avant d'enregistrer. Si une vérification échoue, l'erreur indique laquelle et pourquoi (mot de passe erroné, port fermé...).
+  </Step>
+  <Step title="Choisissez l'agent">
+    Choisissez l'agent qui répond aux e-mails de cette boîte.
+  </Step>
+</Steps>
+
+## Paramètres courants
+
+| Fournisseur | IMAP | SMTP |
+| --- | --- | --- |
+| Google Workspace / Gmail | `imap.gmail.com`, 993, SSL | `smtp.gmail.com`, 465 SSL ou 587 STARTTLS |
+| Microsoft 365 / Outlook | `outlook.office365.com`, 993, SSL | `smtp.office365.com`, 587, STARTTLS |
+
+<Note>Gmail et Microsoft 365 exigent en général un **mot de passe d'application** (ou l'activation d'IMAP par votre administrateur) pour une connexion IMAP / SMTP. La connexion Gmail et Outlook en un clic est [bientôt disponible](/fr/channels/coming-soon).</Note>
+
+## Laisser vos clients connecter leur boîte mail
+
+Si vous construisez un produit sur Shortext, vos clients peuvent connecter leur propre boîte mail depuis votre application grâce à une [session hébergée](/fr/api-reference/hosted-sessions) avec l'objectif `mail` : ils saisissent leurs paramètres sur une page Shortext, qui les vérifie avant d'enregistrer.

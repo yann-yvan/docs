@@ -1,0 +1,40 @@
+---
+title: Inbox
+description: Follow every conversation of your channels live, and answer customers yourself when needed.
+---
+
+The Inbox gathers the conversations of all your channels (WhatsApp, mailboxes, Shortext endpoints) in one place. Your agents answer automatically; your team watches, steps in and follows up.
+
+{/* TODO screenshot: Inbox with the conversation list and an open conversation (Filament 4). */}
+
+## Views
+
+| View | Shows |
+| --- | --- |
+| **All** | Every conversation of the company. |
+| **Mine** | The conversations assigned to you. |
+| **Unassigned** | The conversations nobody has picked up. |
+
+Members with the **agent** role only see what their role allows: typically the conversations, not the configuration.
+
+## A conversation
+
+Opening a conversation shows:
+
+- the messages, whatever their author: the contact, the AI agent, a member of your team, or your system through the API;
+- the contact (name, identifier, language) and the channel;
+- the current session: open (active) or closed (archived), whether a human took it over, and who it is assigned to.
+
+## Answer a customer
+
+Type your message and send it. You can also send media, documents and interactive messages from the message builder.
+
+<Note>
+Replying takes the conversation over: the AI agent stops answering this contact until you hand it back. See [Handover and assignment](/inbox/handover-and-assignment).
+</Note>
+
+On WhatsApp, if the contact has not written in the last 24 hours, Shortext sends your reply as a notification template so it can reach them. See [the 24-hour window](/channels/whatsapp#the-24-hour-window).
+
+## From the API
+
+Everything the Inbox does is also available to your systems with the API v2.0: list conversations and their messages, reply, take over, hand back and assign. See the [API Reference](/api-reference/introduction).

@@ -1,0 +1,36 @@
+---
+title: Handover and assignment
+description: Take a conversation over from the AI agent, hand it back, and assign it to a member of your team.
+---
+
+## Handover
+
+A conversation is in **handover** when a human follows it: the AI agent no longer answers this contact.
+
+- **Take over**: turn on the assistance switch of the conversation, or simply reply to the customer. The AI stops answering.
+- **Hand back**: turn the assistance switch off. The AI answers the next messages of the contact again.
+
+{/* TODO screenshot: the assistance switch in a conversation (Filament 4). */}
+
+Handover applies to the current session. Each change is announced to your systems by the `conversation.handover` and `conversation.released` [webhooks](/api-reference/webhooks).
+
+<Tip>Write in the agent's instructions when it should ask for a human, for example "for refunds, tell the customer a person will follow up". Your team then takes these conversations over from the Inbox.</Tip>
+
+## Assignment
+
+You can assign the current session of a conversation to a member of your company. It then appears in their **Mine** view.
+
+- A member with the **agent** role cannot answer a conversation assigned to someone else.
+- Unassigned conversations are listed in **Unassigned**.
+
+## From the API
+
+| Action | Endpoint |
+| --- | --- |
+| Take over | `PUT /conversations/{id}/handover` |
+| Hand back | `DELETE /conversations/{id}/handover` |
+| Reply without taking over | `POST /conversations/{id}/messages` with `"handover": false` |
+| Assign / unassign | `PUT /conversations/{id}/assignee` with `user_id` (or `null`) |
+| List the members you can assign | `GET /conversations/assignees` |
+
+See the guide [Handover and release](/api-reference/guides/handover).

@@ -1,0 +1,50 @@
+---
+title: Erreurs
+description: Les codes d'erreur de l'API Shortext et la conduite à tenir pour chacun.
+---
+
+Les erreurs reviennent en HTTP 200 (sauf une version retirée, qui répond 410), avec `success: false`, un `code` et un `message`. Utilisez le `code` dans votre logique ; affichez ou journalisez le `message` ; transmettez le `trace_id` au support si vous avez besoin d'aide.
+
+## Codes
+
+| Code | Signification | Que faire |
+| --- | --- | --- |
+| `1000` | Succès | - |
+| `1` | Le jeton a expiré | Créez une nouvelle clé. |
+| `2` | Le jeton est révoqué | Utilisez une autre clé. |
+| `3` | Le jeton est invalide | Vérifiez l'en-tête `Authorization`. |
+| `4` | Jeton introuvable | Envoyez `Authorization: Bearer {clé}` avec une clé valide. |
+| `5` | Aucune entreprise pour ce jeton | Utilisez une clé API d'entreprise. |
+| `1001` | La requête a échoué | Lisez `message`, par exemple un canal qui a refusé le message. Réessayez plus tard si c'est temporaire. |
+| `1002` | Erreur de validation | Corrigez la requête : `body` liste les erreurs par champ. |
+| `1003` | La requête a expiré | Recommencez l'opération. |
+| `1004` | Doublon | La ressource existe déjà. |
+| `1005` | Non autorisé | Une permission manquante sur la clé, une limite de votre forfait (`body.limit`) ou une action impossible dans l'état actuel. |
+| `1006` | Erreur serveur | Réessayez avec un délai croissant ; contactez le support avec le `trace_id` si elle persiste. |
+| `1007` | Introuvable | Vérifiez l'identifiant, et que la ressource appartient à votre entreprise. |
+| `1008` | JSON invalide | Envoyez un corps JSON valide avec `Content-Type: application/json`. |
+| `1009` | Service indisponible | Réessayez plus tard. |
+| `1010` | Urgence | Contactez le support. |
+| `1200` | Version d'API retirée (HTTP 410) | Passez à la version indiquée dans `body.latest`. Voir [Versionnement](/fr/api-reference/versioning). |
+
+## Erreurs de validation
+
+```json
+{
+  "success": false,
+  "message": "The message.content.text field is required when message.type is text.",
+  "code": 1002,
+  "body": {
+    "message.content.text": ["The message.content.text field is required when message.type is text."]
+  },
+  "trace_id": "..."
+}
+```
+
+Certaines règles métier répondent aussi `1002` avec un message explicite, par exemple un modèle non approuvé, une variable de modèle manquante, ou un message WhatsApp libre hors de la fenêtre de 24 heures.
+
+## Relancer une requête
+
+- Relancez `1006` et `1009` avec un délai exponentiel.
+- Ne relancez pas `1002`, `1005` ou `1007` sans modification : ils échoueront de nouveau.
+- Les requêtes `POST` qui créent quelque chose (un message, une conversation) ne sont pas idempotentes, sauf l'appel [entrant Shortext](/fr/api-reference/shortext-endpoint#idempotence), qui dédoublonne sur `message.id`.

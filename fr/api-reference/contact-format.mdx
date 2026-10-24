@@ -1,0 +1,62 @@
+---
+title: Format des contacts
+description: Comment l'API identifie et décrit un contact, sur chaque canal.
+---
+
+Tous les endpoints qui s'adressent à un contact utilisent le même objet `contact` :
+
+```json
+{
+  "identifier": "237699999999",
+  "profile": {
+    "lastname": "Mbarga",
+    "firstname": "Brice",
+    "email": "brice@example.com",
+    "address": "Douala",
+    "preferred_language": "fr"
+  }
+}
+```
+
+## Identifiant
+
+<ParamField body="identifier" type="string" required>
+  L'identité du contact sur le canal, jusqu'à 200 caractères.
+</ParamField>
+
+| Canal | Identifiant | `identifier_type` |
+| --- | --- | --- |
+| WhatsApp | Le numéro au format E.164 **sans** le `+`, par exemple `237699999999` | `phone` |
+| Boîte mail | L'adresse e-mail | `email` |
+| Endpoint Shortext | Votre propre identifiant utilisateur, par exemple `user-42` | `external_id` |
+
+Sur un endpoint Shortext, l'identifiant n'est unique qu'au sein de votre entreprise : le même `user-42` dans deux entreprises correspond à deux contacts différents. L'API vous renvoie toujours votre propre identifiant.
+
+## Profil
+
+Tous les champs du profil sont facultatifs quand vous démarrez une conversation ou envoyez un message entrant (le `POST /messages/send` de la v1.0 exige `lastname`).
+
+| Champ | Type | Remarques |
+| --- | --- | --- |
+| `lastname` | string | Jusqu'à 250 caractères. |
+| `firstname` | string | Jusqu'à 250 caractères. |
+| `email` | string | Une adresse e-mail valide. |
+| `address` | string | Jusqu'à 250 caractères. |
+| `preferred_language` | string | `en`, `fr`, `es` ou `de`. |
+
+Le profil met à jour le contact que Shortext conserve ; l'agent utilise le nom et la langue pour s'adresser au contact.
+
+## Les contacts dans les réponses et les webhooks
+
+Les réponses et les webhooks décrivent un contact avec son identifiant, son type, son profil et, quand il est connu, son pays :
+
+```json
+{
+  "identifier": "237699999999",
+  "identifier_type": "phone",
+  "profile": { "lastname": "Mbarga", "firstname": "Brice", "preferred_language": "fr" },
+  "country": { "iso_code": "CM", "phone_code": "237", "name": "Cameroun" }
+}
+```
+
+Les champs de profil vides sont omis.

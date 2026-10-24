@@ -1,0 +1,29 @@
+---
+title: Endpoint Shortext
+description: Intégrez un agent Shortext dans votre propre application, site web ou backend.
+---
+
+Un endpoint Shortext est un canal pour **votre propre logiciel**. Votre serveur envoie les messages de vos utilisateurs à Shortext via l'API ; l'agent rattaché à l'endpoint répond, et votre serveur affiche les réponses à vos utilisateurs. Les conversations apparaissent dans la boîte de réception comme celles de WhatsApp ou de l'e-mail, et votre équipe peut les prendre en main.
+
+## Créer un endpoint
+
+Ouvrez **Communication > Canaux > Shortext** et créez un endpoint (ou utilisez `POST /channels/shortext` dans l'API).
+
+- **Nom** : pour votre équipe, par exemple « Application mobile ».
+- **Agent** : l'agent qui répond.
+- **Mode de réponse** :
+  - `sync` : la requête qui envoie un message utilisateur attend la réponse de l'agent (jusqu'à 25 secondes) et la renvoie ;
+  - `async` : la requête rend la main immédiatement, les réponses sont envoyées à votre **URL de webhook**.
+- **URL de webhook** : là où Shortext envoie les réponses (mode async, délais dépassés en mode sync, et réponses rédigées par votre équipe dans la boîte de réception). Elle doit être publique et en HTTPS.
+
+L'endpoint reçoit un identifiant `ste_...` et une **URL d'entrée** (inbound URL), à laquelle votre serveur envoie les messages.
+
+{/* TODO capture : formulaire d'un endpoint Shortext et ses actions URL d'entrée / secret (Filament 4). */}
+
+## Secret du webhook
+
+Quand vous définissez une URL de webhook, Shortext génère un **secret** de signature. Il vous permet de vérifier que les réponses reçues viennent bien de Shortext. Vous pouvez l'afficher, le renouveler, et envoyer un événement de test depuis la page de l'endpoint.
+
+## L'intégrer
+
+L'intégration (format des requêtes, statuts, idempotence, vérification de la signature) est décrite dans le guide développeur : [Intégration d'un endpoint Shortext](/fr/api-reference/shortext-endpoint).

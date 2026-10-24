@@ -1,0 +1,77 @@
+---
+title: Versioning
+description: How Shortext versions its API, announces deprecations and removes old versions.
+---
+
+## Versions are frozen contracts
+
+Each version of the API is a contract. Once released, a version only receives **additive** changes:
+
+- new endpoints;
+- new optional request fields;
+- new fields in responses and webhook payloads;
+- new webhook event types and new values in lists you filter on.
+
+Anything that could break an existing integration (removing or renaming a field, changing a type or a behavior) ships in a **new version**. Write your integration so that it ignores unknown fields.
+
+## Current versions
+
+| Version | Base URL | Status |
+| --- | --- | --- |
+| `v2.0` | `https://shortext.ny-corp.io/api/v2.0` | Active, latest |
+| `v1.0` | `https://shortext.ny-corp.io/api` | Legacy, will be deprecated |
+
+`GET https://shortext.ny-corp.io/api/versions` lists the versions and their status. It needs no authentication.
+
+```json
+{
+  "success": true,
+  "message": "Request success.",
+  "code": 1000,
+  "body": {
+    "latest": "v2.0",
+    "versions": [
+      { "version": "v1.0", "status": "active", "released_at": null, "deprecated_at": null, "sunset_at": null, "changelog": null, "docs": null },
+      { "version": "v2.0", "status": "active", "released_at": null, "deprecated_at": null, "sunset_at": null, "changelog": null, "docs": "https://shortext.ny-corp.io/api/docs/v2.0" }
+    ]
+  }
+}
+```
+
+`status` is `active`, `deprecated` or `sunset`.
+
+## Headers
+
+Every response says which version answered:
+
+```http
+X-Shortext-Api-Version: v2.0
+```
+
+When a version is scheduled for removal, its responses also carry:
+
+| Header | Meaning |
+| --- | --- |
+| `Deprecation` | The date the version was deprecated, as `@{unix timestamp}` (RFC 9745). |
+| `Sunset` | The date the version stops working (RFC 8594). |
+| `Link` | The changelog, with `rel="deprecation"`, when there is one. |
+
+Log these headers in your integration: they are your advance notice.
+
+## After the sunset date
+
+Once a version is sunset, every request to it gets the HTTP status **410 Gone**, whatever the endpoint, with `code` `1200`:
+
+```json
+{
+  "success": false,
+  "message": "API version v1.0 is no longer available",
+  "code": 1200,
+  "body": { "sunset_at": "2027-06-30", "latest": "v2.0" },
+  "trace_id": "..."
+}
+```
+
+## Webhooks and versions
+
+A webhook endpoint receives payloads in the version used to create it (its `api_version`). Endpoints created with v2.0 keep receiving v2.0 payloads, even after a newer version is released.

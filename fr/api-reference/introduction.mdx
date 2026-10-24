@@ -1,0 +1,105 @@
+---
+title: Introduction à l'API
+description: URL de base, enveloppe de réponse et pagination de l'API Shortext.
+---
+
+L'API Shortext permet à vos systèmes d'envoyer des messages, de suivre les conversations, de gérer agents et canaux, de recevoir des webhooks et de connecter les canaux de vos propres clients. C'est une API JSON sur HTTPS.
+
+<CardGroup cols={2}>
+  <Card title="Démarrage rapide" icon="rocket" href="/fr/getting-started/api-quickstart">
+    Créez une clé et envoyez votre premier message.
+  </Card>
+  <Card title="Vous venez de la v1.0 ?" icon="arrow-right-arrow-left" href="/fr/api-reference/guides/migrate-to-v2">
+    La v1.0 est historique et sera retirée. Passez à la v2.0.
+  </Card>
+</CardGroup>
+
+## URL de base
+
+| Version | URL de base | Statut |
+| --- | --- | --- |
+| **v2.0** | `https://shortext.ny-corp.io/api/v2.0` | Actuelle, à utiliser pour toute nouvelle intégration |
+| v1.0 | `https://shortext.ny-corp.io/api` | Historique, voir [v1.0](/fr/api-reference/v1.0/introduction) |
+
+Envoyez `Accept: application/json` et, avec un corps, `Content-Type: application/json`. Authentifiez chaque requête avec une [clé API](/fr/api-reference/authentication).
+
+## Enveloppe de réponse
+
+Toutes les réponses ont le statut HTTP **200**, que la requête ait réussi ou non (seule exception : une version d'API retirée, voir [Versionnement](/fr/api-reference/versioning)). Le résultat est dans le corps :
+
+```json Succès
+{
+  "success": true,
+  "message": "Request success.",
+  "code": 1000,
+  "body": { "id": "AGI-XXXXX", "name": "Support" }
+}
+```
+
+```json Échec
+{
+  "success": false,
+  "message": "Missing the permissions.manage_integrations permission",
+  "code": 1005,
+  "body": null,
+  "trace_id": "6f1c2e..."
+}
+```
+
+| Champ | Description |
+| --- | --- |
+| `success` | `true` quand la requête a réussi. Vérifiez-le en premier. |
+| `code` | `1000` en cas de succès, sinon un [code d'erreur](/fr/api-reference/errors). |
+| `message` | Une description lisible. Ne l'analysez pas. |
+| `body` | Le résultat : un objet, une liste, une liste paginée ou `null`. En cas d'erreur de validation, les erreurs par champ. |
+| `trace_id` | En cas d'échec uniquement : transmettez-le au support pour retrouver votre requête. |
+
+<Warning>Ne vous fiez pas au statut HTTP pour détecter les erreurs : lisez toujours `success` et `code`.</Warning>
+
+## Pagination
+
+Les listes sont paginées, 50 éléments par page, les plus récents d'abord sauf mention contraire. Demandez une page avec `?page=2`. Le `body` d'une réponse paginée est :
+
+```json
+{
+  "current_page": 1,
+  "data": [ { "id": "AGI-XXXXX", "name": "Support" } ],
+  "first_page_url": "https://shortext.ny-corp.io/api/v2.0/agents?page=1",
+  "from": 1,
+  "last_page": 3,
+  "last_page_url": "https://shortext.ny-corp.io/api/v2.0/agents?page=3",
+  "next_page_url": "https://shortext.ny-corp.io/api/v2.0/agents?page=2",
+  "path": "https://shortext.ny-corp.io/api/v2.0/agents",
+  "per_page": 50,
+  "prev_page_url": null,
+  "to": 50,
+  "total": 128
+}
+```
+
+Suivez `next_page_url` jusqu'à ce qu'il vaille `null`.
+
+## Dates et identifiants
+
+- Les dates sont des chaînes ISO 8601, par exemple `2026-10-24T09:12:44+00:00`.
+- Les identifiants sont des chaînes opaques (`AGI-XXXXX`, `ste_...`, uuid). Stockez-les comme des chaînes, ne les analysez jamais.
+
+## Limites de débit
+
+{/* TODO: documenter les limites de débit de l'API (requêtes par minute et par clé) et la réponse quand elles sont dépassées. */}
+
+Les limites de débit ne sont pas encore documentées. Gardez une intégration raisonnable : relancez les requêtes échouées avec un délai croissant et n'interrogez pas l'API en boucle quand un [webhook](/fr/api-reference/webhooks) vous donne l'information.
+
+## Contenu de l'API
+
+| Ressource | Ce que vous pouvez faire |
+| --- | --- |
+| Compte | `GET /me` : l'entreprise et la clé derrière votre jeton |
+| Agents | Créer, modifier, supprimer et restaurer des agents |
+| Canaux | Lister les canaux, les rattacher à des agents ; créer et gérer des endpoints Shortext |
+| Conversations | Lister, lire, démarrer, répondre, prendre en main, rendre la main, assigner |
+| Modèles | Lister les modèles WhatsApp que vous pouvez envoyer |
+| Webhooks | Gérer les endpoints, les tester, lire et relancer les livraisons |
+| Sessions hébergées | Laisser vos clients connecter leur numéro WhatsApp ou leur boîte mail sur une page Shortext |
+
+La liste complète se trouve dans **Endpoints**, générée à partir de la spécification OpenAPI.

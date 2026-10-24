@@ -1,0 +1,41 @@
+---
+title: Mailbox
+description: Connect a mailbox through IMAP and SMTP so an agent answers your emails.
+---
+
+Any mailbox that offers IMAP (to read) and SMTP (to send) can be connected: your own mail server, a hosting provider, Google Workspace or Microsoft 365 with an app password. Shortext reads the new emails, the agent answers them by email, and the threads appear in the Inbox like any other conversation.
+
+## Connect a mailbox
+
+<Steps>
+  <Step title="Add the mailbox">
+    Open **Communication > Channels > Mail Inbox** and add a mailbox.
+
+    {/* TODO screenshot: mailbox creation form with the IMAP and SMTP sections (Filament 4). */}
+  </Step>
+  <Step title="Fill in the IMAP settings">
+    Host, port, encryption (SSL/TLS or STARTTLS), username, password and the folder to read (usually `INBOX`).
+  </Step>
+  <Step title="Fill in the SMTP settings">
+    Host, port, encryption, username and password, and the sender: **from email** and **from name**.
+  </Step>
+  <Step title="Save">
+    Shortext checks the IMAP and SMTP connections before saving. If a check fails, the error tells you which one and why (wrong password, port closed...).
+  </Step>
+  <Step title="Choose the agent">
+    Choose the agent that answers the emails of this mailbox.
+  </Step>
+</Steps>
+
+## Common settings
+
+| Provider | IMAP | SMTP |
+| --- | --- | --- |
+| Google Workspace / Gmail | `imap.gmail.com`, 993, SSL | `smtp.gmail.com`, 465 SSL or 587 STARTTLS |
+| Microsoft 365 / Outlook | `outlook.office365.com`, 993, SSL | `smtp.office365.com`, 587, STARTTLS |
+
+<Note>Gmail and Microsoft 365 usually require an **app password** (or IMAP to be enabled by your administrator) when you connect with IMAP / SMTP. One-click Gmail and Outlook connection is [coming soon](/channels/coming-soon).</Note>
+
+## Let your clients connect their mailbox
+
+If you build a product on Shortext, your clients can connect their own mailbox from your app through a [hosted session](/api-reference/hosted-sessions) with the `mail` purpose: they fill in the settings on a Shortext page, which checks them before saving.

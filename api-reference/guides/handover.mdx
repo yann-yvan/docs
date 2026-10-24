@@ -1,0 +1,39 @@
+---
+title: Handover and release
+description: Take a conversation over from the AI agent, hand it back, and assign it, from your own systems.
+---
+
+import Handover from '/snippets/code/handover.mdx';
+
+Use these endpoints to build your own agent console, or to stop the AI when your system detects a sensitive case. All of them require **Send messages**, and the conversation must have an active session.
+
+## Take over and hand back
+
+<Handover />
+
+| Endpoint | Effect | Webhook |
+| --- | --- | --- |
+| `PUT /conversations/{id}/handover` | A human follows the conversation: the AI agent stops answering. | `conversation.handover` |
+| `DELETE /conversations/{id}/handover` | The AI agent answers the next messages again. | `conversation.released` |
+
+Both return the conversation; `session.handover` and `session.handover_at` tell you its state.
+
+Replying with `POST /conversations/{id}/messages` also takes the conversation over, unless you send `"handover": false`. Starting a conversation with `"handover": true` opens it directly in handover.
+
+## Assign
+
+1. `GET /conversations/assignees` lists the members of your company (`USR-XXXXX`).
+2. `PUT /conversations/{id}/assignee` with `{ "user_id": "USR-XXXXX" }` assigns the current session; `{ "user_id": null }` unassigns it.
+
+```bash
+curl -X PUT https://shortext.ny-corp.io/api/v2.0/conversations/$CONVERSATION_ID/assignee \
+  -H "Authorization: Bearer $SHORTEXT_API_KEY" \
+  -H "Accept: application/json" -H "Content-Type: application/json" \
+  -d '{ "user_id": "USR-XXXXX" }'
+```
+
+Filter conversations by assignee with `GET /conversations?assignee=USR-XXXXX` (or `none`).
+
+## Keep your system in sync
+
+Subscribe a [webhook](/api-reference/webhooks) to `conversation.*` to know when someone takes over or hands back from the Inbox, and to `message.*` to follow the messages.

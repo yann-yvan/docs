@@ -1,0 +1,57 @@
+---
+title: Connect a client's WhatsApp
+description: Let each of your clients connect their own WhatsApp Business number from your product, with a hosted session.
+---
+
+import HostedSession from '/snippets/code/hosted-session.mdx';
+
+This guide walks through the [hosted session](/api-reference/hosted-sessions) flow for the `whatsapp` purpose. Your key needs **Manage integrations**.
+
+## 1. Prepare the agent
+
+Create or choose the agent that will answer on the client's number (`POST /agents` or `GET /agents`). Keep its id, `AGI-XXXXX`.
+
+## 2. Create the session when the client clicks "Connect WhatsApp"
+
+<HostedSession />
+
+Store `body.id` with the client it belongs to, then redirect the client to `body.url`. The link is valid for `expires_in` minutes (60 by default, 24 hours at most).
+
+## 3. The client connects their number
+
+On the Shortext page, the client logs in to Facebook, chooses or creates their Meta business portfolio and WhatsApp Business account, then adds and verifies their number. Shortext then sends them to:
+
+```text
+https://app.example.com/settings/whatsapp?session_id=9b1e4c3a-...&status=completed
+```
+
+## 4. Confirm on your server
+
+Show a waiting state on your return page, and confirm with your server:
+
+- listen to `hosted_session.completed` / `hosted_session.failed` on your [webhook](/api-reference/webhooks) (filter on `purpose` if needed), or
+- call `GET /hosted-sessions/{session_id}`.
+
+On success, `result.channels` lists the connected numbers:
+
+```json
+{
+  "id": "9b1e4c3a-6f2d-4b8e-9a7c-2d5f8e1b0c4a",
+  "purpose": "whatsapp",
+  "status": "completed",
+  "result": {
+    "channels": [
+      { "type": "whatsapp", "id": "532867649916076", "name": "+237 6 99 99 99 99 (Acme)", "enabled": true, "agent": { "id": "AGI-XXXXX", "name": "Support" } }
+    ]
+  },
+  "error": null
+}
+```
+
+Save each channel `id` for the client: it is the `channel_id` to send messages from. On `failed`, show `error` and offer to try again with a new session.
+
+## 5. Go further
+
+- Send the client's first messages with [templates](/api-reference/guides/send-a-template).
+- Move the number to another agent with `PUT /channels/whatsapp/{id}/agent`.
+- Connect a mailbox the same way with the `mail` purpose.

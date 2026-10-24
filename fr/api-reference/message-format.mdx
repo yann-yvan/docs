@@ -1,0 +1,187 @@
+---
+title: Format des messages
+description: La grammaire unique qu'utilisent tous les endpoints pour décrire un message - texte, modèle, interactif et média.
+---
+
+Tous les endpoints qui envoient un message (démarrer une conversation, répondre, entrant Shortext, envoi v1.0), ainsi que chaque message d'une réponse ou d'un webhook, utilisent le même objet `message` :
+
+```json
+{
+  "type": "text",
+  "content": { "text": "Bonjour, comment puis-je vous aider ?" }
+}
+```
+
+`type` vaut `text`, `template`, `interactive` ou `media` ; `content` en dépend.
+
+| Type | À utiliser pour | Fenêtre WhatsApp de 24 heures |
+| --- | --- | --- |
+| `text` | Du texte simple | Dans la fenêtre uniquement |
+| `template` | Les modèles WhatsApp approuvés | Dans la fenêtre et en dehors |
+| `interactive` | Boutons, listes, liens d'appel à l'action | Dans la fenêtre uniquement |
+| `media` | Images, vidéos, documents, audio | Dans la fenêtre uniquement |
+
+Chaque endpoint accepte les types qui ont du sens pour lui : par exemple, un message entrant Shortext est uniquement `text`.
+
+## Texte
+
+<ParamField body="content.text" type="string" required>
+  Le texte, jusqu'à **4 096 caractères**. Sur WhatsApp, une URL dans le texte s'affiche comme un lien.
+</ParamField>
+
+```json
+{ "type": "text", "content": { "text": "Votre commande A-1042 a quitté notre entrepôt." } }
+```
+
+## Modèle
+
+<ParamField body="content.template_name" type="string" required>
+  Le nom du modèle, tel que listé par `GET /templates`.
+</ParamField>
+<ParamField body="content.language" type="string" required>
+  La langue du modèle, par exemple `fr` ou `en_US`. Le modèle doit être approuvé dans cette langue.
+</ParamField>
+<ParamField body="content.body" type="object">
+  Les variables du corps, par nom : `{ "name": "Brice", "order": "A-1042" }`. Pour les modèles à variables numérotées (`{{1}}`, `{{2}}`), donnez une liste de paramètres WhatsApp dans l'ordre.
+</ParamField>
+<ParamField body="content.header" type="object">
+  Pour un en-tête **texte** avec variables : `{ "name": "valeur" }`. Pour un en-tête **média** : `{ "url": "https://..." }` (et `filename` pour un document). Sans `url`, le média enregistré avec le modèle est envoyé.
+</ParamField>
+<ParamField body="content.buttons" type="array">
+  Les paramètres des boutons dynamiques, au format de la WhatsApp Cloud API.
+</ParamField>
+<ParamField body="content.category" type="string" default="utility">
+  `utility`, `marketing` ou `authentication`.
+</ParamField>
+
+```json
+{
+  "type": "template",
+  "content": {
+    "template_name": "order_shipped",
+    "language": "fr",
+    "header": { "url": "https://cdn.example.com/parcels/A-1042.jpg" },
+    "body": { "name": "Brice", "order": "A-1042" }
+  }
+}
+```
+
+En v2.0, Shortext vérifie le modèle avant de l'envoyer à WhatsApp et répond `1002` avec un message explicite quand le modèle n'existe pas sur le numéro, n'est pas approuvé dans cette langue, ou qu'il manque une variable (`body.missing` les liste). Voir [Envoyer un modèle](/fr/api-reference/guides/send-a-template).
+
+## Interactif
+
+<ParamField body="content.type" type="string" required>
+  `button` (boutons de réponse), `list`, `cta_url`, `quick_reply`, `carousel`, `flow` ou `payment`.
+</ParamField>
+<ParamField body="content.body" type="string" required>
+  Le texte du message, jusqu'à 1 024 caractères.
+</ParamField>
+<ParamField body="content.action" type="object" required>
+  Les boutons, sections ou le lien, au format `action` de la WhatsApp Cloud API.
+</ParamField>
+<ParamField body="content.header" type="object">
+  `{ "type": "text" | "image" | "video" | "document" | "audio", "value": "texte ou URL", "filename": "pour les documents" }`.
+</ParamField>
+<ParamField body="content.footer" type="string">
+  Jusqu'à 60 caractères.
+</ParamField>
+
+<CodeGroup>
+```json Boutons de réponse
+{
+  "type": "interactive",
+  "content": {
+    "type": "button",
+    "header": { "type": "text", "value": "Livraison" },
+    "body": "Quand souhaitez-vous être livré ?",
+    "footer": "Choisissez un créneau",
+    "action": {
+      "buttons": [
+        { "type": "reply", "reply": { "id": "slot_morning", "title": "Matin" } },
+        { "type": "reply", "reply": { "id": "slot_evening", "title": "Soir" } }
+      ]
+    }
+  }
+}
+```
+
+```json Liste
+{
+  "type": "interactive",
+  "content": {
+    "type": "list",
+    "body": "Pour quel produit avez-vous besoin d'aide ?",
+    "action": {
+      "button": "Voir les produits",
+      "sections": [
+        {
+          "title": "Téléphones",
+          "rows": [
+            { "id": "p_x1", "title": "X1", "description": "Modèle 2025" },
+            { "id": "p_x2", "title": "X2" }
+          ]
+        }
+      ]
+    }
+  }
+}
+```
+</CodeGroup>
+
+WhatsApp autorise jusqu'à 3 boutons de réponse, et jusqu'à 10 sections de 10 lignes dans une liste.
+
+## Média
+
+<ParamField body="content.media_type" type="string" required>
+  `image`, `video`, `document` ou `audio`.
+</ParamField>
+<ParamField body="content.media_url" type="string" required>
+  Une URL publique depuis laquelle Shortext peut télécharger le fichier.
+</ParamField>
+<ParamField body="content.caption" type="string">
+  Jusqu'à 1 024 caractères (pas pour l'audio).
+</ParamField>
+<ParamField body="content.filename" type="string">
+  Le nom de fichier affiché pour un document.
+</ParamField>
+<ParamField body="content.mime" type="string">
+  Le type MIME, par exemple `application/pdf`.
+</ParamField>
+
+```json
+{
+  "type": "media",
+  "content": {
+    "media_type": "document",
+    "media_url": "https://cdn.example.com/invoices/A-1042.pdf",
+    "filename": "Facture A-1042.pdf",
+    "caption": "Votre facture"
+  }
+}
+```
+
+## Les messages dans les réponses et les webhooks
+
+Les messages renvoyés par l'API et envoyés dans les webhooks `message.*` enveloppent le même objet :
+
+```json
+{
+  "id": "msg-hashid",
+  "conversation_id": "conv-hashid",
+  "direction": "inbound",
+  "channel": "whatsapp",
+  "channel_id": "532867649916076",
+  "contact": { "identifier": "237699999999", "identifier_type": "phone", "profile": { "firstname": "Brice" } },
+  "message": {
+    "id": "wamid.HBgM...",
+    "type": "text",
+    "content": { "text": "Bonjour, où en est ma commande ?" }
+  },
+  "status": "received",
+  "created_at": "2026-10-24T09:12:44+00:00"
+}
+```
+
+- `direction` vaut `inbound` (venant du contact) ou `outbound` (de l'agent IA, d'un membre de votre équipe ou de l'API).
+- `message.id` est l'identifiant sur le canal (identifiant de message WhatsApp ; sur un endpoint Shortext, votre propre identifiant de message).
+- `status` vaut `received` pour les messages entrants, puis `sent`, `delivered`, `read` ou `failed` pour les messages sortants ; les changements sont envoyés par le webhook `message.status`.

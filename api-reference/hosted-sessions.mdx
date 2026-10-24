@@ -1,0 +1,131 @@
+---
+title: Hosted sessions
+description: Let your own clients connect their WhatsApp number or mailbox on a Shortext page, from your product.
+---
+
+import HostedSession from '/snippets/code/hosted-session.mdx';
+
+A hosted session is a signed, expiring link to a page **hosted by Shortext**, where your user completes a step you cannot do in your own product: logging in to Meta to connect a WhatsApp Business number, or entering and checking mailbox settings. When they are done, they come back to your app and you receive the result.
+
+Typical case: you build a product on Shortext, and each of your clients connects their own WhatsApp number to the agent you set up for them.
+
+## Flow
+
+<Steps>
+  <Step title="Create the session (your server)">
+    `POST /hosted-sessions` with a `purpose`. The response holds the `url` of the page.
+  </Step>
+  <Step title="Send your user to the page">
+    Redirect them, or open the URL in a new window. Do not embed it in an iframe: the Meta login refuses it.
+  </Step>
+  <Step title="Your user completes the page">
+    On `https://shortext.ny-corp.io/connect/{token}`, they log in to Meta or fill in their mailbox settings.
+  </Step>
+  <Step title="Back to your app">
+    Shortext sends them to your `return_url` with `?session_id={id}&status={status}`.
+  </Step>
+  <Step title="Get the result (your server)">
+    Receive the `hosted_session.completed` or `hosted_session.failed` webhook, or call `GET /hosted-sessions/{id}`. Do not trust the `status` of the return URL alone: anyone can type it.
+  </Step>
+</Steps>
+
+## Purposes
+
+`GET /hosted-sessions/purposes` lists them.
+
+| Purpose | Page | `context` |
+| --- | --- | --- |
+| `whatsapp` | Connect WhatsApp Business numbers with Meta embedded signup. | `agent_id`: the agent that answers on the numbers (default: your first agent). |
+| `mail` | Connect a mailbox with IMAP / SMTP; the connection is checked before saving. | `agent_id`: the agent that answers on the mailbox (default: your first agent). |
+
+## Create a session
+
+Requires the **Manage integrations** permission.
+
+<ParamField body="purpose" type="string" required>
+  `whatsapp` or `mail`.
+</ParamField>
+<ParamField body="context" type="object">
+  Options of the purpose, for example `{ "agent_id": "AGI-XXXXX" }`. The agent must belong to your company.
+</ParamField>
+<ParamField body="return_url" type="string">
+  Your page the user comes back to. HTTPS only.
+</ParamField>
+<ParamField body="locale" type="string">
+  The language of the page, for example `fr` or `en`.
+</ParamField>
+<ParamField body="expires_in" type="integer" default="60">
+  Lifetime of the link in minutes, from 5 to 1,440 (24 hours).
+</ParamField>
+
+<HostedSession />
+
+```json Response
+{
+  "success": true,
+  "message": "Request success.",
+  "code": 1000,
+  "body": {
+    "url": "https://shortext.ny-corp.io/connect/hs_...",
+    "id": "9b1e4c3a-6f2d-4b8e-9a7c-2d5f8e1b0c4a",
+    "purpose": "whatsapp",
+    "status": "pending",
+    "context": { "agent_id": "AGI-XXXXX" },
+    "result": null,
+    "error": null,
+    "return_url": "https://app.example.com/settings/whatsapp",
+    "locale": "fr",
+    "expires_at": "2026-10-24T10:12:44+00:00",
+    "opened_at": null,
+    "finished_at": null,
+    "created_at": "2026-10-24T09:12:44+00:00"
+  }
+}
+```
+
+<Warning>The `url` contains a secret and is only returned at creation. Never log it, never share it with anyone but the user it is for.</Warning>
+
+## Statuses
+
+| Status | Meaning |
+| --- | --- |
+| `pending` | Created, the page has not been opened yet. |
+| `opened` | The user opened the page. |
+| `completed` | Done: `result` holds what it produced. |
+| `failed` | The step failed: `error` says why. |
+| `cancelled` | You cancelled it with `DELETE /hosted-sessions/{id}`. |
+| `expired` | Not finished before `expires_at`. |
+
+A session serves **one** outcome: once it is completed, failed, cancelled or expired, its link stops working. Create a new session to try again.
+
+## Result
+
+For both purposes, `result` lists the connected channels, in the same format as `GET /channels`:
+
+```json
+{
+  "channels": [
+    {
+      "type": "whatsapp",
+      "id": "532867649916076",
+      "name": "+237 6 99 99 99 99 (Acme)",
+      "enabled": true,
+      "agent": { "id": "AGI-XXXXX", "name": "Support" },
+      "settings": null,
+      "created_at": "2026-10-24T09:20:02+00:00"
+    }
+  ]
+}
+```
+
+Keep the channel `id`: it is the `channel_id` you send messages from. A `channel.connected` webhook is also sent for each new channel.
+
+## Other endpoints
+
+| Endpoint | Use |
+| --- | --- |
+| `GET /hosted-sessions` | Your sessions, most recent first, filterable by `purpose`. |
+| `GET /hosted-sessions/{id}` | One session, with its status and result. |
+| `DELETE /hosted-sessions/{id}` | Cancel a session that is not finished: the link stops working. |
+
+See the guide [Connect a client's WhatsApp](/api-reference/guides/connect-whatsapp).

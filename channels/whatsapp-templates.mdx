@@ -1,0 +1,37 @@
+---
+title: WhatsApp templates
+description: Create, sync and use the message templates WhatsApp requires to write first to a contact.
+---
+
+A template is a message model approved by Meta. It is the only kind of message a business can send to a contact outside the [24-hour window](/channels/whatsapp#the-24-hour-window), for example to send an order update or to start a conversation.
+
+## Anatomy of a template
+
+- **Name** and **language**: a template exists in one or more languages (`fr`, `en_US`...). You send it by name and language.
+- **Category**: `UTILITY` (transactional updates), `MARKETING` (promotions) or `AUTHENTICATION` (one-time codes). Meta prices conversations by category.
+- **Header** (optional): a text, or an image, a video or a document.
+- **Body**: the text, with **variables** such as `{{name}}` and `{{order}}`.
+- **Footer** (optional): a short text.
+- **Buttons** (optional): quick replies, a URL, a phone number, a code to copy.
+
+## Manage templates in the dashboard
+
+Open a WhatsApp number in **Communication > Channels > WhatsApp Business** and go to its templates.
+
+- **Create** a template: fill in the parts above and add variables to the body.
+- **Publish** it to submit it to Meta. It is `PENDING` until Meta approves (`APPROVED`) or rejects it (`REJECTED`, with a reason).
+- **Sync** pulls the templates created directly in Meta Business Manager, and refreshes their status.
+- **Sample API Code** shows how to send the template through the API.
+
+{/* TODO screenshot: templates of a number, with the Create, Sync and Publish actions (Filament 4). */}
+
+<Note>Only `APPROVED` templates can be sent. Meta also tracks the quality of each template (green, yellow, red) from how contacts react to it.</Note>
+
+## Send a template
+
+- From the dashboard: in a **campaign** to a segment of contacts, or from the Inbox when the window is closed.
+- From the API: `POST /conversations` with `message.type` `template`. See [Send a template](/api-reference/guides/send-a-template).
+
+## Coming soon
+
+A hosted template builder, so your own clients can create and submit templates from your product. See [Coming soon](/channels/coming-soon).

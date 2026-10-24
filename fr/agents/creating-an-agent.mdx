@@ -1,0 +1,61 @@
+---
+title: Créer un agent
+description: Créez un agent, rédigez ses instructions, rattachez-le à des canaux et restez dans la limite d'agents de votre forfait.
+---
+
+Un agent répond à vos clients sur les canaux qui lui sont rattachés. Vous pouvez créer des agents depuis le tableau de bord ou par l'API (`POST /agents`, voir la [Référence API](/fr/api-reference/introduction)).
+
+## Créer l'agent
+
+<Steps>
+  <Step title="Ouvrez les agents">
+    Dans la barre latérale, ouvrez **Communication > Agents IA** et créez un nouvel agent.
+
+    {/* TODO capture : liste des agents IA et formulaire de création (Filament 4). */}
+  </Step>
+
+  <Step title="Nommez-le et choisissez sa façon de répondre">
+    - **Nom** : affiché à votre équipe dans la boîte de réception, les statistiques et l'API.
+    - **Agent enabled** (agent activé) : un agent désactivé continue d'enregistrer les messages mais ne répond pas.
+    - **Use AI** (utiliser l'IA) : l'IA répond en suivant les instructions. Quand elle est désactivée, l'agent envoie à la place le **message d'indisponibilité**, par exemple « Notre équipe vous répondra pendant nos heures d'ouverture. »
+  </Step>
+
+  <Step title="Rédigez les instructions">
+    Les instructions sont le prompt système de l'IA (jusqu'à 15 000 caractères). Décrivez qui est l'agent, ce à quoi il peut répondre, le ton à adopter et quand il doit passer la main à une personne. Par exemple :
+
+    ```text
+    Tu es l'assistant support d'Acme, une boutique en ligne.
+    Réponds dans la langue du client, en messages courts.
+    Tu peux suivre les commandes avec l'outil get_order. Ne promets jamais de remboursement :
+    quand un client en demande un, dis-lui qu'une personne de l'équipe va le recontacter.
+    ```
+
+    Vous pouvez modifier les instructions à tout moment ; les conversations en cours gardent leur historique.
+  </Step>
+
+  <Step title="Donnez-lui des outils et des connaissances (facultatif)">
+    - Les **outils** permettent à l'agent d'appeler vos propres API, par exemple pour consulter une commande. Voir [Outils](/fr/agents/tools-configuration).
+    - Les **bases de connaissances** sont des documents dans lesquels l'agent cherche avant de répondre : FAQ, conditions, fiches produits.
+  </Step>
+
+  <Step title="Rattachez des canaux">
+    Un agent ne répond que sur les canaux qui lui sont rattachés. Connectez un canal et choisissez cet agent, ou déplacez-y un canal existant. Voir [Canaux](/fr/channels/overview).
+  </Step>
+</Steps>
+
+## Tester avant la mise en production
+
+Avant de rattacher un canal de production, testez l'agent sur un numéro ou une boîte mail de test : écrivez-lui comme le ferait un client, vérifiez les réponses et les appels d'outils dans les journaux, et affinez les instructions.
+
+## Limite d'agents de votre forfait
+
+Votre forfait fixe le nombre d'agents que votre entreprise peut avoir. Une fois la limite atteinte, la création d'un agent (ou la restauration d'un agent supprimé) est refusée, dans le tableau de bord comme dans l'API, où la réponse a le `code` `1005` et où `body.limit` donne la limite de votre forfait.
+
+Pour libérer une place, supprimez un agent que vous n'utilisez plus. Pour avoir plus d'agents, changez de forfait depuis **Facturation**.
+
+{/* TODO: nombre d'agents inclus dans chaque forfait. */}
+
+## Désactiver ou supprimer un agent
+
+- **Désactivez-le** (décochez **Agent enabled**) pour qu'il cesse de répondre tout en gardant ses canaux.
+- **Supprimez-le** quand vous n'en avez plus besoin. Un agent qui a encore des canaux ne peut pas être supprimé : déplacez ou détachez d'abord ses canaux. Ses tickets, ses outils et son historique sont conservés, et un agent supprimé peut être restauré tant que votre forfait le permet.

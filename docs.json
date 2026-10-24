@@ -1,33 +1,57 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "maple",
-  "name": "API documentation",
+  "name": "Shortext",
+  "description": "Shortext runs AI agents on WhatsApp, mailboxes and your own apps. Guides for the dashboard and reference for the public API.",
   "colors": {
     "primary": "#0D9373",
     "light": "#07C983",
     "dark": "#0D9373"
   },
   "favicon": "/favicon.svg",
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "background": {
+    "decoration": "windows"
+  },
   "navigation": {
-    "tabs": [
+    "global": {
+      "anchors": [
+        {
+          "anchor": "Community",
+          "href": "https://shortext.ny-corp.io/community",
+          "icon": "users"
+        },
+        {
+          "anchor": "Blog",
+          "href": "https://shortext.ny-corp.io/blogs",
+          "icon": "newspaper"
+        }
+      ]
+    },
+    "languages": [
       {
-        "tab": "Documentation",
-        "anchors": [
+        "language": "en",
+        "tabs": [
           {
-            "anchor": "Documentation",
+            "tab": "Guides",
             "icon": "book-open",
             "groups": [
               {
                 "group": "Introduction",
                 "pages": [
-                  "introduction/what-is-shortext"
+                  "introduction/what-is-shortext",
+                  "introduction/concepts"
                 ]
               },
               {
-                "group": "Getting Started",
+                "group": "Getting started",
                 "pages": [
                   "getting-started/creating-an-account",
-                  "getting-started/platform-overview"
+                  "getting-started/platform-overview",
+                  "getting-started/api-quickstart"
                 ]
               },
               {
@@ -36,50 +60,225 @@
                   "agents/creating-an-agent",
                   "agents/tools-configuration"
                 ]
+              },
+              {
+                "group": "Channels",
+                "pages": [
+                  "channels/overview",
+                  "channels/whatsapp",
+                  "channels/whatsapp-templates",
+                  "channels/mailbox",
+                  "channels/shortext-endpoint",
+                  "channels/coming-soon"
+                ]
+              },
+              {
+                "group": "Inbox",
+                "pages": [
+                  "inbox/overview",
+                  "inbox/handover-and-assignment",
+                  "inbox/tickets"
+                ]
               }
             ]
           },
           {
-            "anchor": "API Reference",
-            "openapi": {
-              "source": "/api-reference/openapi.json",
-              "directory": "api-reference"
-            },
-            "icon": "square-terminal"
-          },
-          {
-            "anchor": "Community",
-            "href": "https://shortext.ny-corp.io/community",
-            "icon": "slack"
-          },
-          {
-            "anchor": "Blog",
-            "href": "https://shortext.ny-corp.io/blogs",
-            "icon": "newspaper"
-          }
-        ]
-      },
-      {
-        "tab": "API Reference",
-        "anchors": [
-          {
-            "anchor": "API Reference",
-            "openapi": {
-              "source": "/api-reference/openapi.json",
-              "directory": "api-reference"
-            },
+            "tab": "API Reference",
             "icon": "square-terminal",
-            "groups": [
+            "versions": [
               {
-                "group": "API Documentation",
-                "pages": [
-                  "api-reference/introduction"
+                "version": "v2.0",
+                "default": true,
+                "tag": "Latest",
+                "groups": [
+                  {
+                    "group": "Get started",
+                    "pages": [
+                      "api-reference/introduction",
+                      "api-reference/authentication",
+                      "api-reference/versioning",
+                      "api-reference/errors"
+                    ]
+                  },
+                  {
+                    "group": "Formats",
+                    "pages": [
+                      "api-reference/message-format",
+                      "api-reference/contact-format"
+                    ]
+                  },
+                  {
+                    "group": "Integrations",
+                    "pages": [
+                      "api-reference/webhooks",
+                      "api-reference/hosted-sessions",
+                      "api-reference/shortext-endpoint"
+                    ]
+                  },
+                  {
+                    "group": "Guides",
+                    "pages": [
+                      "api-reference/guides/start-a-conversation",
+                      "api-reference/guides/send-a-template",
+                      "api-reference/guides/handover",
+                      "api-reference/guides/connect-whatsapp",
+                      "api-reference/guides/migrate-to-v2"
+                    ]
+                  },
+                  {
+                    "group": "Endpoints",
+                    "openapi": {
+                      "source": "api-reference/v2.0/openapi.json",
+                      "directory": "api-reference/v2.0/endpoints"
+                    }
+                  }
                 ]
               },
               {
-                "group": "Messages",
+                "version": "v1.0",
+                "tag": "Legacy",
+                "groups": [
+                  {
+                    "group": "Legacy API",
+                    "pages": [
+                      "api-reference/v1.0/introduction",
+                      "api-reference/v1.0/send-message"
+                    ]
+                  },
+                  {
+                    "group": "Endpoints",
+                    "openapi": {
+                      "source": "api-reference/v1.0/openapi.json",
+                      "directory": "api-reference/v1.0/endpoints"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "default": true
+      },
+      {
+        "language": "fr",
+        "tabs": [
+          {
+            "tab": "Guides",
+            "icon": "book-open",
+            "groups": [
+              {
+                "group": "Introduction",
                 "pages": [
-                  "api-reference/endpoint/message"
+                  "fr/introduction/what-is-shortext",
+                  "fr/introduction/concepts"
+                ]
+              },
+              {
+                "group": "Premiers pas",
+                "pages": [
+                  "fr/getting-started/creating-an-account",
+                  "fr/getting-started/platform-overview",
+                  "fr/getting-started/api-quickstart"
+                ]
+              },
+              {
+                "group": "Agents",
+                "pages": [
+                  "fr/agents/creating-an-agent",
+                  "fr/agents/tools-configuration"
+                ]
+              },
+              {
+                "group": "Canaux",
+                "pages": [
+                  "fr/channels/overview",
+                  "fr/channels/whatsapp",
+                  "fr/channels/whatsapp-templates",
+                  "fr/channels/mailbox",
+                  "fr/channels/shortext-endpoint",
+                  "fr/channels/coming-soon"
+                ]
+              },
+              {
+                "group": "Boîte de réception",
+                "pages": [
+                  "fr/inbox/overview",
+                  "fr/inbox/handover-and-assignment",
+                  "fr/inbox/tickets"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "Référence API",
+            "icon": "square-terminal",
+            "versions": [
+              {
+                "version": "v2.0",
+                "default": true,
+                "tag": "Actuelle",
+                "groups": [
+                  {
+                    "group": "Démarrer",
+                    "pages": [
+                      "fr/api-reference/introduction",
+                      "fr/api-reference/authentication",
+                      "fr/api-reference/versioning",
+                      "fr/api-reference/errors"
+                    ]
+                  },
+                  {
+                    "group": "Formats",
+                    "pages": [
+                      "fr/api-reference/message-format",
+                      "fr/api-reference/contact-format"
+                    ]
+                  },
+                  {
+                    "group": "Intégrations",
+                    "pages": [
+                      "fr/api-reference/webhooks",
+                      "fr/api-reference/hosted-sessions",
+                      "fr/api-reference/shortext-endpoint"
+                    ]
+                  },
+                  {
+                    "group": "Guides",
+                    "pages": [
+                      "fr/api-reference/guides/start-a-conversation",
+                      "fr/api-reference/guides/send-a-template",
+                      "fr/api-reference/guides/handover",
+                      "fr/api-reference/guides/connect-whatsapp",
+                      "fr/api-reference/guides/migrate-to-v2"
+                    ]
+                  },
+                  {
+                    "group": "Endpoints",
+                    "openapi": {
+                      "source": "api-reference/v2.0/openapi.json",
+                      "directory": "fr/api-reference/v2.0/endpoints"
+                    }
+                  }
+                ]
+              },
+              {
+                "version": "v1.0",
+                "tag": "Historique",
+                "groups": [
+                  {
+                    "group": "API historique",
+                    "pages": [
+                      "fr/api-reference/v1.0/introduction",
+                      "fr/api-reference/v1.0/send-message"
+                    ]
+                  },
+                  {
+                    "group": "Endpoints",
+                    "openapi": {
+                      "source": "api-reference/v1.0/openapi.json",
+                      "directory": "fr/api-reference/v1.0/endpoints"
+                    }
+                  }
                 ]
               }
             ]
@@ -88,21 +287,42 @@
       }
     ]
   },
-  "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
-  },
-  "background": {
-    "decoration": "windows"
+  "redirects": [
+    {
+      "source": "/introduction",
+      "destination": "/introduction/what-is-shortext"
+    },
+    {
+      "source": "/quickstart",
+      "destination": "/getting-started/api-quickstart"
+    },
+    {
+      "source": "/api-reference/endpoint/message",
+      "destination": "/api-reference/v1.0/send-message"
+    }
+  ],
+  "api": {
+    "openapi": "api-reference/v2.0/openapi.json",
+    "playground": {
+      "display": "interactive"
+    },
+    "examples": {
+      "languages": [
+        "curl",
+        "php",
+        "javascript",
+        "python"
+      ]
+    }
   },
   "navbar": {
     "links": [
       {
-        "label": "Mail Us",
+        "label": "Mail us",
         "href": "mailto:hello@ny-corp.io"
       },
       {
-        "label": "WhatsApp Us",
+        "label": "WhatsApp us",
         "href": "https://shortext.ny-corp.io/237657482849"
       }
     ],

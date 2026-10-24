@@ -1,0 +1,62 @@
+---
+title: Authentification
+description: Les clés API d'entreprise, leurs permissions et la façon de les envoyer.
+---
+
+L'API authentifie les requêtes avec des **clés API d'entreprise**. Une clé appartient à une entreprise, pas à une personne : elle continue de fonctionner quand l'équipe change.
+
+## Créer une clé
+
+Dans le tableau de bord, ouvrez **Développeur > API Keys** (il faut la permission **Accéder à l'API** dans votre entreprise) et créez une clé :
+
+1. donnez-lui un nom qui dit ce qui l'utilise, par exemple « Intégration CRM » ou « Service de facturation » ;
+2. choisissez ses permissions (voir ci-dessous) ;
+3. copiez la clé : elle n'est affichée **qu'une fois**.
+
+Vous pouvez modifier les permissions d'une clé existante sans la recréer, et supprimer une clé pour la révoquer immédiatement.
+
+{/* TODO capture : Développeur > API Keys et le formulaire de création (Filament 4). */}
+
+## Envoyer la clé
+
+Envoyez la clé dans l'en-tête `Authorization` comme jeton bearer :
+
+```http
+GET /api/v2.0/me HTTP/1.1
+Host: shortext.ny-corp.io
+Authorization: Bearer 12|AbCdEf...
+Accept: application/json
+```
+
+Une clé absente ou invalide obtient `success: false` avec le `code` `4`.
+
+<Warning>Gardez les clés sur vos serveurs. Ne les livrez jamais dans une application mobile, un navigateur ou un dépôt public. Si une clé fuite, supprimez-la dans le tableau de bord et créez-en une nouvelle.</Warning>
+
+## Permissions
+
+Une clé ne fait que ce que ses permissions autorisent. Il y en a quatre :
+
+| Permission | Capacité | Donne accès à | Par défaut |
+| --- | --- | --- | --- |
+| Envoyer des messages | `permissions.send_messages` | Démarrer des conversations, répondre, prendre en main, rendre la main, assigner ; lister les modèles | Oui |
+| Voir les messages | `permissions.view_messages` | Lister et lire les conversations et leurs messages, lister les membres assignables | Oui |
+| Gérer les liens dynamiques | `permissions.manage_dynamic_links` | Liens profonds (v1.0) | Oui |
+| Gérer les intégrations | `permissions.manage_integrations` | Agents, canaux, endpoints Shortext, webhooks, sessions hébergées | Non |
+
+Donnez à chaque clé le minimum nécessaire : un service qui n'envoie que des notifications a besoin d'**Envoyer des messages**, un back-office qui configure des agents a besoin de **Gérer les intégrations**.
+
+Une requête sans la permission requise obtient le `code` `1005` et un message qui nomme la permission manquante :
+
+```json
+{
+  "success": false,
+  "message": "Missing the permissions.manage_integrations permission",
+  "code": 1005,
+  "body": null,
+  "trace_id": "..."
+}
+```
+
+`GET /me` renvoie les capacités de la clé utilisée (`body.token.abilities`).
+
+<Note>**La v1.0 ne vérifie pas les permissions des clés** : toute clé valide peut appeler n'importe quel endpoint v1.0. La v2.0 les vérifie à chaque requête. Lors de votre migration, assurez-vous que vos clés ont les permissions dont vos appels ont besoin.</Note>

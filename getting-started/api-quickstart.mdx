@@ -1,0 +1,83 @@
+---
+title: API quickstart
+description: Create an API key, check it with GET /me and send your first message with the Shortext API v2.0.
+---
+
+import Me from '/snippets/code/me.mdx';
+import StartConversation from '/snippets/code/start-conversation.mdx';
+
+This quickstart takes you from an empty integration to a first WhatsApp message sent through the API. You need a Shortext company with at least one [connected WhatsApp number](/channels/whatsapp).
+
+<Steps>
+  <Step title="Create an API key">
+    In the dashboard, open **Developer > API Keys** and create a key. Give it a name (for example "CRM integration") and choose its permissions. To follow this quickstart, keep **Send messages** checked; add **Manage integrations** if your integration also manages agents, channels or webhooks.
+
+    The key is shown **once**. Store it in a secret manager or an environment variable, for example `SHORTEXT_API_KEY`.
+
+    {/* TODO screenshot: Developer > API Keys, creation form with the permissions (Filament 4). */}
+
+    <Warning>An API key gives access to your company's data. Never put it in a mobile app, a web page or a public repository.</Warning>
+  </Step>
+
+  <Step title="Check the key with GET /me">
+    Every request sends the key as a bearer token. `GET /me` tells you which company and which key you are using.
+
+    <Me />
+
+    ```json Response
+    {
+      "success": true,
+      "message": "Request success.",
+      "code": 1000,
+      "body": {
+        "company": { "id": "CMP-XXXXX", "name": "Acme" },
+        "user": null,
+        "token": {
+          "name": "CRM integration",
+          "abilities": ["permissions.send_messages", "permissions.view_messages"],
+          "last_used_at": "2026-10-24T09:12:44.000000Z",
+          "expires_at": null
+        },
+        "api_version": "v2.0"
+      }
+    }
+    ```
+
+    The HTTP status is always `200`: read `success` and `code` to know the outcome. See [API introduction](/api-reference/introduction).
+  </Step>
+
+  <Step title="Find your channel and a template">
+    `GET /channels?type=whatsapp` lists your WhatsApp numbers. The `id` of a channel is the `channel_id` you send messages from.
+
+    WhatsApp only lets a business write first with an **approved template**. `GET /templates?channel_id={id}&status=APPROVED` lists the templates this number can send, with their variables.
+  </Step>
+
+  <Step title="Send your first message">
+    `POST /conversations` sends a first message to a contact and opens (or continues) the conversation.
+
+    <StartConversation />
+
+    The response holds the `conversation` and the sent `message`. Keep `conversation.id`: you use it to [reply](/api-reference/guides/start-a-conversation), [take the conversation over](/api-reference/guides/handover) or read its messages.
+  </Step>
+
+  <Step title="Receive the replies">
+    When the contact answers, the agent attached to the channel replies automatically. To follow the conversation from your system, create a [webhook endpoint](/api-reference/webhooks) subscribed to `message.*`.
+  </Step>
+</Steps>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key" href="/api-reference/authentication">
+    API keys and their permissions.
+  </Card>
+  <Card title="Message format" icon="message" href="/api-reference/message-format">
+    Text, templates, interactive messages and media.
+  </Card>
+  <Card title="Webhooks" icon="webhook" href="/api-reference/webhooks">
+    Receive signed events in real time.
+  </Card>
+  <Card title="The 24-hour rule" icon="clock" href="/api-reference/guides/start-a-conversation">
+    When WhatsApp accepts free text, and when it needs a template.
+  </Card>
+</CardGroup>

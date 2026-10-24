@@ -1,0 +1,57 @@
+---
+title: Connecter le WhatsApp d'un client
+description: Laissez chacun de vos clients connecter son propre numéro WhatsApp Business depuis votre produit, avec une session hébergée.
+---
+
+import HostedSession from '/snippets/code/hosted-session.mdx';
+
+Ce guide détaille le parcours de [session hébergée](/fr/api-reference/hosted-sessions) avec l'objectif `whatsapp`. Votre clé doit avoir **Gérer les intégrations**.
+
+## 1. Préparer l'agent
+
+Créez ou choisissez l'agent qui répondra sur le numéro du client (`POST /agents` ou `GET /agents`). Gardez son identifiant, `AGI-XXXXX`.
+
+## 2. Créer la session quand le client clique sur « Connecter WhatsApp »
+
+<HostedSession />
+
+Enregistrez `body.id` avec le client concerné, puis redirigez le client vers `body.url`. Le lien est valable `expires_in` minutes (60 par défaut, 24 heures au maximum).
+
+## 3. Le client connecte son numéro
+
+Sur la page Shortext, le client se connecte à Facebook, choisit ou crée son portefeuille Meta Business et son compte WhatsApp Business, puis ajoute et vérifie son numéro. Shortext le renvoie ensuite vers :
+
+```text
+https://app.example.com/settings/whatsapp?session_id=9b1e4c3a-...&status=completed
+```
+
+## 4. Confirmer sur votre serveur
+
+Affichez un état d'attente sur votre page de retour, et confirmez côté serveur :
+
+- écoutez `hosted_session.completed` / `hosted_session.failed` sur votre [webhook](/fr/api-reference/webhooks) (filtrez sur `purpose` si besoin), ou
+- appelez `GET /hosted-sessions/{session_id}`.
+
+En cas de succès, `result.channels` liste les numéros connectés :
+
+```json
+{
+  "id": "9b1e4c3a-6f2d-4b8e-9a7c-2d5f8e1b0c4a",
+  "purpose": "whatsapp",
+  "status": "completed",
+  "result": {
+    "channels": [
+      { "type": "whatsapp", "id": "532867649916076", "name": "+237 6 99 99 99 99 (Acme)", "enabled": true, "agent": { "id": "AGI-XXXXX", "name": "Support" } }
+    ]
+  },
+  "error": null
+}
+```
+
+Enregistrez l'`id` de chaque canal pour le client : c'est le `channel_id` depuis lequel envoyer les messages. En cas de `failed`, affichez `error` et proposez de réessayer avec une nouvelle session.
+
+## 5. Aller plus loin
+
+- Envoyez les premiers messages du client avec des [modèles](/fr/api-reference/guides/send-a-template).
+- Déplacez le numéro vers un autre agent avec `PUT /channels/whatsapp/{id}/agent`.
+- Connectez une boîte mail de la même façon avec l'objectif `mail`.

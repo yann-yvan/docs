@@ -1,0 +1,72 @@
+---
+title: Send a message (v1.0)
+description: The legacy POST /messages/send endpoint and the message types it supports.
+---
+
+<Warning>Legacy endpoint. In v2.0, use [`POST /conversations`](/api-reference/guides/start-a-conversation) to write first and `POST /conversations/{id}/messages` to reply. See [Migrate to v2.0](/api-reference/guides/migrate-to-v2).</Warning>
+
+`POST https://shortext.ny-corp.io/api/messages/send`
+
+| Field | Description |
+| --- | --- |
+| `channel` | `whatsapp` or `mail`. |
+| `from` | The sending channel: WhatsApp phone number id or mailbox username. |
+| `contact` | `identifier` (WhatsApp: E.164 without `+`) and `profile`, where `lastname` is **required**. See [Contact format](/api-reference/contact-format). |
+| `message` | `type` and `content`, see [Message format](/api-reference/message-format). |
+
+```json
+{
+  "channel": "whatsapp",
+  "from": "532867649916076",
+  "contact": { "identifier": "237699999999", "profile": { "lastname": "Mbarga" } },
+  "message": { "type": "text", "content": { "text": "Your order A-1042 has left our warehouse." } }
+}
+```
+
+On WhatsApp, text, media and interactive messages are only delivered within 24 hours of the contact's last message; outside that window, send a template.
+
+## What the messages look like
+
+<Tabs>
+  <Tab title="Text">
+    Text messages contain a body of up to 4,096 characters. WhatsApp renders a preview of the first URL of the text when it can (the URL must start with `http://` or `https://`); otherwise it shows a clickable link.
+
+    <Frame>
+      <img src="/images/text-message.png" alt="A text message on WhatsApp" />
+    </Frame>
+  </Tab>
+
+  <Tab title="Reply buttons">
+    Interactive reply buttons offer up to three predefined replies.
+
+    <Frame>
+      <img height="200" src="/images/interactive-button-reply.png" alt="A message with reply buttons" />
+    </Frame>
+
+    When the contact taps a button, their choice comes back as a message.
+
+    <Frame>
+      <img height="150" src="/images/interactive-button-sample-response.png" alt="The contact's choice" />
+    </Frame>
+  </Tab>
+
+  <Tab title="Lists">
+    Interactive lists present options grouped in sections: up to 10 sections of 10 rows, with an optional header and footer.
+
+    <Frame>
+      <img height="200" src="/images/interactive-list.png" alt="A list message" />
+    </Frame>
+
+    Tapping the button opens the list of options:
+
+    <Frame>
+      <img height="150" src="/images/interactive-list-modal.png" alt="The options of a list" />
+    </Frame>
+
+    The selected option comes back as a reply:
+
+    <Frame>
+      <img height="150" src="/images/interactive-list-reply.png" alt="The contact's selection" />
+    </Frame>
+  </Tab>
+</Tabs>

@@ -1,0 +1,36 @@
+---
+title: Prise en main et assignation
+description: Prenez une conversation en main à la place de l'agent IA, rendez-la-lui, et assignez-la à un membre de votre équipe.
+---
+
+## Prise en main
+
+Une conversation est **prise en main** (handover) quand une personne la suit : l'agent IA ne répond plus à ce contact.
+
+- **Prendre en main** : activez l'interrupteur d'assistance de la conversation, ou répondez simplement au client. L'IA cesse de répondre.
+- **Rendre la main** : désactivez l'interrupteur d'assistance. L'IA répond de nouveau aux prochains messages du contact.
+
+{/* TODO capture : l'interrupteur d'assistance dans une conversation (Filament 4). */}
+
+La prise en main s'applique à la session en cours. Chaque changement est annoncé à vos systèmes par les [webhooks](/fr/api-reference/webhooks) `conversation.handover` et `conversation.released`.
+
+<Tip>Indiquez dans les instructions de l'agent quand il doit faire appel à une personne, par exemple « pour les remboursements, dis au client qu'une personne va le recontacter ». Votre équipe prend alors ces conversations en main depuis la boîte de réception.</Tip>
+
+## Assignation
+
+Vous pouvez assigner la session en cours d'une conversation à un membre de votre entreprise. Elle apparaît alors dans sa vue **Mes conversations**.
+
+- Un membre ayant le rôle **agent** ne peut pas répondre à une conversation assignée à quelqu'un d'autre.
+- Les conversations non assignées sont listées dans **Non assignées**.
+
+## Depuis l'API
+
+| Action | Endpoint |
+| --- | --- |
+| Prendre en main | `PUT /conversations/{id}/handover` |
+| Rendre la main | `DELETE /conversations/{id}/handover` |
+| Répondre sans prendre en main | `POST /conversations/{id}/messages` avec `"handover": false` |
+| Assigner / désassigner | `PUT /conversations/{id}/assignee` avec `user_id` (ou `null`) |
+| Lister les membres assignables | `GET /conversations/assignees` |
+
+Voir le guide [Prise en main et retour à l'agent](/fr/api-reference/guides/handover).

@@ -1,0 +1,46 @@
+---
+title: Canaux
+description: Les canaux pris en charge par Shortext, leur lien avec les agents et l'endroit où les gérer.
+---
+
+Un canal est l'endroit où vos clients vous écrivent et où votre agent leur répond. Gérez-les dans **Communication > Canaux** ; connecter ou modifier un canal demande la permission **Gérer les intégrations**.
+
+<CardGroup cols={3}>
+  <Card title="WhatsApp" icon="whatsapp" href="/fr/channels/whatsapp">
+    Numéros WhatsApp Business, connectés avec Meta.
+  </Card>
+  <Card title="Boîte mail" icon="envelope" href="/fr/channels/mailbox">
+    Toute boîte mail accessible en IMAP et SMTP.
+  </Card>
+  <Card title="Endpoint Shortext" icon="code" href="/fr/channels/shortext-endpoint">
+    Votre propre application ou serveur, via l'API.
+  </Card>
+</CardGroup>
+
+## Un agent par canal
+
+Chaque canal est rattaché à un agent, qui répond à toutes les conversations du canal. Vous pouvez :
+
+- **rattacher** un canal à un agent au moment de le connecter ;
+- le **déplacer** vers un autre agent à tout moment : les nouveaux messages reçoivent la réponse du nouvel agent ;
+- le **détacher** : les messages sont toujours reçus et enregistrés dans la boîte de réception, mais personne ne répond automatiquement.
+
+Un agent peut avoir plusieurs canaux, par exemple un numéro WhatsApp et une boîte mail de support.
+
+## Identifiants des canaux
+
+Chaque canal a un identifiant, utilisé par l'API et les webhooks (`channel_id`) :
+
+| Canal | Identifiant |
+| --- | --- |
+| WhatsApp | L'identifiant du numéro de téléphone WhatsApp fourni par Meta, par exemple `532867649916076` |
+| Boîte mail | Le nom d'utilisateur de la boîte, en général son adresse e-mail |
+| Endpoint Shortext | `ste_...` |
+
+## Supprimer un canal
+
+La suppression d'un canal est définitive : il ne reçoit plus de messages et ses conversations quittent la boîte de réception (elles sont conservées pour audit).
+
+## Bientôt disponible
+
+Boîtes Gmail et Outlook connectées en un clic, éditeur de modèles hébergé, Instagram et Messenger. Voir [Bientôt disponible](/fr/channels/coming-soon).

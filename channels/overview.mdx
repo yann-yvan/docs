@@ -1,0 +1,46 @@
+---
+title: Channels
+description: The channels Shortext supports, how they relate to agents, and where to manage them.
+---
+
+A channel is where your customers write to you and where your agent answers. Manage them in **Communication > Channels**; connecting or changing a channel needs the **Manage integrations** permission.
+
+<CardGroup cols={3}>
+  <Card title="WhatsApp" icon="whatsapp" href="/channels/whatsapp">
+    WhatsApp Business numbers, connected with Meta.
+  </Card>
+  <Card title="Mailbox" icon="envelope" href="/channels/mailbox">
+    Any mailbox reachable through IMAP and SMTP.
+  </Card>
+  <Card title="Shortext endpoint" icon="code" href="/channels/shortext-endpoint">
+    Your own app or server, through the API.
+  </Card>
+</CardGroup>
+
+## One agent per channel
+
+Each channel is attached to one agent, which answers every conversation on it. You can:
+
+- **attach** a channel to an agent when you connect it;
+- **move** it to another agent at any time: new messages are answered by the new agent;
+- **detach** it: messages are still received and stored in the Inbox, but nobody answers automatically.
+
+An agent can have several channels, for example a WhatsApp number and a support mailbox.
+
+## Channel ids
+
+Every channel has an id, used by the API and the webhooks (`channel_id`):
+
+| Channel | Id |
+| --- | --- |
+| WhatsApp | The WhatsApp phone number id given by Meta, for example `532867649916076` |
+| Mailbox | The mailbox username, usually its email address |
+| Shortext endpoint | `ste_...` |
+
+## Deleting a channel
+
+Deleting a channel is final: it stops receiving messages and its conversations leave the Inbox (they are kept for audits).
+
+## Coming soon
+
+Gmail and Outlook mailboxes connected in one click, a hosted template builder, and Instagram and Messenger. See [Coming soon](/channels/coming-soon).

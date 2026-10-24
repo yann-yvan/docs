@@ -1,0 +1,111 @@
+---
+title: Migrate from v1.0 to v2.0
+description: v1.0 is legacy and will be removed. What changes in v2.0 and how to move your integration.
+---
+
+<Warning>
+**v1.0 is legacy.** It keeps working for now but receives no new features, and it will be deprecated then removed. The dates will be announced in advance through the `Deprecation` and `Sunset` headers of v1.0 responses (see [Versioning](/api-reference/versioning)); after the sunset date, every v1.0 call answers HTTP 410. Move to v2.0 now.
+</Warning>
+
+## What stays the same
+
+- The **API keys**: the same keys work on both versions.
+- The **response envelope**: HTTP 200 with `success`, `code`, `message` and `body`.
+- The **message** and **contact** grammars: `message.type` + `message.content`, `contact.identifier` + `contact.profile`.
+
+## What changes
+
+| | v1.0 | v2.0 |
+| --- | --- | --- |
+| Base URL | `https://shortext.ny-corp.io/api` | `https://shortext.ny-corp.io/api/v2.0` |
+| Key permissions | Not checked | Checked on every request, see [Authentication](/api-reference/authentication) |
+| Sending | `POST /messages/send`, one call per message, no conversation | `POST /conversations` to start, `POST /conversations/{id}/messages` to reply |
+| Sending channel | `from` | `channel_id` |
+| Contact profile | `lastname` required | All profile fields optional |
+| Templates | Sent as given to WhatsApp | Checked first (exists, approved, variables), short forms `body: { name: value }` and `header: { url }` |
+| 24-hour rule | Errors come from WhatsApp | Explicit `1002` before sending |
+| Agents | `GET /agent/search` | Full management: `GET`, `POST`, `PATCH`, `DELETE /agents`, restore |
+| Conversations | Not available | List, read, reply, handover, assignment |
+| Channels | Not available | List, attach to agents, Shortext endpoints |
+| Webhooks | Not available | Signed webhooks with retries |
+| Hosted sessions | Not available | Connect your clients' WhatsApp and mailboxes |
+
+## Endpoint mapping
+
+| v1.0 | v2.0 |
+| --- | --- |
+| `POST /messages/send` | `POST /conversations` (first message) or `POST /conversations/{id}/messages` (reply) |
+| `GET /agent/search` | `GET /agents` |
+| `POST /v1.0/messages/inbound` (Shortext) | Unchanged: still `POST /api/v1.0/messages/inbound`, see [Shortext endpoint](/api-reference/shortext-endpoint) |
+| `GET /business-manager/balance` | No v2.0 equivalent yet: keep using v1.0 |
+| `GET /ticket/search`, `/ticket/sla/search`, `/ticket/status/search` | No v2.0 equivalent yet; find the conversation of a ticket with `GET /conversations?ticket_id=` |
+| `POST /contact/knowledge/add` | No v2.0 equivalent yet: keep using v1.0 |
+
+{/* TODO: confirm the v2.0 plans for balance, tickets and contact knowledge before v1.0 is deprecated. */}
+
+## Example: sending a message
+
+<CodeGroup>
+```json v1.0 POST /api/messages/send
+{
+  "channel": "whatsapp",
+  "from": "532867649916076",
+  "contact": {
+    "identifier": "237699999999",
+    "profile": { "lastname": "Mbarga" }
+  },
+  "message": {
+    "type": "template",
+    "content": {
+      "template_name": "order_update",
+      "language": "fr",
+      "body": [
+        { "type": "text", "parameter_name": "name", "text": "Brice" },
+        { "type": "text", "parameter_name": "order", "text": "A-1042" }
+      ]
+    }
+  }
+}
+```
+
+```json v2.0 POST /api/v2.0/conversations
+{
+  "channel": "whatsapp",
+  "channel_id": "532867649916076",
+  "contact": {
+    "identifier": "237699999999",
+    "profile": { "lastname": "Mbarga" }
+  },
+  "message": {
+    "type": "template",
+    "content": {
+      "template_name": "order_update",
+      "language": "fr",
+      "body": { "name": "Brice", "order": "A-1042" }
+    }
+  }
+}
+```
+</CodeGroup>
+
+The v2.0 response gives you the `conversation` (keep its `id` to reply or take over) and the `message`.
+
+## Checklist
+
+<Steps>
+  <Step title="Check your keys">
+    Call `GET /api/v2.0/me` with each key and check `body.token.abilities`. Add **Send messages**, **View messages** or **Manage integrations** in **Developer > API Keys** where needed.
+  </Step>
+  <Step title="Switch the base URL">
+    Point your client to `https://shortext.ny-corp.io/api/v2.0`.
+  </Step>
+  <Step title="Replace the sending calls">
+    `from` becomes `channel_id`; replies go to `POST /conversations/{id}/messages`.
+  </Step>
+  <Step title="Replace polling with webhooks">
+    Subscribe to `message.*` and `conversation.*` instead of polling.
+  </Step>
+  <Step title="Watch the headers">
+    Log `X-Shortext-Api-Version`, `Deprecation` and `Sunset` in your client so you never miss an announcement.
+  </Step>
+</Steps>

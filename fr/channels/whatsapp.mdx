@@ -1,0 +1,55 @@
+---
+title: WhatsApp
+description: Connectez des numéros WhatsApp Business avec l'inscription intégrée de Meta, et comprenez la fenêtre de 24 heures.
+---
+
+Shortext utilise la plateforme officielle WhatsApp Business (Cloud API). Vous connectez vos numéros en vous identifiant auprès de Meta depuis Shortext : aucun jeton à copier, aucun webhook à configurer.
+
+## Avant de commencer
+
+- Un compte Facebook ayant accès au portefeuille **Meta Business** de votre entreprise (ou le droit d'en créer un).
+- Un numéro de téléphone pouvant recevoir un SMS ou un appel pour le vérifier, et qui n'est **pas** enregistré dans l'application WhatsApp ou WhatsApp Business (ou que vous êtes prêt à migrer).
+- Un moyen de paiement dans Meta Business pour les conversations que Meta facture.
+
+## Connecter un numéro
+
+<Steps>
+  <Step title="Lancez la connexion">
+    Ouvrez **Communication > Canaux > WhatsApp Business** et cliquez sur **Connecter un numéro WhatsApp**.
+
+    {/* TODO capture : liste des canaux WhatsApp avec le bouton Connecter un numéro WhatsApp (Filament 4). */}
+  </Step>
+  <Step title="Identifiez-vous auprès de Meta">
+    Une page Shortext ouvre la fenêtre d'inscription de Meta. Connectez-vous avec Facebook, choisissez ou créez votre portefeuille business et votre compte WhatsApp Business, puis ajoutez et vérifiez votre numéro.
+
+    {/* TODO capture : la page de connexion Shortext et la fenêtre d'inscription intégrée de Meta. */}
+  </Step>
+  <Step title="Retour dans Shortext">
+    Une fois l'étape Meta terminée, vous revenez au tableau de bord. Vos numéros apparaissent dans les canaux WhatsApp, et Shortext synchronise leurs modèles.
+  </Step>
+  <Step title="Choisissez l'agent">
+    Ouvrez le numéro et choisissez l'agent qui y répond.
+  </Step>
+</Steps>
+
+<Tip>Vos clients peuvent connecter **leurs propres** numéros à votre entreprise Shortext avec le même parcours Meta, depuis votre produit, grâce à une [session hébergée](/fr/api-reference/hosted-sessions).</Tip>
+
+## La fenêtre de 24 heures
+
+WhatsApp protège ses utilisateurs des messages non sollicités :
+
+- Quand un contact vous écrit, une **fenêtre de 24 heures** s'ouvre. Pendant cette fenêtre, votre agent et votre équipe peuvent envoyer n'importe quel message : texte, média, interactif.
+- En dehors de cette fenêtre, une entreprise ne peut envoyer qu'un **modèle approuvé**. C'est aussi ainsi que vous écrivez en premier à un contact.
+
+En pratique :
+
+| Situation | Ce que vous pouvez envoyer |
+| --- | --- |
+| Le contact a écrit il y a moins de 24 heures | Tout |
+| Le contact n'a jamais écrit, ou a écrit il y a plus de 24 heures | Un modèle approuvé uniquement |
+
+Quand votre équipe répond depuis la boîte de réception hors de la fenêtre, Shortext envoie la réponse sous forme de modèle de notification pour qu'elle atteigne quand même le contact. Par l'API, démarrer une conversation avec du texte libre hors de la fenêtre est refusé : utilisez un modèle. Voir [Démarrer une conversation](/fr/api-reference/guides/start-a-conversation).
+
+## Modèles
+
+Les modèles sont créés et approuvés par compte WhatsApp Business. Voir [Modèles WhatsApp](/fr/channels/whatsapp-templates).

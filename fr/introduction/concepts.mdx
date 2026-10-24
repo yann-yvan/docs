@@ -1,0 +1,55 @@
+---
+title: Concepts clés
+description: Les quelques objets que vous manipulez dans Shortext, dans le tableau de bord comme dans l'API.
+---
+
+## Entreprise
+
+Tout, dans Shortext, appartient à une **entreprise** : agents, canaux, conversations, clés API et webhooks. Votre compte utilisateur peut être membre de plusieurs entreprises ; chaque membre a un rôle (par exemple administrateur, manager ou agent) qui détermine ce qu'il peut voir et faire dans le tableau de bord.
+
+## Agent
+
+Un **agent** répond à vos clients. Il possède :
+
+- un **nom** et un interrupteur **actif** : un agent inactif continue de recevoir et d'enregistrer les messages, mais ne répond pas ;
+- des **instructions** : le prompt système que suit l'IA (ton, règles, ce qu'il faut faire ou non) ;
+- un interrupteur **IA** : quand l'IA est désactivée, l'agent envoie à la place un **message d'indisponibilité** fixe ;
+- des **outils** : vos propres API HTTP que l'agent peut appeler pour consulter ou modifier des données, voir [Outils](/fr/agents/tools-configuration) ;
+- une **base de connaissances** dans laquelle il cherche pour répondre.
+
+Votre forfait fixe le nombre d'agents que votre entreprise peut avoir.
+
+## Canal
+
+Un **canal** est l'endroit où ont lieu les conversations. Shortext prend en charge trois types :
+
+| Type | Ce que c'est | Identifiant du canal |
+| --- | --- | --- |
+| `whatsapp` | Un numéro WhatsApp Business connecté via Meta | L'identifiant du numéro de téléphone WhatsApp |
+| `mail` | Une boîte mail connectée en IMAP / SMTP | Le nom d'utilisateur de la boîte |
+| `shortext` | Un endpoint avec lequel votre serveur ou votre application dialogue via l'API | `ste_...` |
+
+Chaque canal est rattaché à **un agent**, qui y répond. Un canal peut aussi être **détaché** : les messages sont toujours enregistrés, mais personne ne répond automatiquement.
+
+## Contact
+
+Un **contact** est un client. Il est identifié par son **identifiant** sur le canal : un numéro de téléphone sur WhatsApp, une adresse e-mail sur une boîte mail, votre propre identifiant utilisateur sur un endpoint Shortext.
+
+## Conversation et session
+
+Une **conversation** est le fil d'échanges entre un contact et l'un de vos canaux. À l'intérieur, une **session** est la période d'activité en cours :
+
+- **active** : une session est ouverte, l'agent (ou une personne) répond ;
+- **archivée** : aucune session n'est ouverte ; un nouveau message ouvre une nouvelle session.
+
+## Prise en main
+
+Quand un membre de votre équipe prend une conversation en main, elle est en **handover** : l'agent IA cesse de répondre à ce contact jusqu'à ce que la conversation lui soit rendue. Répondre depuis la boîte de réception (ou via l'API) prend la conversation en main par défaut. Voir [Prise en main et assignation](/fr/inbox/handover-and-assignment).
+
+## Assignation et tickets
+
+Une session peut être **assignée** à un membre de votre entreprise, qui la suit alors dans **Boîte de réception > Mes conversations**. Une conversation peut aussi donner lieu à des **tickets** pour suivre une demande jusqu'à sa résolution. Voir [Tickets](/fr/inbox/tickets).
+
+## Identifiants dans l'API
+
+L'API n'expose jamais les identifiants internes de la base de données. Les agents ressemblent à `AGI-XXXXX`, les membres à `USR-XXXXX`, les entreprises à `CMP-XXXXX`, les endpoints Shortext à `ste_...` et les événements webhook à `evt_...`. Traitez chaque identifiant comme une chaîne opaque.

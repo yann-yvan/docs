@@ -1,0 +1,37 @@
+---
+title: Modèles WhatsApp
+description: Créez, synchronisez et utilisez les modèles de message qu'exige WhatsApp pour écrire en premier à un contact.
+---
+
+Un modèle (template) est un message type approuvé par Meta. C'est le seul type de message qu'une entreprise peut envoyer à un contact hors de la [fenêtre de 24 heures](/fr/channels/whatsapp#la-fenêtre-de-24-heures), par exemple pour envoyer un suivi de commande ou démarrer une conversation.
+
+## Anatomie d'un modèle
+
+- **Nom** et **langue** : un modèle existe dans une ou plusieurs langues (`fr`, `en_US`...). Vous l'envoyez par son nom et sa langue.
+- **Catégorie** : `UTILITY` (notifications transactionnelles), `MARKETING` (promotions) ou `AUTHENTICATION` (codes à usage unique). Meta facture les conversations selon la catégorie.
+- **En-tête** (facultatif) : un texte, ou une image, une vidéo ou un document.
+- **Corps** : le texte, avec des **variables** comme `{{name}}` et `{{order}}`.
+- **Pied de page** (facultatif) : un texte court.
+- **Boutons** (facultatif) : réponses rapides, URL, numéro de téléphone, code à copier.
+
+## Gérer les modèles dans le tableau de bord
+
+Ouvrez un numéro WhatsApp dans **Communication > Canaux > WhatsApp Business** et allez dans ses modèles.
+
+- **Créez** un modèle : remplissez les parties ci-dessus et ajoutez des variables au corps.
+- **Publiez-le** (**Publish**) pour le soumettre à Meta. Il reste `PENDING` jusqu'à ce que Meta l'approuve (`APPROVED`) ou le rejette (`REJECTED`, avec un motif).
+- **Sync** récupère les modèles créés directement dans Meta Business Manager et met à jour leur statut.
+- **Sample API Code** montre comment envoyer le modèle par l'API.
+
+{/* TODO capture : modèles d'un numéro, avec les actions Créer, Sync et Publish (Filament 4). */}
+
+<Note>Seuls les modèles `APPROVED` peuvent être envoyés. Meta suit aussi la qualité de chaque modèle (vert, jaune, rouge) selon la réaction des contacts.</Note>
+
+## Envoyer un modèle
+
+- Depuis le tableau de bord : dans une **campagne** vers un segment de contacts, ou depuis la boîte de réception quand la fenêtre est fermée.
+- Depuis l'API : `POST /conversations` avec `message.type` `template`. Voir [Envoyer un modèle](/fr/api-reference/guides/send-a-template).
+
+## Bientôt disponible
+
+Un éditeur de modèles hébergé, pour que vos propres clients créent et soumettent des modèles depuis votre produit. Voir [Bientôt disponible](/fr/channels/coming-soon).

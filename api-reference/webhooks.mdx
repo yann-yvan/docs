@@ -1,0 +1,134 @@
+---
+title: Webhooks
+description: Receive Shortext events in real time on your own HTTPS endpoint, signed and retried.
+---
+
+import VerifySignature from '/snippets/code/verify-signature.mdx';
+
+Webhooks push events to your server as they happen: a contact writes, a message is delivered, a human takes a conversation over, a client finishes connecting their WhatsApp number. Prefer them to polling the API.
+
+## Create an endpoint
+
+Create endpoints in the dashboard (**Developer > Webhooks**) or with the API (`POST /webhooks`, **Manage integrations** permission):
+
+```json
+{
+  "url": "https://example.com/webhooks/shortext",
+  "events": ["message.*", "conversation.handover", "conversation.released"],
+  "filters": { "app": "AGI-XXXXX" },
+  "description": "CRM sync"
+}
+```
+
+| Field | Description |
+| --- | --- |
+| `url` | A public **HTTPS** URL. Private and local addresses are refused. |
+| `events` | Exact types (`message.received`), a prefix wildcard (`message.*`) or `*` for everything. |
+| `filters` | Optional. Only receive events whose context matches: `app` (an agent id), `channel` (`whatsapp`, `mail`, `shortext`), `channel_id`. |
+| `description` | Optional, for you. |
+
+The response contains the signing **`secret`, shown only once**. Store it with your other secrets.
+
+<Note>An endpoint receives payloads in the API version used to create it (`api_version`), so a new API version never changes what you receive.</Note>
+
+## Events
+
+`GET /webhooks/events` returns the catalog.
+
+| Event | When |
+| --- | --- |
+| `message.received` | A contact sent a message to one of your agents. |
+| `message.sent` | A message was sent to a contact (by the AI agent, a member of your team or the API). |
+| `message.status` | A message status changed (delivered, read, failed...). |
+| `conversation.handover` | A human took a conversation over: the agent stops answering. |
+| `conversation.released` | A conversation was handed back to the agent. |
+| `channel.connected` | A channel (WhatsApp number, mailbox, Shortext endpoint) was connected. |
+| `channel.agent_changed` | A channel was attached to an agent, moved to another one or detached. |
+| `agent.created` | An agent was created. |
+| `agent.updated` | An agent was updated (settings or instructions). |
+| `agent.deleted` | An agent was deleted. |
+| `hosted_session.completed` | A [hosted session](/api-reference/hosted-sessions) was completed: `result` holds what it produced. |
+| `hosted_session.failed` | A hosted session failed: `error` says why. |
+| `webhook.test` | Sent on demand to check an endpoint. |
+
+New event types can be added at any time: ignore the types you do not handle.
+
+## Payload
+
+Every delivery is a `POST` with a JSON body:
+
+```json
+{
+  "id": "evt_01JB8Z6X4Q2W3E5R7T9Y1U3I5O",
+  "type": "message.received",
+  "api_version": "v2.0",
+  "created_at": "2026-10-24T09:12:44+00:00",
+  "data": {
+    "id": "msg-hashid",
+    "conversation_id": "conv-hashid",
+    "direction": "inbound",
+    "channel": "whatsapp",
+    "channel_id": "532867649916076",
+    "contact": { "identifier": "237699999999", "identifier_type": "phone", "profile": { "firstname": "Brice" } },
+    "message": { "id": "wamid.HBgM...", "type": "text", "content": { "text": "Hello, where is my order?" } },
+    "status": "received",
+    "created_at": "2026-10-24T09:12:44+00:00"
+  }
+}
+```
+
+`data` depends on the type:
+
+| Events | `data` |
+| --- | --- |
+| `message.*` | A message, as in [Message format](/api-reference/message-format#messages-in-responses-and-webhooks). |
+| `conversation.*` | `conversation_id`, `channel`, `channel_id` and `contact.identifier`. |
+| `channel.*` | A channel, as returned by `GET /channels`; `channel.agent_changed` adds `previous_agent`. |
+| `agent.*` | An agent, as returned by `GET /agents/{id}` (without its channels). |
+| `hosted_session.*` | A hosted session, as returned by `GET /hosted-sessions/{id}`. |
+
+## Headers
+
+| Header | Value |
+| --- | --- |
+| `X-Shortext-Event` | The event type, for example `message.received`. |
+| `X-Shortext-Delivery` | The delivery id (a uuid). A redelivery has a new one. |
+| `X-Shortext-Timestamp` | The Unix time the request was signed. |
+| `X-Shortext-Signature` | `sha256=` followed by the hex HMAC of the request. |
+| `X-Shortext-Api-Version` | The version of the payload, for example `v2.0`. |
+
+## Verify the signature
+
+Check every request before trusting it:
+
+```text
+expected = "sha256=" + hex(hmac_sha256(secret, "{X-Shortext-Timestamp}.{raw body}"))
+```
+
+1. Read the **raw** body, before any JSON parsing: re-encoding it changes the bytes and breaks the signature.
+2. Reject requests whose timestamp is more than 5 minutes away from your clock (replays).
+3. Compare `expected` with `X-Shortext-Signature` in constant time.
+
+<VerifySignature />
+
+## Respond and deduplicate
+
+- Answer with any **2xx** status within **10 seconds**. Do the work after answering, in a queue.
+- Anything else (another status, a timeout, a redirect, a network error) is a failure and is retried.
+- The same event can arrive more than once. Deduplicate on the event `id` (`evt_...`), which stays the same on retries and redeliveries.
+- Events can arrive out of order: rely on `created_at` and on the API when order matters.
+
+## Retries
+
+A failed delivery is retried with an increasing delay: after 10 seconds, 1 minute, 5 minutes, 30 minutes, 2 hours, 6 hours and 12 hours, that is 8 attempts over about **21 hours**. After the last one, the delivery is marked failed.
+
+An endpoint that keeps failing for **72 hours** is **disabled**: `is_enabled` becomes `false` and `disabled_reason` says why. Fix your server, then enable the endpoint again (`PUT /webhooks/{id}` with `"is_enabled": true`).
+
+## Test, inspect and redeliver
+
+| Endpoint | Use |
+| --- | --- |
+| `POST /webhooks/{id}/test` | Send a `webhook.test` event now (not retried) and get your server's response. |
+| `GET /webhooks/{id}/deliveries` | The deliveries of the last **30 days**, filterable by `status` (`pending`, `succeeded`, `failed`), with attempts, response status, the first 2,000 characters of your response and the payload. |
+| `POST /webhooks/{id}/deliveries/{delivery}/retry` | Queue a new delivery of the same event (same event `id`). |
+| `POST /webhooks/{id}/rotate-secret` | Generate a new secret. The previous one stops working **immediately**: deploy the new one first. |

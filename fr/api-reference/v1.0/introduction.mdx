@@ -1,0 +1,37 @@
+---
+title: API v1.0 (historique)
+description: L'API Shortext historique. Toujours servie, plus développée, et appelée à disparaître.
+---
+
+<Warning>
+**La v1.0 est historique et sera retirée.** Elle ne reçoit plus de nouvelles fonctionnalités. Ses dates de dépréciation et de retrait seront annoncées par les en-têtes de réponse `Deprecation` et `Sunset` ; après la date de retrait, tout appel v1.0 répondra HTTP 410 avec le `code` `1200`. Construisez les nouvelles intégrations sur la [v2.0](/fr/api-reference/introduction) et [migrez](/fr/api-reference/guides/migrate-to-v2) celles qui existent.
+</Warning>
+
+## URL de base
+
+```text
+https://shortext.ny-corp.io/api
+```
+
+Les endpoints v1.0 sont servis sans préfixe de version, par exemple `POST https://shortext.ny-corp.io/api/messages/send`. Les réponses portent `X-Shortext-Api-Version: v1.0`.
+
+## Authentification
+
+Les mêmes clés API d'entreprise que la v2.0, comme jeton bearer : `Authorization: Bearer {clé}`. **La v1.0 ne vérifie pas les permissions de la clé.**
+
+## Réponses
+
+La même enveloppe que la v2.0 : HTTP 200 avec `success`, `code`, `message`, `body` et, en cas d'échec, `trace_id`. Voir [Erreurs](/fr/api-reference/errors). Les listes sont paginées avec `?page=`.
+
+## Endpoints
+
+| Endpoint | Usage | Remplacement en v2.0 |
+| --- | --- | --- |
+| `POST /messages/send` | Envoyer un message à un contact | `POST /conversations`, `POST /conversations/{id}/messages` |
+| `GET /agent/search` | Lister les agents | `GET /agents` |
+| `GET /business-manager/balance` | Solde de l'entreprise | Aucun pour l'instant |
+| `GET /ticket/search`, `/ticket/sla/search`, `/ticket/status/search` | Tickets, SLA et statuts | Aucun pour l'instant |
+| `POST /contact/knowledge/add` | Ajouter des connaissances sur un contact | Aucun pour l'instant |
+| `POST /v1.0/messages/inbound` | Messages entrants d'un endpoint Shortext | Toujours d'actualité, voir [Endpoint Shortext](/fr/api-reference/shortext-endpoint) |
+
+La référence de chaque endpoint se trouve dans **Endpoints**.

@@ -1,0 +1,99 @@
+---
+title: Outils
+description: Permettez à un agent d'appeler vos propres API pour consulter ou modifier des données pendant qu'il répond à un client.
+---
+
+Un outil est l'une de vos API HTTP qu'un agent peut appeler pendant une conversation : consulter une commande, vérifier un solde, créer une réservation. L'IA décide quand appeler un outil d'après son nom et sa description, remplit les paramètres à partir de la conversation, et utilise la réponse pour répondre.
+
+## Ouvrir les outils d'un agent
+
+Ouvrez l'agent dans **Communication > Agents IA** et allez dans son onglet **API Connectors**.
+
+<Frame>
+  <img src="/images/agents/api-tab.png" alt="Onglet des connecteurs API d'un agent" />
+</Frame>
+
+## Ajouter un outil
+
+<Frame>
+  <img src="/images/agents/add-api.png" alt="Ajout d'un outil" />
+</Frame>
+
+- **Nom** : unique, en snake_case, par exemple `get_order` ou `confirm_payment`.
+- **État** : indique si l'agent peut utiliser l'outil. Désactivez-le pendant une maintenance de votre API.
+- **Description** : ce que fait l'outil et quand l'utiliser. L'IA s'appuie dessus pour décider, soyez donc explicite :
+
+```text
+Renvoie le statut et la date de livraison d'une commande à partir de sa référence (par exemple A-1042).
+Utilise-le quand le client demande où en est sa commande.
+```
+
+## Définir l'endpoint et les en-têtes
+
+<Frame>
+  <img src="/images/agents/api-endpoints.png" alt="Endpoint d'un outil" />
+</Frame>
+
+- **Méthode** : `GET`, `POST`, `PUT`, `DELETE`...
+- **URL** : l'URL complète de votre API, par exemple `https://api.example.com/orders/{reference}`.
+- **En-têtes** : authentification et type de contenu, par exemple `Authorization: Bearer ...`.
+
+<Note>Les secrets stockés dans les en-têtes sont chiffrés.</Note>
+
+## Définir les paramètres
+
+<Frame>
+  <img src="/images/agents/api-body.png" alt="Paramètres d'un outil" />
+</Frame>
+
+Chaque paramètre a :
+
+- un **nom**, unique dans l'outil, par exemple `reference` ;
+- un **type** : `STRING`, `INTEGER` ou `BOOLEAN` ; un `STRING` peut être limité à une liste de valeurs possibles ;
+- un indicateur **obligatoire** ;
+- une **description** qui dit à l'IA comment le remplir, par exemple « La référence de la commande, comme A-1042 ».
+
+## Renvoyer des réponses que l'IA comprend
+
+Renvoyez du JSON ou du texte dont le sens est clair sans votre documentation interne :
+
+```json
+{
+  "success": true,
+  "message": "Order found",
+  "body": {
+    "reference": "A-1042",
+    "status": "shipped",
+    "estimated_delivery": "2026-10-28"
+  }
+}
+```
+
+Préférez des noms de champs explicites et des messages courts ; en cas d'erreur, renvoyez une phrase que l'IA peut transmettre, comme « Aucune commande trouvée avec cette référence ».
+
+## Tester un outil
+
+Utilisez **Debug** sur un endpoint pour l'appeler avec des paramètres d'exemple et voir la réponse avant que l'agent ne l'utilise.
+
+<Frame>
+  <img src="/images/agents/api-tester.png" alt="Test d'un outil" />
+</Frame>
+
+## Suivre les appels
+
+Les **Connectors Logs** de l'agent listent chaque appel : heure, paramètres, statut et durée de la réponse, erreurs.
+
+<Frame>
+  <img src="/images/agents/api-logs.png" alt="Journaux des appels d'outils" />
+</Frame>
+
+<Warning>Un outil qui échoue souvent dégrade les réponses de l'agent. Consultez les journaux après chaque modification de votre API.</Warning>
+
+## Exemples
+
+| Usage | Outil | Endpoint |
+| --- | --- | --- |
+| Retrouver un client | `get_customer` | `GET /customers/{phone}` |
+| Suivre une commande | `get_order` | `GET /orders/{reference}` |
+| Confirmer un paiement | `confirm_payment` | `POST /payments/verify` |
+| Ouvrir une demande dans votre système | `create_request` | `POST /requests` |

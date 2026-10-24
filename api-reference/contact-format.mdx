@@ -1,0 +1,62 @@
+---
+title: Contact format
+description: How the API identifies and describes a contact, on every channel.
+---
+
+Every endpoint that addresses a contact uses the same `contact` object:
+
+```json
+{
+  "identifier": "237699999999",
+  "profile": {
+    "lastname": "Mbarga",
+    "firstname": "Brice",
+    "email": "brice@example.com",
+    "address": "Douala",
+    "preferred_language": "fr"
+  }
+}
+```
+
+## Identifier
+
+<ParamField body="identifier" type="string" required>
+  The identity of the contact on the channel, up to 200 characters.
+</ParamField>
+
+| Channel | Identifier | `identifier_type` |
+| --- | --- | --- |
+| WhatsApp | The phone number in E.164 format **without** the `+`, for example `237699999999` | `phone` |
+| Mailbox | The email address | `email` |
+| Shortext endpoint | Your own user id, for example `user-42` | `external_id` |
+
+On a Shortext endpoint, the identifier is only unique within your company: the same `user-42` in two companies is two different contacts. The API always gives you back your own id.
+
+## Profile
+
+All the profile fields are optional when you start a conversation or send an inbound message (the v1.0 `POST /messages/send` requires `lastname`).
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `lastname` | string | Up to 250 characters. |
+| `firstname` | string | Up to 250 characters. |
+| `email` | string | A valid email address. |
+| `address` | string | Up to 250 characters. |
+| `preferred_language` | string | `en`, `fr`, `es` or `de`. |
+
+The profile updates the contact Shortext keeps; the agent uses the name and the language to address the contact.
+
+## Contacts in responses and webhooks
+
+Responses and webhooks describe a contact with its identifier, its type, its profile and, when known, its country:
+
+```json
+{
+  "identifier": "237699999999",
+  "identifier_type": "phone",
+  "profile": { "lastname": "Mbarga", "firstname": "Brice", "preferred_language": "fr" },
+  "country": { "iso_code": "CM", "phone_code": "237", "name": "Cameroun" }
+}
+```
+
+Empty profile fields are left out.

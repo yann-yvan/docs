@@ -1,0 +1,37 @@
+---
+title: API v1.0 (legacy)
+description: The historical Shortext API. Still served, no longer developed, and going away.
+---
+
+<Warning>
+**v1.0 is legacy and will be removed.** It receives no new features. Its deprecation and sunset dates will be announced through the `Deprecation` and `Sunset` response headers; after the sunset date, every v1.0 call answers HTTP 410 with `code` `1200`. Build new integrations on [v2.0](/api-reference/introduction) and [migrate](/api-reference/guides/migrate-to-v2) existing ones.
+</Warning>
+
+## Base URL
+
+```text
+https://shortext.ny-corp.io/api
+```
+
+v1.0 endpoints are served without a version prefix, for example `POST https://shortext.ny-corp.io/api/messages/send`. Responses carry `X-Shortext-Api-Version: v1.0`.
+
+## Authentication
+
+The same company API keys as v2.0, as a bearer token: `Authorization: Bearer {key}`. **v1.0 does not check the permissions of the key.**
+
+## Responses
+
+The same envelope as v2.0: HTTP 200 with `success`, `code`, `message`, `body` and, on failures, `trace_id`. See [Errors](/api-reference/errors). Lists are paginated with `?page=`.
+
+## Endpoints
+
+| Endpoint | Use | v2.0 replacement |
+| --- | --- | --- |
+| `POST /messages/send` | Send a message to a contact | `POST /conversations`, `POST /conversations/{id}/messages` |
+| `GET /agent/search` | List agents | `GET /agents` |
+| `GET /business-manager/balance` | Company balance | None yet |
+| `GET /ticket/search`, `/ticket/sla/search`, `/ticket/status/search` | Tickets, SLAs and statuses | None yet |
+| `POST /contact/knowledge/add` | Add knowledge about a contact | None yet |
+| `POST /v1.0/messages/inbound` | Shortext endpoint inbound messages | Still current, see [Shortext endpoint](/api-reference/shortext-endpoint) |
+
+The reference of each endpoint is in **Endpoints**.

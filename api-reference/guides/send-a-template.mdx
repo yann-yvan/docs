@@ -1,0 +1,59 @@
+---
+title: Send a WhatsApp template
+description: Find an approved template, fill its variables and send it through the API.
+---
+
+import StartConversation from '/snippets/code/start-conversation.mdx';
+
+Templates are the only messages WhatsApp accepts outside the 24-hour window. They are created and approved in the dashboard, see [WhatsApp templates](/channels/whatsapp-templates).
+
+## 1. Find the template
+
+`GET /templates?channel_id={whatsapp channel id}&status=APPROVED` lists the templates a number can send:
+
+```json
+{
+  "id": "tpl-hashid",
+  "name": "order_update",
+  "language": "fr",
+  "status": "APPROVED",
+  "category": "UTILITY",
+  "channels": ["532867649916076"],
+  "header": { "type": "NONE", "text": null, "variables": [], "media_url": null },
+  "body": { "text": "Bonjour {{name}}, votre commande {{order}} est prête.", "variables": ["name", "order"] },
+  "footer": null,
+  "buttons": []
+}
+```
+
+`body.variables` (and `header.variables` for a text header) are the values you must give.
+
+## 2. Send it
+
+Use `message.type` `template`, the template `name` and `language`, and the variables by name:
+
+<StartConversation />
+
+To send a template in an existing conversation, post the same `message` to `POST /conversations/{id}/messages`.
+
+### Media header
+
+For a template with an image, video or document header, give its URL:
+
+```json
+"header": { "url": "https://cdn.example.com/parcels/A-1042.jpg" }
+```
+
+Without `url`, the media stored with the template is used. A document also takes a `filename`.
+
+## Errors
+
+Shortext checks the template before sending it and answers `code` `1002` with a message you can act on:
+
+| Message | Fix |
+| --- | --- |
+| `Template order_update not found for this WhatsApp number` | Check the name, and that the template belongs to the WhatsApp Business account of this number. |
+| `Template order_update has no en version: fr` | Use one of the languages listed. |
+| `Template order_update (fr) is PENDING: only approved templates can be sent` | Wait for Meta's approval. |
+| `Missing body variables: order` | Give every variable; `body.missing` lists them. |
+| `Template ... has a image header: give message.content.header.url` | Give the media URL. |

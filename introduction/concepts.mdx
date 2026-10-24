@@ -1,0 +1,55 @@
+---
+title: Key concepts
+description: The few objects you work with in Shortext, in the dashboard and in the API.
+---
+
+## Company
+
+Everything in Shortext belongs to a **company**: agents, channels, conversations, API keys and webhooks. Your user account can be a member of several companies; each member has a role (for example admin, manager or agent) that decides what they can see and do in the dashboard.
+
+## Agent
+
+An **agent** answers your customers. It has:
+
+- a **name** and an **active** switch: an inactive agent keeps receiving and storing messages, but does not answer;
+- **instructions**: the system prompt the AI follows (tone, rules, what to do and not to do);
+- an **AI** switch: when the AI is off, the agent sends a fixed **inactive message** instead;
+- **tools**: your own HTTP APIs the agent can call to look up or change data, see [Tools](/agents/tools-configuration);
+- a **knowledge base** it can search to answer.
+
+Your plan sets how many agents your company can have.
+
+## Channel
+
+A **channel** is where conversations happen. Shortext supports three types:
+
+| Type | What it is | Channel id |
+| --- | --- | --- |
+| `whatsapp` | A WhatsApp Business number connected through Meta | The WhatsApp phone number id |
+| `mail` | A mailbox connected through IMAP / SMTP | The mailbox username |
+| `shortext` | An endpoint your own server or app talks to through the API | `ste_...` |
+
+Each channel is attached to **one agent**, which answers on it. A channel can also be **detached**: messages are still stored, nobody answers automatically.
+
+## Contact
+
+A **contact** is a customer. It is identified by its **identifier** on the channel: a phone number on WhatsApp, an email address on a mailbox, your own user id on a Shortext endpoint.
+
+## Conversation and session
+
+A **conversation** is the thread between one contact and one of your channels. Inside it, a **session** is the current period of activity:
+
+- **active**: a session is open, the agent (or a human) answers;
+- **archived**: no session is open; a new message opens a new session.
+
+## Handover
+
+When a person from your team takes a conversation over, it is in **handover**: the AI agent stops answering this contact until the conversation is handed back. Replying from the Inbox (or through the API) takes the conversation over by default. See [Handover and assignment](/inbox/handover-and-assignment).
+
+## Assignee and tickets
+
+A session can be **assigned** to a member of your company, who then follows it in **Inbox > Mine**. A conversation can also produce **tickets** to track a request until it is solved. See [Tickets](/inbox/tickets).
+
+## Identifiers in the API
+
+The API never exposes internal database ids. Agents look like `AGI-XXXXX`, members like `USR-XXXXX`, companies like `CMP-XXXXX`, Shortext endpoints like `ste_...` and webhook events like `evt_...`. Treat every id as an opaque string.

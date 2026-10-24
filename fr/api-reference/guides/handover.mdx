@@ -1,0 +1,39 @@
+---
+title: Prise en main et retour à l'agent
+description: Prenez une conversation en main à la place de l'agent IA, rendez-la-lui et assignez-la, depuis vos propres systèmes.
+---
+
+import Handover from '/snippets/code/handover.mdx';
+
+Utilisez ces endpoints pour construire votre propre console d'agents, ou pour arrêter l'IA quand votre système détecte un cas sensible. Ils demandent tous **Envoyer des messages**, et la conversation doit avoir une session active.
+
+## Prendre en main et rendre la main
+
+<Handover />
+
+| Endpoint | Effet | Webhook |
+| --- | --- | --- |
+| `PUT /conversations/{id}/handover` | Une personne suit la conversation : l'agent IA cesse de répondre. | `conversation.handover` |
+| `DELETE /conversations/{id}/handover` | L'agent IA répond de nouveau aux prochains messages. | `conversation.released` |
+
+Les deux renvoient la conversation ; `session.handover` et `session.handover_at` indiquent son état.
+
+Répondre avec `POST /conversations/{id}/messages` prend aussi la conversation en main, sauf si vous envoyez `"handover": false`. Démarrer une conversation avec `"handover": true` l'ouvre directement en prise en main.
+
+## Assigner
+
+1. `GET /conversations/assignees` liste les membres de votre entreprise (`USR-XXXXX`).
+2. `PUT /conversations/{id}/assignee` avec `{ "user_id": "USR-XXXXX" }` assigne la session en cours ; `{ "user_id": null }` la désassigne.
+
+```bash
+curl -X PUT https://shortext.ny-corp.io/api/v2.0/conversations/$CONVERSATION_ID/assignee \
+  -H "Authorization: Bearer $SHORTEXT_API_KEY" \
+  -H "Accept: application/json" -H "Content-Type: application/json" \
+  -d '{ "user_id": "USR-XXXXX" }'
+```
+
+Filtrez les conversations par personne assignée avec `GET /conversations?assignee=USR-XXXXX` (ou `none`).
+
+## Rester synchronisé
+
+Abonnez un [webhook](/fr/api-reference/webhooks) à `conversation.*` pour savoir quand quelqu'un prend en main ou rend la main depuis la boîte de réception, et à `message.*` pour suivre les messages.

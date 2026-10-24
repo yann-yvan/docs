@@ -1,123 +1,53 @@
 ---
-title: Platform Overview
-description: Discover how the Shortext dashboard is organized and how to navigate its main features.
+title: Platform overview
+description: How the Shortext dashboard is organized and where to find each feature.
 ---
 
-The **Shortext dashboard** is where you control everything — from AI agents and automations to integrations and analytics.
-This section gives you a quick tour of the main components and how to use them efficiently.
+The dashboard at [shortext.ny-corp.io/dash](https://shortext.ny-corp.io/dash) is organized in sections in the left sidebar. What you see depends on your role in the company and on your plan.
 
----
+{/* TODO screenshot: full dashboard with the sidebar expanded (Filament 4). */}
 
-## 🏠 Main Dashboard
+## Inbox
 
-After logging in, you’ll land on the **main dashboard**.
-It provides an overview of your workspace activity — including active conversations, session status, and quick insights about your agents.
+Where your team follows conversations live and answers customers.
 
-<img src="/images/platform-overview/dashboard-home.png" alt="Shortext main dashboard" />
+- **All**: every conversation of the company.
+- **Mine**: conversations assigned to you.
+- **Unassigned**: conversations nobody has picked up yet.
 
-### Key Elements:
-- **Navigation Sidebar** — Access core modules like Agents, Conversations, and Automations.
-- **Top Bar** — Contains search, account settings, and notifications.
-- **Quick Stats** — Displays total conversations, active sessions, and response rate.
+See [Inbox](/inbox/overview).
 
-<Note type="info">
-    Your dashboard adapts dynamically to your plan and enabled features. Some items may appear or hide based on your permissions.
-</Note>
+## Conversations
 
----
+The history of all conversations and the **tickets** opened from them. See [Tickets](/inbox/tickets).
 
-## 💬 Conversations
+## Customers
 
-The **Conversations** module is the heart of your communication.
-It displays real-time interactions between your users and your AI agents.
+Your **contacts** (everyone who wrote to you or whom you wrote to) and **segments** to group them, for example for campaigns.
 
-<img src="/images/platform-overview/conversations.png" alt="Conversations view" />
+## Marketing
 
-### You can:
-- View and filter messages by **status** or **agent**.
-- Inspect user sessions and message history.
-- Manually reply when needed.
+**Campaigns** send a WhatsApp template to a segment of contacts.
 
-<Note type="tip">
-    When a user sends a message on WhatsApp or another channel, it instantly appears here.
-</Note>
+## Communication
 
----
+The configuration of your automation:
 
-## 🤖 Agents
+- **AI Agents**: create agents, write their instructions, give them tools and knowledge. See [Agents](/agents/creating-an-agent).
+- **Channels**: connect WhatsApp numbers, mailboxes and Shortext endpoints, and choose the agent answering on each. See [Channels](/channels/overview).
+- **Knowledge bases**: documents your agents can search to answer.
 
-The **Agents** section lets you create, configure, and train your AI-powered assistants.
+## Billing
 
-<img src="/images/platform-overview/agents.png" alt="Agents list view" />
+Your plan, your credit balance and usage, and your invoices.
 
-Each agent can be personalized with:
-- A **name** and **profile**
-- A **personality** or tone of voice
-- **Custom behaviors** or rules
-- **Linked APIs** for advanced automation
+## Developer
 
-> Agents are the backbone of Shortext’s automation system — they handle messages, trigger actions, and can even make external API calls.
+Everything for integrators:
 
----
+- **API Keys**: create the keys your systems use to call the API. See [Authentication](/api-reference/authentication).
+- **Webhooks**: endpoints where Shortext pushes events. See [Webhooks](/api-reference/webhooks).
 
-## 🔄 Automations
+## Company settings
 
-Automations allow you to create tasks that run automatically — like scheduled notifications or daily summaries.
-
-<img src="/images/platform-overview/automations.png" alt="Automations view" />
-
-Examples:
-- Send a message every morning at 9 AM.
-- Notify a team when a ticket is created.
-- Perform an API request at a fixed interval.
-
-<Note type="warning">
-    Use automations wisely — each scheduled task consumes resources and may affect your monthly usage limits.
-</Note>
-
----
-
-## ⚙️ Settings
-
-The **Settings** section is where you configure everything related to your account and workspace.
-
-<img src="/images/platform-overview/settings.png" alt="Settings screen" />
-
-You’ll find:
-- **Billing and Subscription** information
-- **Integrations** (WhatsApp, Telegram, API keys)
-- **Team Members and Roles**
-- **Notification Preferences**
-
-<Note type="success">
-    Admins can control which modules each user can access through Role Management.
-</Note>
-
----
-
-## 📊 Insights (optional module)
-
-If enabled, the **Insights** page displays analytics about conversations, agent performance, and response quality.
-
-<img src="/images/platform-overview/insights.png" alt="Analytics and Insights" />
-
-Metrics include:
-- Total conversations per day
-- Response rate per agent
-- Average session duration
-- User retention indicators
-
----
-
-## 🚀 Next Steps
-
-Now that you’re familiar with the dashboard, continue with:
-- [Creating and Configuring Your First Agent →](/agents/creating-an-agent)
-- [Connecting WhatsApp →](/integrations/whatsapp-setup)
-- [Testing Your API Connections →](/api/configuration)
-
----
-
-<Note type="info">
-    Each module has its own dedicated section in this documentation where you’ll find detailed guides and examples.
-</Note>
+The company profile, members and roles, and notification preferences are in the company menu and in your user profile.

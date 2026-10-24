@@ -1,0 +1,36 @@
+<CodeGroup>
+```bash cURL
+# Take the conversation over: the AI agent stops answering
+curl -X PUT https://shortext.ny-corp.io/api/v2.0/conversations/$CONVERSATION_ID/handover \
+  -H "Authorization: Bearer $SHORTEXT_API_KEY" -H "Accept: application/json"
+
+# Hand it back: the AI agent answers again
+curl -X DELETE https://shortext.ny-corp.io/api/v2.0/conversations/$CONVERSATION_ID/handover \
+  -H "Authorization: Bearer $SHORTEXT_API_KEY" -H "Accept: application/json"
+```
+
+```php PHP
+<?php
+$client  = new GuzzleHttp\Client(['base_uri' => 'https://shortext.ny-corp.io/api/v2.0/']);
+$headers = ['Authorization' => 'Bearer ' . getenv('SHORTEXT_API_KEY'), 'Accept' => 'application/json'];
+
+$client->put("conversations/{$conversationId}/handover", ['headers' => $headers]);    // take over
+$client->delete("conversations/{$conversationId}/handover", ['headers' => $headers]); // hand back
+```
+
+```javascript Node.js
+const url = `https://shortext.ny-corp.io/api/v2.0/conversations/${conversationId}/handover`;
+const headers = { Authorization: `Bearer ${process.env.SHORTEXT_API_KEY}`, Accept: "application/json" };
+
+await fetch(url, { method: "PUT", headers });    // take over
+await fetch(url, { method: "DELETE", headers }); // hand back
+```
+
+```python Python
+url = f"https://shortext.ny-corp.io/api/v2.0/conversations/{conversation_id}/handover"
+headers = {"Authorization": f"Bearer {os.environ['SHORTEXT_API_KEY']}", "Accept": "application/json"}
+
+requests.put(url, headers=headers)     # take over
+requests.delete(url, headers=headers)  # hand back
+```
+</CodeGroup>

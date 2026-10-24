@@ -1,0 +1,29 @@
+---
+title: Tickets
+description: Track customer requests until they are solved, with statuses, priorities and SLAs.
+---
+
+A ticket tracks a request that needs follow-up beyond the conversation: a refund, a complaint, a repair. It is linked to the conversation it came from.
+
+## Create a ticket
+
+- From a conversation in the Inbox, with **Create ticket** in the conversation menu.
+- Automatically, when your agent is set up to open tickets.
+
+{/* TODO: confirm how agents open tickets automatically, and add a screenshot of the ticket form (Filament 4). */}
+
+A ticket has a **subject**, a **description**, a **priority**, a **status** and an **assignee**. Your team adds **notes** as the request progresses.
+
+## Statuses
+
+Tickets follow a status flow, for example open, in progress, resolved, closed. You can use the default flow or define your own statuses and the transitions allowed between them (**Status management**). A closed ticket can be reopened.
+
+## SLA
+
+An SLA policy sets the **first response** and **resolution** deadlines of a ticket. Tickets that miss a deadline are marked **SLA breached**, so your team sees them first.
+
+## Find tickets
+
+Tickets are listed in **Conversations > Tickets**. From a ticket you can open its conversation.
+
+Through the API, `GET /conversations?ticket_id={ticket}` returns the conversation of a ticket.

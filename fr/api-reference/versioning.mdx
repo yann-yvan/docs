@@ -1,0 +1,77 @@
+---
+title: Versionnement
+description: Comment Shortext versionne son API, annonce les dépréciations et retire les anciennes versions.
+---
+
+## Les versions sont des contrats figés
+
+Chaque version de l'API est un contrat. Une fois publiée, une version ne reçoit que des changements **additifs** :
+
+- de nouveaux endpoints ;
+- de nouveaux champs facultatifs dans les requêtes ;
+- de nouveaux champs dans les réponses et les charges utiles des webhooks ;
+- de nouveaux types d'événements webhook et de nouvelles valeurs dans les listes sur lesquelles vous filtrez.
+
+Tout ce qui pourrait casser une intégration existante (supprimer ou renommer un champ, changer un type ou un comportement) arrive dans une **nouvelle version**. Écrivez votre intégration de façon à ignorer les champs inconnus.
+
+## Versions actuelles
+
+| Version | URL de base | Statut |
+| --- | --- | --- |
+| `v2.0` | `https://shortext.ny-corp.io/api/v2.0` | Active, la plus récente |
+| `v1.0` | `https://shortext.ny-corp.io/api` | Historique, sera dépréciée |
+
+`GET https://shortext.ny-corp.io/api/versions` liste les versions et leur statut. Il ne demande pas d'authentification.
+
+```json
+{
+  "success": true,
+  "message": "Request success.",
+  "code": 1000,
+  "body": {
+    "latest": "v2.0",
+    "versions": [
+      { "version": "v1.0", "status": "active", "released_at": null, "deprecated_at": null, "sunset_at": null, "changelog": null, "docs": null },
+      { "version": "v2.0", "status": "active", "released_at": null, "deprecated_at": null, "sunset_at": null, "changelog": null, "docs": "https://shortext.ny-corp.io/api/docs/v2.0" }
+    ]
+  }
+}
+```
+
+`status` vaut `active`, `deprecated` ou `sunset`.
+
+## En-têtes
+
+Chaque réponse indique la version qui a répondu :
+
+```http
+X-Shortext-Api-Version: v2.0
+```
+
+Quand le retrait d'une version est programmé, ses réponses portent aussi :
+
+| En-tête | Signification |
+| --- | --- |
+| `Deprecation` | La date de dépréciation de la version, sous la forme `@{timestamp unix}` (RFC 9745). |
+| `Sunset` | La date à laquelle la version cesse de fonctionner (RFC 8594). |
+| `Link` | Le journal des modifications, avec `rel="deprecation"`, s'il existe. |
+
+Journalisez ces en-têtes dans votre intégration : ce sont vos préavis.
+
+## Après la date de retrait
+
+Une fois une version retirée, toute requête vers elle obtient le statut HTTP **410 Gone**, quel que soit l'endpoint, avec le `code` `1200` :
+
+```json
+{
+  "success": false,
+  "message": "API version v1.0 is no longer available",
+  "code": 1200,
+  "body": { "sunset_at": "2027-06-30", "latest": "v2.0" },
+  "trace_id": "..."
+}
+```
+
+## Webhooks et versions
+
+Un endpoint webhook reçoit les charges utiles dans la version utilisée pour le créer (son `api_version`). Les endpoints créés avec la v2.0 continuent de recevoir des charges v2.0, même après la sortie d'une version plus récente.

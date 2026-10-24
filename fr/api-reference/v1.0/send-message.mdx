@@ -1,0 +1,72 @@
+---
+title: Envoyer un message (v1.0)
+description: L'endpoint historique POST /messages/send et les types de messages qu'il prend en charge.
+---
+
+<Warning>Endpoint historique. En v2.0, utilisez [`POST /conversations`](/fr/api-reference/guides/start-a-conversation) pour écrire en premier et `POST /conversations/{id}/messages` pour répondre. Voir [Migrer vers la v2.0](/fr/api-reference/guides/migrate-to-v2).</Warning>
+
+`POST https://shortext.ny-corp.io/api/messages/send`
+
+| Champ | Description |
+| --- | --- |
+| `channel` | `whatsapp` ou `mail`. |
+| `from` | Le canal d'envoi : identifiant du numéro WhatsApp ou nom d'utilisateur de la boîte mail. |
+| `contact` | `identifier` (WhatsApp : E.164 sans `+`) et `profile`, où `lastname` est **obligatoire**. Voir [Format des contacts](/fr/api-reference/contact-format). |
+| `message` | `type` et `content`, voir [Format des messages](/fr/api-reference/message-format). |
+
+```json
+{
+  "channel": "whatsapp",
+  "from": "532867649916076",
+  "contact": { "identifier": "237699999999", "profile": { "lastname": "Mbarga" } },
+  "message": { "type": "text", "content": { "text": "Votre commande A-1042 a quitté notre entrepôt." } }
+}
+```
+
+Sur WhatsApp, les messages texte, médias et interactifs ne sont remis que dans les 24 heures qui suivent le dernier message du contact ; hors de cette fenêtre, envoyez un modèle.
+
+## À quoi ressemblent les messages
+
+<Tabs>
+  <Tab title="Texte">
+    Les messages texte contiennent un corps de 4 096 caractères au plus. WhatsApp affiche un aperçu de la première URL du texte quand il le peut (l'URL doit commencer par `http://` ou `https://`) ; sinon il affiche un lien cliquable.
+
+    <Frame>
+      <img src="/images/text-message.png" alt="Un message texte sur WhatsApp" />
+    </Frame>
+  </Tab>
+
+  <Tab title="Boutons de réponse">
+    Les boutons de réponse interactifs proposent jusqu'à trois réponses prédéfinies.
+
+    <Frame>
+      <img height="200" src="/images/interactive-button-reply.png" alt="Un message avec des boutons de réponse" />
+    </Frame>
+
+    Quand le contact touche un bouton, son choix revient sous forme de message.
+
+    <Frame>
+      <img height="150" src="/images/interactive-button-sample-response.png" alt="Le choix du contact" />
+    </Frame>
+  </Tab>
+
+  <Tab title="Listes">
+    Les listes interactives présentent des options regroupées en sections : jusqu'à 10 sections de 10 lignes, avec un en-tête et un pied de page facultatifs.
+
+    <Frame>
+      <img height="200" src="/images/interactive-list.png" alt="Un message liste" />
+    </Frame>
+
+    Toucher le bouton ouvre la liste des options :
+
+    <Frame>
+      <img height="150" src="/images/interactive-list-modal.png" alt="Les options d'une liste" />
+    </Frame>
+
+    L'option choisie revient sous forme de réponse :
+
+    <Frame>
+      <img height="150" src="/images/interactive-list-reply.png" alt="La sélection du contact" />
+    </Frame>
+  </Tab>
+</Tabs>

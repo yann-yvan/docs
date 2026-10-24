@@ -1,0 +1,104 @@
+<CodeGroup>
+```php PHP
+<?php
+// $secret: the signing secret returned when the webhook endpoint was created
+function shortextSignatureIsValid(string $secret, string $timestamp, string $rawBody, string $signature): bool
+{
+    // Reject old deliveries: protects against replays
+    if (!ctype_digit($timestamp) || abs(time() - (int) $timestamp) > 300) {
+        return false;
+    }
+
+    $expected = 'sha256=' . hash_hmac('sha256', "{$timestamp}.{$rawBody}", $secret);
+
+    return hash_equals($expected, $signature);
+}
+
+$rawBody = file_get_contents('php://input'); // the raw body, before any JSON decoding
+$valid   = shortextSignatureIsValid(
+    getenv('SHORTEXT_WEBHOOK_SECRET'),
+    $_SERVER['HTTP_X_SHORTEXT_TIMESTAMP'] ?? '',
+    $rawBody,
+    $_SERVER['HTTP_X_SHORTEXT_SIGNATURE'] ?? ''
+);
+
+if (!$valid) {
+    http_response_code(401);
+    exit;
+}
+
+$event = json_decode($rawBody, true);
+// Acknowledge fast with a 2xx, then process $event (deduplicate on $event['id'])
+http_response_code(200);
+```
+
+```javascript Node.js
+import crypto from "node:crypto";
+import express from "express";
+
+const app = express();
+
+function signatureIsValid(secret, timestamp, rawBody, signature) {
+  if (!/^\d+$/.test(timestamp) || Math.abs(Date.now() / 1000 - Number(timestamp)) > 300) {
+    return false;
+  }
+  const expected =
+    "sha256=" + crypto.createHmac("sha256", secret).update(`${timestamp}.${rawBody}`).digest("hex");
+  const a = Buffer.from(expected);
+  const b = Buffer.from(signature ?? "");
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
+}
+
+// express.raw keeps the body exactly as it was sent
+app.post("/webhooks/shortext", express.raw({ type: "application/json" }), (req, res) => {
+  const rawBody = req.body.toString("utf8");
+  const valid = signatureIsValid(
+    process.env.SHORTEXT_WEBHOOK_SECRET,
+    req.get("X-Shortext-Timestamp") ?? "",
+    rawBody,
+    req.get("X-Shortext-Signature")
+  );
+  if (!valid) return res.sendStatus(401);
+
+  const event = JSON.parse(rawBody);
+  res.sendStatus(200); // acknowledge fast, then process (deduplicate on event.id)
+});
+
+app.listen(3000);
+```
+
+```python Python
+import hashlib
+import hmac
+import os
+import time
+
+from flask import Flask, abort, request
+
+app = Flask(__name__)
+
+
+def signature_is_valid(secret: str, timestamp: str, raw_body: bytes, signature: str) -> bool:
+    if not timestamp.isdigit() or abs(time.time() - int(timestamp)) > 300:
+        return False
+    signed = timestamp.encode() + b"." + raw_body
+    expected = "sha256=" + hmac.new(secret.encode(), signed, hashlib.sha256).hexdigest()
+    return hmac.compare_digest(expected, signature)
+
+
+@app.post("/webhooks/shortext")
+def shortext_webhook():
+    raw_body = request.get_data()  # the raw body, before any JSON decoding
+    if not signature_is_valid(
+        os.environ["SHORTEXT_WEBHOOK_SECRET"],
+        request.headers.get("X-Shortext-Timestamp", ""),
+        raw_body,
+        request.headers.get("X-Shortext-Signature", ""),
+    ):
+        abort(401)
+
+    event = request.get_json()
+    # Acknowledge fast, then process (deduplicate on event["id"])
+    return "", 200
+```
+</CodeGroup>

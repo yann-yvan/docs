@@ -1,0 +1,62 @@
+---
+title: Authentication
+description: Company API keys, their permissions, and how to send them.
+---
+
+The API authenticates requests with **company API keys**. A key belongs to a company, not to a person: it keeps working when team members change.
+
+## Create a key
+
+In the dashboard, open **Developer > API Keys** (it requires the **Access API** permission in your company) and create a key:
+
+1. give it a name that says what uses it, for example "CRM integration" or "Billing service";
+2. choose its permissions (see below);
+3. copy the key: it is shown **only once**.
+
+You can change the permissions of an existing key without recreating it, and delete a key to revoke it at once.
+
+{/* TODO screenshot: Developer > API Keys and the creation form (Filament 4). */}
+
+## Send the key
+
+Send the key in the `Authorization` header as a bearer token:
+
+```http
+GET /api/v2.0/me HTTP/1.1
+Host: shortext.ny-corp.io
+Authorization: Bearer 12|AbCdEf...
+Accept: application/json
+```
+
+A missing or invalid key gets `success: false` with `code` `4`.
+
+<Warning>Keep keys on your servers. Never ship them in a mobile app, a browser or a public repository. If a key leaks, delete it in the dashboard and create a new one.</Warning>
+
+## Permissions
+
+A key only does what its permissions allow. There are four:
+
+| Permission | Ability | Gives access to | Default |
+| --- | --- | --- | --- |
+| Send messages | `permissions.send_messages` | Start conversations, reply, take over, hand back, assign; list templates | Yes |
+| View messages | `permissions.view_messages` | List and read conversations and their messages, list assignees | Yes |
+| Manage dynamic links | `permissions.manage_dynamic_links` | Deep links (v1.0) | Yes |
+| Manage integrations | `permissions.manage_integrations` | Agents, channels, Shortext endpoints, webhooks, hosted sessions | No |
+
+Give each key the smallest set it needs: a service that only sends notifications needs **Send messages**, a back-office that configures agents needs **Manage integrations**.
+
+A request without the needed permission gets `code` `1005` and a message naming the missing permission:
+
+```json
+{
+  "success": false,
+  "message": "Missing the permissions.manage_integrations permission",
+  "code": 1005,
+  "body": null,
+  "trace_id": "..."
+}
+```
+
+`GET /me` returns the abilities of the key you use (`body.token.abilities`).
+
+<Note>**v1.0 does not check key permissions**: any valid key can call any v1.0 endpoint. v2.0 checks them on every request. When you migrate, make sure your keys have the permissions your calls need.</Note>

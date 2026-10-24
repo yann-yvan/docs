@@ -1,191 +1,99 @@
 ---
-title: Tools Configuration & Testing
-description: Learn how to connect, configure, and test APIs within your Shortext agents to extend their capabilities.
+title: Tools
+description: Let an agent call your own APIs to look up or change data while it answers a customer.
 ---
 
-Shortext Agents can interact with external systems through APIs — allowing them to fetch data, trigger workflows, or update other applications automatically.
+A tool is one of your HTTP APIs that an agent can call during a conversation: fetch an order, check a balance, create a booking. The AI decides when to call a tool from its name and description, fills the parameters from the conversation, and uses the response to answer.
 
-This section explains how to configure and test these API integrations step by step.
+## Open the tools of an agent
 
----
+Open the agent in **Communication > AI Agents** and go to its **API Connectors** tab.
 
-## 🔧 Step 1 — Access the API Settings
+<Frame>
+  <img src="/images/agents/api-tab.png" alt="API connectors tab of an agent" />
+</Frame>
 
-From your **Agent Configuration** page, open the **“Tools”** tab.
+## Add a tool
 
-<img src="/images/agents/api-tab.png" alt="Agent API configuration tab" />
+<Frame>
+  <img src="/images/agents/add-api.png" alt="Adding a tool" />
+</Frame>
 
-Each agent can have one or more API connections depending on your workflow.
+- **Name**: unique, in snake_case, for example `get_order` or `confirm_payment`.
+- **State**: whether the agent may use the tool. Disable it while your API is under maintenance.
+- **Description**: what the tool does and when to use it. The AI relies on it to decide, so be explicit:
 
----
+```text
+Returns the status and the delivery date of an order from its reference (for example A-1042).
+Use it when the customer asks where their order is.
+```
 
-## 🧩 Step 2 — Add a New Tool
+## Define the endpoint and headers
 
-Click **“New Tool”** to define a new connection.
+<Frame>
+  <img src="/images/agents/api-endpoints.png" alt="Endpoint of a tool" />
+</Frame>
 
-<img src="/images/agents/add-api.png" alt="Adding a new API configuration" />
+- **Method**: `GET`, `POST`, `PUT`, `DELETE`...
+- **URL**: the full URL of your API, for example `https://api.example.com/orders/{reference}`.
+- **Headers**: authentication and content type, for example `Authorization: Bearer ...`.
 
-You’ll need to provide:
-- **Name** — a friendly *unique* name in camelcase (e.g., `payment_confirmation` or `get_orders`)
-- **State** — if the tool can be use or not by the agent (e.g `disable when the api is under maintenance`)
-- **Description** — note about what the API does to allow agent to understand when to use it
+<Note>Secrets stored in headers are encrypted.</Note>
 
-Example of description:
+## Define the parameters
 
-```md
-This API provides data on the movies and TV shows available on Netflix, a popular streaming service.
-````
+<Frame>
+  <img src="/images/agents/api-body.png" alt="Parameters of a tool" />
+</Frame>
 
----
+Each parameter has:
 
-## ⚙️ Step 3 — Define Endpoint and headers
+- a **name**, unique within the tool, for example `reference`;
+- a **type**: `STRING`, `INTEGER` or `BOOLEAN`; a `STRING` can be limited to a list of possible values;
+- a **mandatory** flag;
+- a **description** telling the AI how to fill it, for example "The order reference, such as A-1042".
 
-Set the **endpoints** that will be used to consume your service and the required **headers** such as token, api key.
+## Return responses the AI understands
 
-<img src="/images/agents/api-endpoints.png" alt="Defining API endpoints" />
-
-<Note type="info">
-    Sensitive data such as tokens or API keys are encrypted and stored securely.
-</Note>
-
-Each endpoint includes:
-
-* **Method** — `GET`, `POST`, `PUT`, `DELETE`, etc.
-* **Url** — the full URL of your service (e.g., `https://acme.com/users/{id}`)
-* **Headers** — optional (for content type, authentication)
-
-<Note type="tip">
-    You can use **variables** like `{phone}` or `{email}` in your paths.
-    These will be replaced dynamically from the user’s conversation context.
-</Note>
-
----
-
-## ⚙️ Step 3 — Define Request Body
-
-**Request Body** — JSON or form data (for POST/PUT requests)
-
-<img src="/images/agents/api-body.png" alt="Defining API endpoints" />
-
-Each parameter includes:
-
-* **Name** — a friendly *unique* name (e.g., `order_id` or `id`).
-* **Type** — the parameter type `STRING`, `INTEGER`, `BOOLEAN`. in case of `STRING`: possible values can be defined
-* **Mandatory** — if it should be set always present or not
-* **Description** — note about what the parameter does to allow agent to understand how to fill it
-
-**Response Mapping** — always return response that has a clear meaning in JSON or plain text
-
-Example:
+Return JSON or plain text whose meaning is clear without your internal documentation:
 
 ```json
 {
   "success": true,
-  "message": "The balance has been refresh successfully",
+  "message": "Order found",
   "body": {
-  "balance": {
-    "amount": 634.1987,
-    "currency": "EUR"
-  },
-  "local_balance": {
-    "amount": 416618.8856,
-    "currency": "XAF"
-    }
+    "reference": "A-1042",
+    "status": "shipped",
+    "estimated_delivery": "2026-10-28"
   }
 }
 ```
 
+Prefer explicit field names and short messages; on errors, return a sentence the AI can relay, such as "No order found with this reference".
 
----
+## Test a tool
 
-## 🧠 Step 4 — Usage of the API Inside an Agent
+Use **Debug** on an endpoint to call it with sample parameters and see the response before the agent uses it.
 
-Once your API is configured and enabled, you can make it **callable** from your agent’s workflow or rules.
+<Frame>
+  <img src="/images/agents/api-tester.png" alt="Testing a tool" />
+</Frame>
 
-<img src="/images/api/api-call-example.png" alt="Example of an agent using an API" />
+## Monitor the calls
 
-Example:
-When a user says *“Check my application status”*, your agent can call:
+The **Connectors Logs** of the agent list every call: time, parameters, response status and duration, and errors.
 
-```json
-{
-  "action": "api.call",
-  "api": "RecruitmentService",
-  "endpoint": "application_status",
-  "params": {
-    "phone": "{{user.phone}}"
-  }
-}
-```
+<Frame>
+  <img src="/images/agents/api-logs.png" alt="Logs of the tool calls" />
+</Frame>
 
-<Note type="success">
-    You can define conditions so that API calls are triggered only when specific user intents are detected.
-</Note>
+<Warning>A tool that fails often makes the agent's answers worse. Check the logs after each change of your API.</Warning>
 
----
+## Examples
 
-## 🧪 Step 5 — Test the API Connection
-
-Shortext provides a built-in **API Tester** so you can validate your setup before deploying it.
-
-<img src="/images/agents/api-tester.png" alt="API testing interface" />
-
-To test:
-
-1. Click on **Debug** on the endpoint you configured.
-2. Provide any **parameters or payload** required.
-3. Click **“Run Test”**.
-4. View the **response logs** and status code.
-
-<Note type="info">
-    All test requests are logged for debugging. You can re-run tests as often as needed without affecting your live agents.
-</Note>
-
----
-
-## 🧭 Step 6 — Monitor API Usage
-
-After deployment, you can track how often your agents call APIs via the **API Usage Log**.
-
-<img src="/images/agents/api-logs.png" alt="API usage logs and monitoring" />
-
-You’ll see:
-
-* **Timestamps** of API calls
-* **Response time and status**
-* **Agent and user** who triggered the call
-* **Error messages** (if any)
-
-<Note type="warning">
-    Frequent or failed API calls may impact performance. Monitor this section to ensure stability.
-</Note>
-
----
-
-## 🧰 Example Use Cases
-
-Here are a few examples of how API connections can enhance your agents:
-
-| Use Case                 | Description                              | Example API             |
-|--------------------------|------------------------------------------|-------------------------|
-| **CRM Lookup**           | Fetch user info based on phone number    | `GET /users/{phone}`    |
-| **Order Tracking**       | Retrieve delivery updates                | `GET /orders/{id}`      |
-| **Payment Confirmation** | Validate or trigger a transaction        | `POST /payments/verify` |
-| **Ticket Creation**      | Send a complaint or issue to your system | `POST /tickets/create`  |
-
----
-
-## 🚀 Next Steps
-
-Now that you’ve connected your APIs, you can:
-
-* [Build Automations That Use API Data →](/automations/creating-automation)
-* [Test Conversations with Live API Calls →](/agents/testing-conversation)
-* [View API Analytics and Logs →](/api/logs)
-
----
-
-<Note type="success">
-    Shortext APIs give your agents the power to act — not just respond.
-    With proper configuration, your bot can become a true workflow engine for your business.
-</Note>
+| Use | Tool | Endpoint |
+| --- | --- | --- |
+| Look up a customer | `get_customer` | `GET /customers/{phone}` |
+| Track an order | `get_order` | `GET /orders/{reference}` |
+| Confirm a payment | `confirm_payment` | `POST /payments/verify` |
+| Open a request in your system | `create_request` | `POST /requests` |

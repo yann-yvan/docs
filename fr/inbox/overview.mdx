@@ -1,0 +1,40 @@
+---
+title: Boîte de réception
+description: Suivez en direct toutes les conversations de vos canaux et répondez vous-même aux clients quand il le faut.
+---
+
+La boîte de réception rassemble les conversations de tous vos canaux (WhatsApp, boîtes mail, endpoints Shortext) au même endroit. Vos agents répondent automatiquement ; votre équipe observe, intervient et assure le suivi.
+
+{/* TODO capture : boîte de réception avec la liste des conversations et une conversation ouverte (Filament 4). */}
+
+## Vues
+
+| Vue | Affiche |
+| --- | --- |
+| **Toutes** | Toutes les conversations de l'entreprise. |
+| **Mes conversations** | Les conversations qui vous sont assignées. |
+| **Non assignées** | Les conversations que personne n'a prises. |
+
+Les membres ayant le rôle **agent** ne voient que ce que leur rôle permet : en général les conversations, pas la configuration.
+
+## Une conversation
+
+Ouvrir une conversation affiche :
+
+- les messages, quel que soit leur auteur : le contact, l'agent IA, un membre de votre équipe ou votre système via l'API ;
+- le contact (nom, identifiant, langue) et le canal ;
+- la session en cours : ouverte (active) ou fermée (archivée), si une personne l'a prise en main, et à qui elle est assignée.
+
+## Répondre à un client
+
+Saisissez votre message et envoyez-le. Vous pouvez aussi envoyer des médias, des documents et des messages interactifs depuis le constructeur de messages.
+
+<Note>
+Répondre prend la conversation en main : l'agent IA cesse de répondre à ce contact jusqu'à ce que vous la lui rendiez. Voir [Prise en main et assignation](/fr/inbox/handover-and-assignment).
+</Note>
+
+Sur WhatsApp, si le contact n'a pas écrit depuis 24 heures, Shortext envoie votre réponse sous forme de modèle de notification pour qu'elle puisse l'atteindre. Voir [la fenêtre de 24 heures](/fr/channels/whatsapp#la-fenêtre-de-24-heures).
+
+## Depuis l'API
+
+Tout ce que fait la boîte de réception est aussi accessible à vos systèmes avec l'API v2.0 : lister les conversations et leurs messages, répondre, prendre en main, rendre la main et assigner. Voir la [Référence API](/fr/api-reference/introduction).

@@ -1,0 +1,73 @@
+<CodeGroup>
+```bash cURL
+curl -X POST https://shortext.ny-corp.io/api/v2.0/hosted-sessions \
+  -H "Authorization: Bearer $SHORTEXT_API_KEY" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "purpose": "whatsapp",
+    "context": { "agent_id": "AGI-XXXXX" },
+    "return_url": "https://app.example.com/settings/whatsapp",
+    "locale": "fr",
+    "expires_in": 60
+  }'
+```
+
+```php PHP
+<?php
+$response = (new GuzzleHttp\Client())->post('https://shortext.ny-corp.io/api/v2.0/hosted-sessions', [
+    'headers' => ['Authorization' => 'Bearer ' . getenv('SHORTEXT_API_KEY'), 'Accept' => 'application/json'],
+    'json'    => [
+        'purpose'    => 'whatsapp',
+        'context'    => ['agent_id' => 'AGI-XXXXX'],
+        'return_url' => 'https://app.example.com/settings/whatsapp',
+        'locale'     => 'fr',
+        'expires_in' => 60,
+    ],
+]);
+$session = json_decode((string) $response->getBody(), true)['body'];
+
+// Store $session['id'], then send the user to the page (never log the URL: it holds a secret)
+header('Location: ' . $session['url']);
+```
+
+```javascript Node.js
+const response = await fetch("https://shortext.ny-corp.io/api/v2.0/hosted-sessions", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.SHORTEXT_API_KEY}`,
+    Accept: "application/json",
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    purpose: "whatsapp",
+    context: { agent_id: "AGI-XXXXX" },
+    return_url: "https://app.example.com/settings/whatsapp",
+    locale: "fr",
+    expires_in: 60,
+  }),
+});
+const { body: session } = await response.json();
+
+// Store session.id, then redirect the user (never log the URL: it holds a secret)
+res.redirect(session.url);
+```
+
+```python Python
+response = requests.post(
+    "https://shortext.ny-corp.io/api/v2.0/hosted-sessions",
+    headers={"Authorization": f"Bearer {os.environ['SHORTEXT_API_KEY']}", "Accept": "application/json"},
+    json={
+        "purpose": "whatsapp",
+        "context": {"agent_id": "AGI-XXXXX"},
+        "return_url": "https://app.example.com/settings/whatsapp",
+        "locale": "fr",
+        "expires_in": 60,
+    },
+)
+session = response.json()["body"]
+
+# Store session["id"], then redirect the user (never log the URL: it holds a secret)
+return redirect(session["url"])
+```
+</CodeGroup>

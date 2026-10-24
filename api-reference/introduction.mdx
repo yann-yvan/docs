@@ -1,93 +1,105 @@
 ---
-title: 'Introduction'
-description: 'Section for showcasing API endpoints'
+title: API introduction
+description: Base URLs, the response envelope and pagination of the Shortext API.
 ---
 
-## Welcome
+The Shortext API lets your systems send messages, follow conversations, manage agents and channels, receive webhooks and onboard your own clients' channels. It is a JSON over HTTPS API.
 
-For SWAGGER lover, we are using the following OpenAPI specification.
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/getting-started/api-quickstart">
+    Create a key and send your first message.
+  </Card>
+  <Card title="Migrating from v1.0?" icon="arrow-right-arrow-left" href="/api-reference/guides/migrate-to-v2">
+    v1.0 is legacy and will be removed. Move to v2.0.
+  </Card>
+</CardGroup>
 
-<Card
-    title="Shortext Endpoints"
-    icon="leaf"
-    href="https://shortext.ny-corp.io/api/docs"
->
-    View the OpenAPI specification file
-</Card>
+## Base URLs
 
-## Authentication
+| Version | Base URL | Status |
+| --- | --- | --- |
+| **v2.0** | `https://shortext.ny-corp.io/api/v2.0` | Current, use it for every new integration |
+| v1.0 | `https://shortext.ny-corp.io/api` | Legacy, see [v1.0](/api-reference/v1.0/introduction) |
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+Send `Accept: application/json` and, with a body, `Content-Type: application/json`. Authenticate every request with an [API key](/api-reference/authentication).
 
-```http request
-"Autorization": bearer <token>
-```
+## Response envelope
 
-## API Response Schema
+Every response has the HTTP status **200**, whether the request succeeded or not (the only exception is a removed API version, see [Versioning](/api-reference/versioning)). The outcome is in the body:
 
-All API endpoints return code 200 with this json structure the content of the response will always be accessible by the *body* key
-
-<Note>
-    trace_id : present only when success=false. Can be used for support request
-</Note>
-
-```json
+```json Success
 {
   "success": true,
   "message": "Request success.",
   "code": 1000,
-  "body": "< CAN BE NULL, A STRING OR JSON OBJECT OR JSON ARRAY>",
-  "trace_id": ""
+  "body": { "id": "AGI-XXXXX", "name": "Support" }
 }
 ```
 
-## Response schema for pagination
+```json Failure
+{
+  "success": false,
+  "message": "Missing the permissions.manage_integrations permission",
+  "code": 1005,
+  "body": null,
+  "trace_id": "6f1c2e..."
+}
+```
 
-All items will be accessible from the data. To navigate to any page juste append **?page=page-number** on the path
-> example : [https://shortext.ny-corp.io/api/agent/search?page=1](https://shortext.ny-corp.io/api/agent/search?page=1)
+| Field | Description |
+| --- | --- |
+| `success` | `true` when the request succeeded. Check it first. |
+| `code` | `1000` on success, otherwise an [error code](/api-reference/errors). |
+| `message` | A human-readable description. Do not parse it. |
+| `body` | The result: an object, a list, a paginated list, or `null`. On validation errors, the errors per field. |
+| `trace_id` | On failures only: give it to the support team to find your request. |
+
+<Warning>Do not rely on the HTTP status to detect errors: always read `success` and `code`.</Warning>
+
+## Pagination
+
+Lists are paginated, 50 items per page, most recent first unless stated otherwise. Ask for a page with `?page=2`. The `body` of a paginated response is:
 
 ```json
 {
-    "current_page": 1,
-    "data": [
-
-    ],
-    "first_page_url": "https://shortext.ny-corp.io/api/agent/search?page=1",
-    "from": 1,
-    "last_page": 1,
-    "last_page_url": "https://shortext.ny-corp.io/api/agent/search?page=1",
-    "next_page_url": null,
-    "path": "https://shortext.ny-corp.io/api/agent/search",
-    "per_page": 50,
-    "prev_page_url": null,
-    "to": 8,
-    "total": 8
+  "current_page": 1,
+  "data": [ { "id": "AGI-XXXXX", "name": "Support" } ],
+  "first_page_url": "https://shortext.ny-corp.io/api/v2.0/agents?page=1",
+  "from": 1,
+  "last_page": 3,
+  "last_page_url": "https://shortext.ny-corp.io/api/v2.0/agents?page=3",
+  "next_page_url": "https://shortext.ny-corp.io/api/v2.0/agents?page=2",
+  "path": "https://shortext.ny-corp.io/api/v2.0/agents",
+  "per_page": 50,
+  "prev_page_url": null,
+  "to": 50,
+  "total": 128
 }
 ```
 
-## Response Code
+Follow `next_page_url` until it is `null`.
 
-| Code | Description                                                                                                         |
-|------|---------------------------------------------------------------------------------------------------------------------|
-| 1    | The token has expired / Le token a expiré.                                                                          |
-| 2    | The token is blacklisted / Le token est dans la liste noire.                                                        |
-| 3    | The token is invalid / Le token est invalide.                                                                       |
-| 4    | The token was not found / Le token n'a pas été trouvé.                                                              |
-| 5    | The user associated with the token was not found / L'utilisateur associé au token n'a pas été trouvé                |
-| 1000 | The request was successful / La requête a réussi.                                                                   |
-| 1001 | The request failed / La requête a échoué.                                                                           |
-| 1002 | Request validation error / Erreur de validation de la requête.                                                      |
-| 1003 | The request has expired / La requête a expiré.                                                                      |
-| 1004 | Trying to insert a duplicate entry / Tentative d'insertion d'un doublon.                                            |
-| 1005 | The request is not authorized / La requête n'est pas autorisée.                                                     |
-| 1006 | An exception occurred while processing the request / Une exception s'est produite lors du traitement de la requête. |
-| 1007 | The request was not found / La requête n'a pas été trouvée.                                                         |
-| 1008 | Incorrect JSON format in the request / Format JSON incorrect dans la requête.                                       |
-| 1009 | The service is not available / Le service n'est pas disponible.                                                     |
-| 1010 | Emergency request / Requête d'urgence.                                                                              |
-| 1100 | The account is not verified / Le compte n'est pas vérifié.                                                          |
-| 1101 | Incorrect username / Nom d'utilisateur incorrect.                                                                   |
-| 1102 | Incorrect password / Mot de passe incorrect.                                                                        |
-| 1103 | Incorrect credentials / Identifiants incorrects.                                                                    |
-| 1104 | The account is verified / Le compte est vérifié.                                                                    |
-| 1105 | The account does not exist / Le compte n'existe pas.                                                                |
+## Dates and ids
+
+- Dates are ISO 8601 strings, for example `2026-10-24T09:12:44+00:00`.
+- Ids are opaque strings (`AGI-XXXXX`, `ste_...`, uuids). Store them as strings, never parse them.
+
+## Rate limits
+
+{/* TODO: document the rate limits of the API (requests per minute per key) and the response when they are exceeded. */}
+
+Rate limits are not documented yet. Keep your integration reasonable: retry failed requests with a backoff and do not poll when a [webhook](/api-reference/webhooks) gives you the information.
+
+## What is in the API
+
+| Resource | What you can do |
+| --- | --- |
+| Account | `GET /me`: the company and the key behind your token |
+| Agents | Create, update, delete and restore agents |
+| Channels | List channels, attach them to agents; create and manage Shortext endpoints |
+| Conversations | List, read, start, reply, take over, hand back, assign |
+| Templates | List the WhatsApp templates you can send |
+| Webhooks | Manage endpoints, test them, read and retry deliveries |
+| Hosted sessions | Let your clients connect their WhatsApp number or mailbox on a Shortext page |
+
+The full list is in **Endpoints**, generated from the OpenAPI specification.

@@ -1,0 +1,131 @@
+---
+title: Sessions hébergées
+description: Laissez vos propres clients connecter leur numéro WhatsApp ou leur boîte mail sur une page Shortext, depuis votre produit.
+---
+
+import HostedSession from '/snippets/code/hosted-session.mdx';
+
+Une session hébergée est un lien signé et temporaire vers une page **hébergée par Shortext**, où votre utilisateur réalise une étape impossible dans votre propre produit : s'identifier auprès de Meta pour connecter un numéro WhatsApp Business, ou saisir et vérifier les paramètres d'une boîte mail. Une fois terminé, il revient dans votre application et vous recevez le résultat.
+
+Cas typique : vous construisez un produit sur Shortext, et chacun de vos clients connecte son propre numéro WhatsApp à l'agent que vous avez configuré pour lui.
+
+## Parcours
+
+<Steps>
+  <Step title="Créez la session (votre serveur)">
+    `POST /hosted-sessions` avec un `purpose` (objectif). La réponse contient l'`url` de la page.
+  </Step>
+  <Step title="Envoyez votre utilisateur sur la page">
+    Redirigez-le, ou ouvrez l'URL dans une nouvelle fenêtre. Ne l'intégrez pas dans une iframe : la connexion Meta la refuse.
+  </Step>
+  <Step title="Votre utilisateur complète la page">
+    Sur `https://shortext.ny-corp.io/connect/{token}`, il s'identifie auprès de Meta ou saisit les paramètres de sa boîte mail.
+  </Step>
+  <Step title="Retour dans votre application">
+    Shortext le renvoie vers votre `return_url` avec `?session_id={id}&status={statut}`.
+  </Step>
+  <Step title="Récupérez le résultat (votre serveur)">
+    Recevez le webhook `hosted_session.completed` ou `hosted_session.failed`, ou appelez `GET /hosted-sessions/{id}`. Ne vous fiez pas au seul `status` de l'URL de retour : n'importe qui peut le saisir.
+  </Step>
+</Steps>
+
+## Objectifs
+
+`GET /hosted-sessions/purposes` les liste.
+
+| Objectif | Page | `context` |
+| --- | --- | --- |
+| `whatsapp` | Connecter des numéros WhatsApp Business avec l'inscription intégrée de Meta. | `agent_id` : l'agent qui répond sur les numéros (par défaut : votre premier agent). |
+| `mail` | Connecter une boîte mail en IMAP / SMTP ; la connexion est vérifiée avant l'enregistrement. | `agent_id` : l'agent qui répond sur la boîte (par défaut : votre premier agent). |
+
+## Créer une session
+
+Demande la permission **Gérer les intégrations**.
+
+<ParamField body="purpose" type="string" required>
+  `whatsapp` ou `mail`.
+</ParamField>
+<ParamField body="context" type="object">
+  Options de l'objectif, par exemple `{ "agent_id": "AGI-XXXXX" }`. L'agent doit appartenir à votre entreprise.
+</ParamField>
+<ParamField body="return_url" type="string">
+  Votre page vers laquelle l'utilisateur revient. HTTPS uniquement.
+</ParamField>
+<ParamField body="locale" type="string">
+  La langue de la page, par exemple `fr` ou `en`.
+</ParamField>
+<ParamField body="expires_in" type="integer" default="60">
+  Durée de validité du lien en minutes, de 5 à 1 440 (24 heures).
+</ParamField>
+
+<HostedSession />
+
+```json Réponse
+{
+  "success": true,
+  "message": "Request success.",
+  "code": 1000,
+  "body": {
+    "url": "https://shortext.ny-corp.io/connect/hs_...",
+    "id": "9b1e4c3a-6f2d-4b8e-9a7c-2d5f8e1b0c4a",
+    "purpose": "whatsapp",
+    "status": "pending",
+    "context": { "agent_id": "AGI-XXXXX" },
+    "result": null,
+    "error": null,
+    "return_url": "https://app.example.com/settings/whatsapp",
+    "locale": "fr",
+    "expires_at": "2026-10-24T10:12:44+00:00",
+    "opened_at": null,
+    "finished_at": null,
+    "created_at": "2026-10-24T09:12:44+00:00"
+  }
+}
+```
+
+<Warning>L'`url` contient un secret et n'est renvoyée qu'à la création. Ne la journalisez jamais, ne la partagez qu'avec l'utilisateur à qui elle est destinée.</Warning>
+
+## Statuts
+
+| Statut | Signification |
+| --- | --- |
+| `pending` | Créée, la page n'a pas encore été ouverte. |
+| `opened` | L'utilisateur a ouvert la page. |
+| `completed` | Terminée : `result` contient ce qu'elle a produit. |
+| `failed` | L'étape a échoué : `error` dit pourquoi. |
+| `cancelled` | Vous l'avez annulée avec `DELETE /hosted-sessions/{id}`. |
+| `expired` | Non terminée avant `expires_at`. |
+
+Une session ne sert qu'**une** issue : une fois terminée, échouée, annulée ou expirée, son lien cesse de fonctionner. Créez une nouvelle session pour réessayer.
+
+## Résultat
+
+Pour les deux objectifs, `result` liste les canaux connectés, au même format que `GET /channels` :
+
+```json
+{
+  "channels": [
+    {
+      "type": "whatsapp",
+      "id": "532867649916076",
+      "name": "+237 6 99 99 99 99 (Acme)",
+      "enabled": true,
+      "agent": { "id": "AGI-XXXXX", "name": "Support" },
+      "settings": null,
+      "created_at": "2026-10-24T09:20:02+00:00"
+    }
+  ]
+}
+```
+
+Conservez l'`id` du canal : c'est le `channel_id` depuis lequel vous envoyez les messages. Un webhook `channel.connected` est aussi envoyé pour chaque nouveau canal.
+
+## Autres endpoints
+
+| Endpoint | Usage |
+| --- | --- |
+| `GET /hosted-sessions` | Vos sessions, les plus récentes d'abord, filtrables par `purpose`. |
+| `GET /hosted-sessions/{id}` | Une session, avec son statut et son résultat. |
+| `DELETE /hosted-sessions/{id}` | Annuler une session non terminée : le lien cesse de fonctionner. |
+
+Voir le guide [Connecter le WhatsApp d'un client](/fr/api-reference/guides/connect-whatsapp).

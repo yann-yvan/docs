@@ -1,0 +1,59 @@
+---
+title: Envoyer un modèle WhatsApp
+description: Trouvez un modèle approuvé, remplissez ses variables et envoyez-le par l'API.
+---
+
+import StartConversation from '/snippets/code/start-conversation.mdx';
+
+Les modèles sont les seuls messages que WhatsApp accepte hors de la fenêtre de 24 heures. Ils sont créés et approuvés dans le tableau de bord, voir [Modèles WhatsApp](/fr/channels/whatsapp-templates).
+
+## 1. Trouver le modèle
+
+`GET /templates?channel_id={identifiant du canal WhatsApp}&status=APPROVED` liste les modèles qu'un numéro peut envoyer :
+
+```json
+{
+  "id": "tpl-hashid",
+  "name": "order_update",
+  "language": "fr",
+  "status": "APPROVED",
+  "category": "UTILITY",
+  "channels": ["532867649916076"],
+  "header": { "type": "NONE", "text": null, "variables": [], "media_url": null },
+  "body": { "text": "Bonjour {{name}}, votre commande {{order}} est prête.", "variables": ["name", "order"] },
+  "footer": null,
+  "buttons": []
+}
+```
+
+`body.variables` (et `header.variables` pour un en-tête texte) sont les valeurs que vous devez fournir.
+
+## 2. L'envoyer
+
+Utilisez `message.type` `template`, le `name` et la `language` du modèle, et les variables par nom :
+
+<StartConversation />
+
+Pour envoyer un modèle dans une conversation existante, postez le même `message` sur `POST /conversations/{id}/messages`.
+
+### En-tête média
+
+Pour un modèle avec un en-tête image, vidéo ou document, donnez son URL :
+
+```json
+"header": { "url": "https://cdn.example.com/parcels/A-1042.jpg" }
+```
+
+Sans `url`, le média enregistré avec le modèle est utilisé. Un document accepte aussi un `filename`.
+
+## Erreurs
+
+Shortext vérifie le modèle avant de l'envoyer et répond `code` `1002` avec un message exploitable :
+
+| Message | Correction |
+| --- | --- |
+| `Template order_update not found for this WhatsApp number` | Vérifiez le nom, et que le modèle appartient au compte WhatsApp Business de ce numéro. |
+| `Template order_update has no en version: fr` | Utilisez l'une des langues indiquées. |
+| `Template order_update (fr) is PENDING: only approved templates can be sent` | Attendez l'approbation de Meta. |
+| `Missing body variables: order` | Fournissez chaque variable ; `body.missing` les liste. |
+| `Template ... has a image header: give message.content.header.url` | Fournissez l'URL du média. |

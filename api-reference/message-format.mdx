@@ -1,0 +1,187 @@
+---
+title: Message format
+description: The one grammar every endpoint uses to describe a message - text, template, interactive and media.
+---
+
+Every endpoint that sends a message (start a conversation, reply, Shortext inbound, v1.0 send) and every message in a response or a webhook uses the same `message` object:
+
+```json
+{
+  "type": "text",
+  "content": { "text": "Hello, how can I help?" }
+}
+```
+
+`type` is one of `text`, `template`, `interactive` or `media`; `content` depends on it.
+
+| Type | Use it for | WhatsApp 24-hour window |
+| --- | --- | --- |
+| `text` | Plain text | Inside only |
+| `template` | Approved WhatsApp templates | Inside and outside |
+| `interactive` | Buttons, lists, call-to-action links | Inside only |
+| `media` | Images, videos, documents, audio | Inside only |
+
+Each endpoint accepts the types that make sense for it: for example a Shortext inbound message is `text` only.
+
+## Text
+
+<ParamField body="content.text" type="string" required>
+  The text, up to **4,096 characters**. On WhatsApp, a URL in the text is rendered as a link.
+</ParamField>
+
+```json
+{ "type": "text", "content": { "text": "Your order A-1042 has left our warehouse." } }
+```
+
+## Template
+
+<ParamField body="content.template_name" type="string" required>
+  The template name, as listed by `GET /templates`.
+</ParamField>
+<ParamField body="content.language" type="string" required>
+  The template language, for example `fr` or `en_US`. The template must be approved in this language.
+</ParamField>
+<ParamField body="content.body" type="object">
+  The body variables, by name: `{ "name": "Brice", "order": "A-1042" }`. For templates with numbered variables (`{{1}}`, `{{2}}`), give a list of WhatsApp parameters in order.
+</ParamField>
+<ParamField body="content.header" type="object">
+  For a **text** header with variables: `{ "name": "value" }`. For a **media** header: `{ "url": "https://..." }` (and `filename` for a document). Without `url`, the media stored with the template is sent.
+</ParamField>
+<ParamField body="content.buttons" type="array">
+  Parameters of dynamic buttons, in the WhatsApp Cloud API format.
+</ParamField>
+<ParamField body="content.category" type="string" default="utility">
+  `utility`, `marketing` or `authentication`.
+</ParamField>
+
+```json
+{
+  "type": "template",
+  "content": {
+    "template_name": "order_shipped",
+    "language": "fr",
+    "header": { "url": "https://cdn.example.com/parcels/A-1042.jpg" },
+    "body": { "name": "Brice", "order": "A-1042" }
+  }
+}
+```
+
+In v2.0, Shortext checks a template before sending it to WhatsApp and answers `1002` with an explicit message when the template does not exist on the number, is not approved in that language, or misses a variable (`body.missing` lists them). See [Send a template](/api-reference/guides/send-a-template).
+
+## Interactive
+
+<ParamField body="content.type" type="string" required>
+  `button` (reply buttons), `list`, `cta_url`, `quick_reply`, `carousel`, `flow` or `payment`.
+</ParamField>
+<ParamField body="content.body" type="string" required>
+  The text of the message, up to 1,024 characters.
+</ParamField>
+<ParamField body="content.action" type="object" required>
+  The buttons, sections or link, in the WhatsApp Cloud API `action` format.
+</ParamField>
+<ParamField body="content.header" type="object">
+  `{ "type": "text" | "image" | "video" | "document" | "audio", "value": "text or URL", "filename": "for documents" }`.
+</ParamField>
+<ParamField body="content.footer" type="string">
+  Up to 60 characters.
+</ParamField>
+
+<CodeGroup>
+```json Reply buttons
+{
+  "type": "interactive",
+  "content": {
+    "type": "button",
+    "header": { "type": "text", "value": "Delivery" },
+    "body": "When should we deliver your order?",
+    "footer": "Choose a slot",
+    "action": {
+      "buttons": [
+        { "type": "reply", "reply": { "id": "slot_morning", "title": "Morning" } },
+        { "type": "reply", "reply": { "id": "slot_evening", "title": "Evening" } }
+      ]
+    }
+  }
+}
+```
+
+```json List
+{
+  "type": "interactive",
+  "content": {
+    "type": "list",
+    "body": "Which product do you need help with?",
+    "action": {
+      "button": "See products",
+      "sections": [
+        {
+          "title": "Phones",
+          "rows": [
+            { "id": "p_x1", "title": "X1", "description": "2025 model" },
+            { "id": "p_x2", "title": "X2" }
+          ]
+        }
+      ]
+    }
+  }
+}
+```
+</CodeGroup>
+
+WhatsApp allows up to 3 reply buttons, and up to 10 sections of 10 rows in a list.
+
+## Media
+
+<ParamField body="content.media_type" type="string" required>
+  `image`, `video`, `document` or `audio`.
+</ParamField>
+<ParamField body="content.media_url" type="string" required>
+  A public URL Shortext can download the file from.
+</ParamField>
+<ParamField body="content.caption" type="string">
+  Up to 1,024 characters (not for audio).
+</ParamField>
+<ParamField body="content.filename" type="string">
+  The file name shown for a document.
+</ParamField>
+<ParamField body="content.mime" type="string">
+  The MIME type, for example `application/pdf`.
+</ParamField>
+
+```json
+{
+  "type": "media",
+  "content": {
+    "media_type": "document",
+    "media_url": "https://cdn.example.com/invoices/A-1042.pdf",
+    "filename": "Invoice A-1042.pdf",
+    "caption": "Your invoice"
+  }
+}
+```
+
+## Messages in responses and webhooks
+
+Messages returned by the API and sent in `message.*` webhooks wrap the same object:
+
+```json
+{
+  "id": "msg-hashid",
+  "conversation_id": "conv-hashid",
+  "direction": "inbound",
+  "channel": "whatsapp",
+  "channel_id": "532867649916076",
+  "contact": { "identifier": "237699999999", "identifier_type": "phone", "profile": { "firstname": "Brice" } },
+  "message": {
+    "id": "wamid.HBgM...",
+    "type": "text",
+    "content": { "text": "Hello, where is my order?" }
+  },
+  "status": "received",
+  "created_at": "2026-10-24T09:12:44+00:00"
+}
+```
+
+- `direction` is `inbound` (from the contact) or `outbound` (from the AI agent, a member of your team or the API).
+- `message.id` is the id on the channel (WhatsApp message id; on a Shortext endpoint, your own message id).
+- `status` is `received` for inbound messages, then `sent`, `delivered`, `read` or `failed` for outbound ones; changes are pushed by the `message.status` webhook.
