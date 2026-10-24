@@ -10,7 +10,7 @@ description: The legacy POST /messages/send endpoint and the message types it su
 | Field | Description |
 | --- | --- |
 | `channel` | `whatsapp` or `mail`. |
-| `from` | The sending channel: WhatsApp phone number id or mailbox username. |
+| `from` | The id of the sending channel: WhatsApp phone number id or mailbox id (`mbx_...`), as listed by `GET /api/v2.0/channels`. |
 | `contact` | `identifier` (WhatsApp: E.164 without `+`) and `profile`, where `lastname` is **required**. See [Contact format](/api-reference/contact-format). |
 | `message` | `type` and `content`, see [Message format](/api-reference/message-format). |
 

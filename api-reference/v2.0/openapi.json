@@ -115,7 +115,7 @@
                     "Hosted sessions"
                 ],
                 "summary": "Create a hosted session",
-                "description": "Returns the `url` of a page hosted by us, to give to your user (redirect or new window, not an iframe). It expires and serves once. Follow the outcome with GET /hosted-sessions/{id} or the webhooks.",
+                "description": "Returns the `url` of a page hosted by us, to give to your user (redirect or new window, not an iframe). It expires and serves once. Follow the outcome with `GET /hosted-sessions/{id}` or the webhooks.",
                 "operationId": "createHostedSession",
                 "requestBody": {
                     "required": true,
@@ -908,7 +908,7 @@
                     "Agents"
                 ],
                 "summary": "Create an agent",
-                "description": "Refused once the plan agent limit is reached. Attach channels with PUT /channels/{type}/{id}/agent.",
+                "description": "Refused once the plan agent limit is reached. Attach channels with `PUT /channels/{type}/{id}/agent`.",
                 "operationId": "createAgent",
                 "requestBody": {
                     "required": true,
@@ -3405,7 +3405,7 @@
                         ]
                     },
                     "content": {
-                        "description": "`text`: { text }. `template`: { template_name, language, body?, header?, buttons?, category? }. `interactive`: { type, body, action, header?, footer? }. `media`: { media_type (image, video, document, audio), media_url, caption?, filename?, mime? }",
+                        "description": "`text`: `{ text }`. `template`: `{ template_name, language, body?, header?, buttons?, category? }`. `interactive`: `{ type, body, action, header?, footer? }`. `media`: `{ media_type, media_url, caption?, filename?, mime? }` (media_type: image, video, document, audio)",
                         "type": "object",
                         "example": {
                             "text": "Hello, how can I help?"
@@ -3501,7 +3501,7 @@
                                 ]
                             },
                             "variables": {
-                                "description": "TEXT header: message.content.header { name: value }",
+                                "description": "TEXT header: `message.content.header` = `{ name: value }`",
                                 "type": "array",
                                 "items": {
                                     "type": "string"
@@ -3524,7 +3524,7 @@
                                 "example": "Hello {{name}}, your order {{order}} is ready."
                             },
                             "variables": {
-                                "description": "message.content.body { name: value }",
+                                "description": "`message.content.body` = `{ name: value }`",
                                 "type": "array",
                                 "items": {
                                     "type": "string"

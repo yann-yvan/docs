@@ -2,7 +2,7 @@
     "openapi": "3.1.0",
     "info": {
         "title": "Shortext API",
-        "description": "This is my API",
+        "description": "Shortext API v1.0 (legacy). New integrations should use v2.0. Every response is HTTP 200: check `success` and `code`.",
         "version": "1.0"
     },
     "servers": [
@@ -48,7 +48,7 @@
         "/business-manager/balance": {
             "get": {
                 "tags": [
-                    "Business - Manager"
+                    "Business manager"
                 ],
                 "summary": "get business balance",
                 "operationId": "getBalance",
@@ -85,7 +85,7 @@
                     "Messages"
                 ],
                 "summary": "Send a message",
-                "description": "Envoie un message au destinataire via l'API Shortext",
+                "description": "Sends a message to a contact from one of your channels (v1.0, legacy: v2.0 has POST /conversations).",
                 "operationId": "sendMessage",
                 "requestBody": {
                     "required": true,
@@ -474,7 +474,7 @@
         "/up": {
             "get": {
                 "tags": [
-                    "health"
+                    "Health"
                 ],
                 "summary": "Health Check",
                 "description": "Check if the service is up",
@@ -558,7 +558,7 @@
                         "type": "object"
                     },
                     "from": {
-                        "description": "Identifier of the sending channel (WhatsApp phone id, mailbox username)",
+                        "description": "Id of the sending channel: WhatsApp phone id, mailbox id (mbx_...) or Shortext endpoint id (ste_...)",
                         "type": "string",
                         "example": "1234567890"
                     },
@@ -1345,8 +1345,8 @@
             "description": "Agents"
         },
         {
-            "name": "Business - Manager",
-            "description": "Business - Manager"
+            "name": "Business manager",
+            "description": "Business manager"
         },
         {
             "name": "Messages",
@@ -1361,8 +1361,8 @@
             "description": "Knowledge"
         },
         {
-            "name": "health",
-            "description": "health"
+            "name": "Health",
+            "description": "Health"
         }
     ]
 }

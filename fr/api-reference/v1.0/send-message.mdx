@@ -10,7 +10,7 @@ description: L'endpoint historique POST /messages/send et les types de messages 
 | Champ | Description |
 | --- | --- |
 | `channel` | `whatsapp` ou `mail`. |
-| `from` | Le canal d'envoi : identifiant du numéro WhatsApp ou nom d'utilisateur de la boîte mail. |
+| `from` | L'identifiant du canal d'envoi : identifiant du numéro WhatsApp ou identifiant de la boîte mail (`mbx_...`), tels que listés par `GET /api/v2.0/channels`. |
 | `contact` | `identifier` (WhatsApp : E.164 sans `+`) et `profile`, où `lastname` est **obligatoire**. Voir [Format des contacts](/fr/api-reference/contact-format). |
 | `message` | `type` et `content`, voir [Format des messages](/fr/api-reference/message-format). |
 
