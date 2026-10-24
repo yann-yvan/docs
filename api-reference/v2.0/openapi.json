@@ -2883,7 +2883,7 @@
                         ]
                     },
                     "channel_id": {
-                        "description": "Your channel (GET /channels): WhatsApp phone id, mailbox, Shortext endpoint",
+                        "description": "Your channel id (`GET /channels`): WhatsApp phone id, mailbox id (mbx_...) or Shortext endpoint id (ste_...)",
                         "type": "string"
                     },
                     "contact": {
@@ -3125,7 +3125,7 @@
                         "example": "whatsapp"
                     },
                     "id": {
-                        "description": "WhatsApp phone number id, mailbox username or Shortext endpoint id (ste_...)",
+                        "description": "Channel id (the channel_id of the webhooks): WhatsApp phone number id, mailbox id (mbx_...) or Shortext endpoint id (ste_...)",
                         "type": "string",
                         "example": "532867649916076"
                     },
