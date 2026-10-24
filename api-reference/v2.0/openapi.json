@@ -11,827 +11,6 @@
         }
     ],
     "paths": {
-        "/hosted-sessions/purposes": {
-            "get": {
-                "tags": [
-                    "Hosted sessions"
-                ],
-                "summary": "Purposes of the hosted sessions",
-                "operationId": "listHostedSessionPurposes",
-                "responses": {
-                    "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "allOf": [
-                                        {
-                                            "$ref": "#/components/schemas/ApiEnvelope"
-                                        },
-                                        {
-                                            "properties": {
-                                                "body": {
-                                                    "allOf": [
-                                                        {
-                                                            "description": "purpose => description",
-                                                            "type": "object",
-                                                            "additionalProperties": {
-                                                                "type": "string"
-                                                            }
-                                                        }
-                                                    ]
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/hosted-sessions": {
-            "get": {
-                "tags": [
-                    "Hosted sessions"
-                ],
-                "summary": "List hosted sessions",
-                "description": "Most recent first, 50 per page.",
-                "operationId": "listHostedSessions",
-                "responses": {
-                    "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "allOf": [
-                                        {
-                                            "$ref": "#/components/schemas/ApiEnvelope"
-                                        },
-                                        {
-                                            "properties": {
-                                                "body": {
-                                                    "allOf": [
-                                                        {
-                                                            "$ref": "#/components/schemas/ApiPage"
-                                                        },
-                                                        {
-                                                            "properties": {
-                                                                "data": {
-                                                                    "type": "array",
-                                                                    "items": {
-                                                                        "$ref": "#/components/schemas/HostedSession"
-                                                                    }
-                                                                }
-                                                            },
-                                                            "type": "object"
-                                                        }
-                                                    ]
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            },
-            "post": {
-                "tags": [
-                    "Hosted sessions"
-                ],
-                "summary": "Create a hosted session",
-                "description": "Returns the `url` of a page hosted by us, to give to your user (redirect or new window, not an iframe). It expires and serves once. Follow the outcome with `GET /hosted-sessions/{id}` or the webhooks.",
-                "operationId": "createHostedSession",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/HostedSessionInput"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "allOf": [
-                                        {
-                                            "$ref": "#/components/schemas/ApiEnvelope"
-                                        },
-                                        {
-                                            "properties": {
-                                                "body": {
-                                                    "allOf": [
-                                                        {
-                                                            "$ref": "#/components/schemas/HostedSession"
-                                                        },
-                                                        {
-                                                            "properties": {
-                                                                "url": {
-                                                                    "description": "The page to give to your user (holds a secret)",
-                                                                    "type": "string"
-                                                                }
-                                                            },
-                                                            "type": "object"
-                                                        }
-                                                    ]
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/hosted-sessions/{id}": {
-            "get": {
-                "tags": [
-                    "Hosted sessions"
-                ],
-                "summary": "Get a hosted session",
-                "operationId": "getHostedSession",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "allOf": [
-                                        {
-                                            "$ref": "#/components/schemas/ApiEnvelope"
-                                        },
-                                        {
-                                            "properties": {
-                                                "body": {
-                                                    "$ref": "#/components/schemas/HostedSession"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            },
-            "delete": {
-                "tags": [
-                    "Hosted sessions"
-                ],
-                "summary": "Cancel a hosted session",
-                "description": "The URL stops working. A finished session cannot be cancelled.",
-                "operationId": "cancelHostedSession",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "allOf": [
-                                        {
-                                            "$ref": "#/components/schemas/ApiEnvelope"
-                                        },
-                                        {
-                                            "properties": {
-                                                "body": {
-                                                    "$ref": "#/components/schemas/HostedSession"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/webhooks/events": {
-            "get": {
-                "tags": [
-                    "Webhooks"
-                ],
-                "summary": "Webhook event catalog",
-                "description": "Event types an endpoint can subscribe to. Subscribe with an exact type, a prefix wildcard such as `message.*`, or `*`.",
-                "operationId": "listWebhookEvents",
-                "responses": {
-                    "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "allOf": [
-                                        {
-                                            "$ref": "#/components/schemas/ApiEnvelope"
-                                        },
-                                        {
-                                            "properties": {
-                                                "body": {
-                                                    "allOf": [
-                                                        {
-                                                            "type": "array",
-                                                            "items": {
-                                                                "properties": {
-                                                                    "type": {
-                                                                        "type": "string"
-                                                                    },
-                                                                    "description": {
-                                                                        "type": "string"
-                                                                    }
-                                                                },
-                                                                "type": "object"
-                                                            }
-                                                        }
-                                                    ]
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/webhooks": {
-            "get": {
-                "tags": [
-                    "Webhooks"
-                ],
-                "summary": "List webhook endpoints",
-                "operationId": "listWebhooks",
-                "responses": {
-                    "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "allOf": [
-                                        {
-                                            "$ref": "#/components/schemas/ApiEnvelope"
-                                        },
-                                        {
-                                            "properties": {
-                                                "body": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "$ref": "#/components/schemas/WebhookEndpoint"
-                                                    }
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            },
-            "post": {
-                "tags": [
-                    "Webhooks"
-                ],
-                "summary": "Create a webhook endpoint",
-                "description": "The signing `secret` is returned **only once**, keep it. Payloads follow the API version used to create the endpoint.",
-                "operationId": "createWebhook",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/WebhookEndpointInput"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "allOf": [
-                                        {
-                                            "$ref": "#/components/schemas/ApiEnvelope"
-                                        },
-                                        {
-                                            "properties": {
-                                                "body": {
-                                                    "allOf": [
-                                                        {
-                                                            "$ref": "#/components/schemas/WebhookEndpoint"
-                                                        },
-                                                        {
-                                                            "properties": {
-                                                                "secret": {
-                                                                    "description": "Signing secret, shown only here",
-                                                                    "type": "string"
-                                                                }
-                                                            },
-                                                            "type": "object"
-                                                        }
-                                                    ]
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/webhooks/{id}": {
-            "get": {
-                "tags": [
-                    "Webhooks"
-                ],
-                "summary": "Get a webhook endpoint",
-                "operationId": "getWebhook",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "allOf": [
-                                        {
-                                            "$ref": "#/components/schemas/ApiEnvelope"
-                                        },
-                                        {
-                                            "properties": {
-                                                "body": {
-                                                    "$ref": "#/components/schemas/WebhookEndpoint"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            },
-            "put": {
-                "tags": [
-                    "Webhooks"
-                ],
-                "summary": "Update a webhook endpoint",
-                "description": "Setting `is_enabled` to true re-enables an endpoint disabled after repeated failures.",
-                "operationId": "updateWebhook",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/WebhookEndpointInput"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "allOf": [
-                                        {
-                                            "$ref": "#/components/schemas/ApiEnvelope"
-                                        },
-                                        {
-                                            "properties": {
-                                                "body": {
-                                                    "$ref": "#/components/schemas/WebhookEndpoint"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            },
-            "delete": {
-                "tags": [
-                    "Webhooks"
-                ],
-                "summary": "Delete a webhook endpoint",
-                "operationId": "deleteWebhook",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Deleted",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "allOf": [
-                                        {
-                                            "$ref": "#/components/schemas/ApiEnvelope"
-                                        },
-                                        {
-                                            "properties": {
-                                                "body": {
-                                                    "allOf": [
-                                                        {
-                                                            "type": "null"
-                                                        }
-                                                    ]
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/webhooks/{id}/rotate-secret": {
-            "post": {
-                "tags": [
-                    "Webhooks"
-                ],
-                "summary": "Rotate the signing secret",
-                "description": "The previous secret stops working immediately.",
-                "operationId": "rotateWebhookSecret",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "allOf": [
-                                        {
-                                            "$ref": "#/components/schemas/ApiEnvelope"
-                                        },
-                                        {
-                                            "properties": {
-                                                "body": {
-                                                    "properties": {
-                                                        "secret": {
-                                                            "description": "The new signing secret",
-                                                            "type": "string"
-                                                        }
-                                                    },
-                                                    "type": "object"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/webhooks/{id}/test": {
-            "post": {
-                "tags": [
-                    "Webhooks"
-                ],
-                "summary": "Send a test event",
-                "description": "Sends a `webhook.test` event right away (no retry) and returns the delivery with the endpoint response.",
-                "operationId": "testWebhook",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "allOf": [
-                                        {
-                                            "$ref": "#/components/schemas/ApiEnvelope"
-                                        },
-                                        {
-                                            "properties": {
-                                                "body": {
-                                                    "$ref": "#/components/schemas/WebhookDelivery"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/webhooks/{id}/deliveries": {
-            "get": {
-                "tags": [
-                    "Webhooks"
-                ],
-                "summary": "Delivery history",
-                "description": "Most recent first, 50 per page. Deliveries are kept 30 days.",
-                "operationId": "listWebhookDeliveries",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    },
-                    {
-                        "name": "status",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "pending",
-                                "succeeded",
-                                "failed"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Always HTTP 200: check `success` and `code`.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "allOf": [
-                                        {
-                                            "$ref": "#/components/schemas/ApiEnvelope"
-                                        },
-                                        {
-                                            "properties": {
-                                                "body": {
-                                                    "allOf": [
-                                                        {
-                                                            "$ref": "#/components/schemas/ApiPage"
-                                                        },
-                                                        {
-                                                            "properties": {
-                                                                "data": {
-                                                                    "type": "array",
-                                                                    "items": {
-                                                                        "$ref": "#/components/schemas/WebhookDelivery"
-                                                                    }
-                                                                }
-                                                            },
-                                                            "type": "object"
-                                                        }
-                                                    ]
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/webhooks/{id}/deliveries/{delivery}/retry": {
-            "post": {
-                "tags": [
-                    "Webhooks"
-                ],
-                "summary": "Redeliver an event",
-                "description": "Queues a new delivery of the same event (same event `id`).",
-                "operationId": "retryWebhookDelivery",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    },
-                    {
-                        "name": "delivery",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "The new WebhookDelivery",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "allOf": [
-                                        {
-                                            "$ref": "#/components/schemas/ApiEnvelope"
-                                        },
-                                        {
-                                            "properties": {
-                                                "body": {
-                                                    "$ref": "#/components/schemas/WebhookDelivery"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
         "/agents": {
             "get": {
                 "tags": [
@@ -2426,447 +1605,831 @@
                     }
                 ]
             }
+        },
+        "/hosted-sessions/purposes": {
+            "get": {
+                "tags": [
+                    "Hosted sessions"
+                ],
+                "summary": "Purposes of the hosted sessions",
+                "operationId": "listHostedSessionPurposes",
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "allOf": [
+                                                        {
+                                                            "description": "purpose => description",
+                                                            "type": "object",
+                                                            "additionalProperties": {
+                                                                "type": "string"
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/hosted-sessions": {
+            "get": {
+                "tags": [
+                    "Hosted sessions"
+                ],
+                "summary": "List hosted sessions",
+                "description": "Most recent first, 50 per page.",
+                "operationId": "listHostedSessions",
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "allOf": [
+                                                        {
+                                                            "$ref": "#/components/schemas/ApiPage"
+                                                        },
+                                                        {
+                                                            "properties": {
+                                                                "data": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "$ref": "#/components/schemas/HostedSession"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Hosted sessions"
+                ],
+                "summary": "Create a hosted session",
+                "description": "Returns the `url` of a page hosted by us, to give to your user (redirect or new window, not an iframe). It expires and serves once. Follow the outcome with `GET /hosted-sessions/{id}` or the webhooks.",
+                "operationId": "createHostedSession",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/HostedSessionInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "allOf": [
+                                                        {
+                                                            "$ref": "#/components/schemas/HostedSession"
+                                                        },
+                                                        {
+                                                            "properties": {
+                                                                "url": {
+                                                                    "description": "The page to give to your user (holds a secret)",
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/hosted-sessions/{id}": {
+            "get": {
+                "tags": [
+                    "Hosted sessions"
+                ],
+                "summary": "Get a hosted session",
+                "operationId": "getHostedSession",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/HostedSession"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Hosted sessions"
+                ],
+                "summary": "Cancel a hosted session",
+                "description": "The URL stops working. A finished session cannot be cancelled.",
+                "operationId": "cancelHostedSession",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/HostedSession"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/webhooks/events": {
+            "get": {
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "Webhook event catalog",
+                "description": "Event types an endpoint can subscribe to. Subscribe with an exact type, a prefix wildcard such as `message.*`, or `*`.",
+                "operationId": "listWebhookEvents",
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "allOf": [
+                                                        {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "properties": {
+                                                                    "type": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "description": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/webhooks": {
+            "get": {
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "List webhook endpoints",
+                "operationId": "listWebhooks",
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/WebhookEndpoint"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "Create a webhook endpoint",
+                "description": "The signing `secret` is returned **only once**, keep it. Payloads follow the API version used to create the endpoint.",
+                "operationId": "createWebhook",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WebhookEndpointInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "allOf": [
+                                                        {
+                                                            "$ref": "#/components/schemas/WebhookEndpoint"
+                                                        },
+                                                        {
+                                                            "properties": {
+                                                                "secret": {
+                                                                    "description": "Signing secret, shown only here",
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/webhooks/{id}": {
+            "get": {
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "Get a webhook endpoint",
+                "operationId": "getWebhook",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/WebhookEndpoint"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "Update a webhook endpoint",
+                "description": "Setting `is_enabled` to true re-enables an endpoint disabled after repeated failures.",
+                "operationId": "updateWebhook",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WebhookEndpointInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/WebhookEndpoint"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "Delete a webhook endpoint",
+                "operationId": "deleteWebhook",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "allOf": [
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/webhooks/{id}/rotate-secret": {
+            "post": {
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "Rotate the signing secret",
+                "description": "The previous secret stops working immediately.",
+                "operationId": "rotateWebhookSecret",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "properties": {
+                                                        "secret": {
+                                                            "description": "The new signing secret",
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/webhooks/{id}/test": {
+            "post": {
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "Send a test event",
+                "description": "Sends a `webhook.test` event right away (no retry) and returns the delivery with the endpoint response.",
+                "operationId": "testWebhook",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/WebhookDelivery"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/webhooks/{id}/deliveries": {
+            "get": {
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "Delivery history",
+                "description": "Most recent first, 50 per page. Deliveries are kept 30 days.",
+                "operationId": "listWebhookDeliveries",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "pending",
+                                "succeeded",
+                                "failed"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "allOf": [
+                                                        {
+                                                            "$ref": "#/components/schemas/ApiPage"
+                                                        },
+                                                        {
+                                                            "properties": {
+                                                                "data": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "$ref": "#/components/schemas/WebhookDelivery"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/webhooks/{id}/deliveries/{delivery}/retry": {
+            "post": {
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "Redeliver an event",
+                "description": "Queues a new delivery of the same event (same event `id`).",
+                "operationId": "retryWebhookDelivery",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "delivery",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The new WebhookDelivery",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/WebhookDelivery"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
         }
     },
     "components": {
         "schemas": {
-            "ApiEnvelope": {
-                "description": "Every response is HTTP 200. The outcome is in `success` and `code` (absolute value of the response code).",
-                "properties": {
-                    "success": {
-                        "type": "boolean",
-                        "example": true
-                    },
-                    "code": {
-                        "type": "integer",
-                        "example": 1000
-                    },
-                    "message": {
-                        "type": "string",
-                        "example": "Request success."
-                    },
-                    "body": {
-                        "description": "Endpoint payload, null when there is none"
-                    },
-                    "token": {
-                        "description": "Present only on authentication routes",
-                        "type": [
-                            "string",
-                            "null"
-                        ]
-                    },
-                    "trace_id": {
-                        "description": "Present only when success is false",
-                        "type": [
-                            "string",
-                            "null"
-                        ]
-                    }
-                },
-                "type": "object"
-            },
-            "ApiPage": {
-                "description": "A page of results: `data` holds the items. Ask another page with `?page=`",
-                "properties": {
-                    "current_page": {
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "data": {
-                        "type": "array",
-                        "items": {}
-                    },
-                    "per_page": {
-                        "type": "integer",
-                        "example": 50
-                    },
-                    "total": {
-                        "type": "integer",
-                        "example": 120
-                    },
-                    "last_page": {
-                        "type": "integer",
-                        "example": 3
-                    },
-                    "from": {
-                        "type": [
-                            "integer",
-                            "null"
-                        ]
-                    },
-                    "to": {
-                        "type": [
-                            "integer",
-                            "null"
-                        ]
-                    },
-                    "first_page_url": {
-                        "type": "string"
-                    },
-                    "last_page_url": {
-                        "type": "string"
-                    },
-                    "next_page_url": {
-                        "type": [
-                            "string",
-                            "null"
-                        ]
-                    },
-                    "prev_page_url": {
-                        "type": [
-                            "string",
-                            "null"
-                        ]
-                    },
-                    "path": {
-                        "type": "string"
-                    }
-                },
-                "type": "object"
-            },
-            "HostedSession": {
-                "description": "A signed, expiring, single-use link to one of our hosted pages, and its outcome",
-                "properties": {
-                    "id": {
-                        "description": "Session id",
-                        "type": "string",
-                        "format": "uuid"
-                    },
-                    "purpose": {
-                        "type": "string",
-                        "example": "whatsapp"
-                    },
-                    "status": {
-                        "type": "string",
-                        "enum": [
-                            "pending",
-                            "opened",
-                            "completed",
-                            "failed",
-                            "cancelled",
-                            "expired"
-                        ]
-                    },
-                    "url": {
-                        "description": "Only in the creation response: the page to give to your user. It holds a secret, never log or share it.",
-                        "type": "string"
-                    },
-                    "context": {
-                        "type": "object"
-                    },
-                    "result": {
-                        "description": "What the session produced (completed)",
-                        "type": [
-                            "object",
-                            "null"
-                        ]
-                    },
-                    "error": {
-                        "type": [
-                            "string",
-                            "null"
-                        ]
-                    },
-                    "return_url": {
-                        "description": "Your page the user is sent back to, with ?session_id=...&status=...",
-                        "type": [
-                            "string",
-                            "null"
-                        ]
-                    },
-                    "locale": {
-                        "type": [
-                            "string",
-                            "null"
-                        ]
-                    },
-                    "expires_at": {
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "opened_at": {
-                        "type": [
-                            "string",
-                            "null"
-                        ],
-                        "format": "date-time"
-                    },
-                    "finished_at": {
-                        "type": [
-                            "string",
-                            "null"
-                        ],
-                        "format": "date-time"
-                    },
-                    "created_at": {
-                        "type": "string",
-                        "format": "date-time"
-                    }
-                },
-                "type": "object"
-            },
-            "HostedSessionInput": {
-                "required": [
-                    "purpose"
-                ],
-                "properties": {
-                    "purpose": {
-                        "description": "GET /hosted-sessions/purposes",
-                        "type": "string",
-                        "example": "whatsapp"
-                    },
-                    "context": {
-                        "description": "Options of the purpose",
-                        "type": "object"
-                    },
-                    "return_url": {
-                        "type": [
-                            "string",
-                            "null"
-                        ],
-                        "format": "uri"
-                    },
-                    "locale": {
-                        "type": [
-                            "string",
-                            "null"
-                        ],
-                        "example": "fr"
-                    },
-                    "expires_in": {
-                        "description": "Minutes, default 60",
-                        "type": "integer",
-                        "maximum": 1440,
-                        "minimum": 5
-                    }
-                },
-                "type": "object"
-            },
-            "WebhookEndpointInput": {
-                "properties": {
-                    "url": {
-                        "description": "Public HTTPS URL",
-                        "type": "string",
-                        "format": "uri",
-                        "example": "https://example.com/webhooks/shortext"
-                    },
-                    "events": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        },
-                        "example": [
-                            "message.*",
-                            "conversation.handover"
-                        ]
-                    },
-                    "filters": {
-                        "description": "Only receive events whose context matches, e.g. one agent",
-                        "type": [
-                            "object",
-                            "null"
-                        ],
-                        "example": {
-                            "app": "AGI-XXXXX"
-                        }
-                    },
-                    "description": {
-                        "type": [
-                            "string",
-                            "null"
-                        ]
-                    },
-                    "is_enabled": {
-                        "type": "boolean"
-                    }
-                },
-                "type": "object"
-            },
-            "WebhookEndpoint": {
-                "properties": {
-                    "id": {
-                        "type": "string",
-                        "format": "uuid"
-                    },
-                    "url": {
-                        "type": "string",
-                        "format": "uri"
-                    },
-                    "events": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    "filters": {
-                        "type": [
-                            "object",
-                            "null"
-                        ]
-                    },
-                    "api_version": {
-                        "description": "Version of the payloads sent to this endpoint",
-                        "type": [
-                            "string",
-                            "null"
-                        ],
-                        "example": "v2.0"
-                    },
-                    "description": {
-                        "type": [
-                            "string",
-                            "null"
-                        ]
-                    },
-                    "is_enabled": {
-                        "type": "boolean"
-                    },
-                    "disabled_reason": {
-                        "description": "Set when disabled after failing for 3 days",
-                        "type": [
-                            "string",
-                            "null"
-                        ]
-                    },
-                    "failing_since": {
-                        "type": [
-                            "string",
-                            "null"
-                        ],
-                        "format": "date-time"
-                    },
-                    "last_success_at": {
-                        "type": [
-                            "string",
-                            "null"
-                        ],
-                        "format": "date-time"
-                    },
-                    "last_failure_at": {
-                        "type": [
-                            "string",
-                            "null"
-                        ],
-                        "format": "date-time"
-                    },
-                    "last_error": {
-                        "type": [
-                            "string",
-                            "null"
-                        ]
-                    },
-                    "created_at": {
-                        "type": "string",
-                        "format": "date-time"
-                    }
-                },
-                "type": "object"
-            },
-            "WebhookDelivery": {
-                "properties": {
-                    "id": {
-                        "description": "Sent in the Delivery header",
-                        "type": "string",
-                        "format": "uuid"
-                    },
-                    "event_id": {
-                        "type": "string",
-                        "example": "evt_01JB..."
-                    },
-                    "event_type": {
-                        "type": "string",
-                        "example": "message.received"
-                    },
-                    "status": {
-                        "type": "string",
-                        "enum": [
-                            "pending",
-                            "succeeded",
-                            "failed"
-                        ]
-                    },
-                    "attempts": {
-                        "type": "integer"
-                    },
-                    "response_status": {
-                        "type": [
-                            "integer",
-                            "null"
-                        ]
-                    },
-                    "response_body": {
-                        "description": "First 2000 characters",
-                        "type": [
-                            "string",
-                            "null"
-                        ]
-                    },
-                    "duration_ms": {
-                        "type": [
-                            "integer",
-                            "null"
-                        ]
-                    },
-                    "error": {
-                        "type": [
-                            "string",
-                            "null"
-                        ]
-                    },
-                    "next_retry_at": {
-                        "type": [
-                            "string",
-                            "null"
-                        ],
-                        "format": "date-time"
-                    },
-                    "delivered_at": {
-                        "type": [
-                            "string",
-                            "null"
-                        ],
-                        "format": "date-time"
-                    },
-                    "created_at": {
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "payload": {
-                        "$ref": "#/components/schemas/WebhookEventPayload"
-                    }
-                },
-                "type": "object"
-            },
-            "WebhookEventPayload": {
-                "description": "Body POSTed to your endpoint. Answer with a 2xx within 10 s and process asynchronously.\nFailed deliveries are retried after 10 s, 1 min, 5 min, 30 min, 2 h, 6 h and 12 h;\nan endpoint failing for 3 days is disabled.\nDelivery order is not guaranteed and an event may be delivered twice: dedupe on `id`.\n\n**Signature**: `X-…-Signature: sha256=hex(hmac_sha256(secret, \"{X-…-Timestamp}.{raw body}\"))`.\nCompare in constant time and reject timestamps older than 5 minutes.",
-                "properties": {
-                    "id": {
-                        "description": "Event id, identical on redeliveries",
-                        "type": "string",
-                        "example": "evt_01JB..."
-                    },
-                    "type": {
-                        "type": "string",
-                        "example": "message.received"
-                    },
-                    "api_version": {
-                        "type": [
-                            "string",
-                            "null"
-                        ],
-                        "example": "v2.0"
-                    },
-                    "created_at": {
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "data": {
-                        "description": "Depends on the event type",
-                        "type": "object"
-                    }
-                },
-                "type": "object"
-            },
             "StartConversationInput": {
                 "required": [
                     "channel",
@@ -3565,6 +3128,443 @@
                     }
                 },
                 "type": "object"
+            },
+            "ApiEnvelope": {
+                "description": "Every response is HTTP 200. The outcome is in `success` and `code` (absolute value of the response code).",
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "code": {
+                        "type": "integer",
+                        "example": 1000
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Request success."
+                    },
+                    "body": {
+                        "description": "Endpoint payload, null when there is none"
+                    },
+                    "token": {
+                        "description": "Present only on authentication routes",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "trace_id": {
+                        "description": "Present only when success is false",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "type": "object"
+            },
+            "ApiPage": {
+                "description": "A page of results: `data` holds the items. Ask another page with `?page=`",
+                "properties": {
+                    "current_page": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "data": {
+                        "type": "array",
+                        "items": {}
+                    },
+                    "per_page": {
+                        "type": "integer",
+                        "example": 50
+                    },
+                    "total": {
+                        "type": "integer",
+                        "example": 120
+                    },
+                    "last_page": {
+                        "type": "integer",
+                        "example": 3
+                    },
+                    "from": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "to": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "first_page_url": {
+                        "type": "string"
+                    },
+                    "last_page_url": {
+                        "type": "string"
+                    },
+                    "next_page_url": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "prev_page_url": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "path": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "HostedSession": {
+                "description": "A signed, expiring, single-use link to one of our hosted pages, and its outcome",
+                "properties": {
+                    "id": {
+                        "description": "Session id",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "purpose": {
+                        "type": "string",
+                        "example": "whatsapp"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "pending",
+                            "opened",
+                            "completed",
+                            "failed",
+                            "cancelled",
+                            "expired"
+                        ]
+                    },
+                    "url": {
+                        "description": "Only in the creation response: the page to give to your user. It holds a secret, never log or share it.",
+                        "type": "string"
+                    },
+                    "context": {
+                        "type": "object"
+                    },
+                    "result": {
+                        "description": "What the session produced (completed)",
+                        "type": [
+                            "object",
+                            "null"
+                        ]
+                    },
+                    "error": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "return_url": {
+                        "description": "Your page the user is sent back to, with ?session_id=...&status=...",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "locale": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "expires_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "opened_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "finished_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "HostedSessionInput": {
+                "required": [
+                    "purpose"
+                ],
+                "properties": {
+                    "purpose": {
+                        "description": "GET /hosted-sessions/purposes",
+                        "type": "string",
+                        "example": "whatsapp"
+                    },
+                    "context": {
+                        "description": "Options of the purpose",
+                        "type": "object"
+                    },
+                    "return_url": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "uri"
+                    },
+                    "locale": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "fr"
+                    },
+                    "expires_in": {
+                        "description": "Minutes, default 60",
+                        "type": "integer",
+                        "maximum": 1440,
+                        "minimum": 5
+                    }
+                },
+                "type": "object"
+            },
+            "WebhookEndpointInput": {
+                "properties": {
+                    "url": {
+                        "description": "Public HTTPS URL",
+                        "type": "string",
+                        "format": "uri",
+                        "example": "https://example.com/webhooks/shortext"
+                    },
+                    "events": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "message.*",
+                            "conversation.handover"
+                        ]
+                    },
+                    "filters": {
+                        "description": "Only receive events whose context matches, e.g. one agent",
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "example": {
+                            "app": "AGI-XXXXX"
+                        }
+                    },
+                    "description": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "is_enabled": {
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "WebhookEndpoint": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "url": {
+                        "type": "string",
+                        "format": "uri"
+                    },
+                    "events": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "filters": {
+                        "type": [
+                            "object",
+                            "null"
+                        ]
+                    },
+                    "api_version": {
+                        "description": "Version of the payloads sent to this endpoint",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "v2.0"
+                    },
+                    "description": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "is_enabled": {
+                        "type": "boolean"
+                    },
+                    "disabled_reason": {
+                        "description": "Set when disabled after failing for 3 days",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "failing_since": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "last_success_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "last_failure_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "last_error": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "WebhookDelivery": {
+                "properties": {
+                    "id": {
+                        "description": "Sent in the Delivery header",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "event_id": {
+                        "type": "string",
+                        "example": "evt_01JB..."
+                    },
+                    "event_type": {
+                        "type": "string",
+                        "example": "message.received"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "pending",
+                            "succeeded",
+                            "failed"
+                        ]
+                    },
+                    "attempts": {
+                        "type": "integer"
+                    },
+                    "response_status": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "response_body": {
+                        "description": "First 2000 characters",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "duration_ms": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "error": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "next_retry_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "delivered_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "payload": {
+                        "$ref": "#/components/schemas/WebhookEventPayload"
+                    }
+                },
+                "type": "object"
+            },
+            "WebhookEventPayload": {
+                "description": "Body POSTed to your endpoint. Answer with a 2xx within 10 s and process asynchronously.\nFailed deliveries are retried after 10 s, 1 min, 5 min, 30 min, 2 h, 6 h and 12 h;\nan endpoint failing for 3 days is disabled.\nDelivery order is not guaranteed and an event may be delivered twice: dedupe on `id`.\n\n**Signature**: `X-…-Signature: sha256=hex(hmac_sha256(secret, \"{X-…-Timestamp}.{raw body}\"))`.\nCompare in constant time and reject timestamps older than 5 minutes.",
+                "properties": {
+                    "id": {
+                        "description": "Event id, identical on redeliveries",
+                        "type": "string",
+                        "example": "evt_01JB..."
+                    },
+                    "type": {
+                        "type": "string",
+                        "example": "message.received"
+                    },
+                    "api_version": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "v2.0"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "data": {
+                        "description": "Depends on the event type",
+                        "type": "object"
+                    }
+                },
+                "type": "object"
             }
         },
         "securitySchemes": {
@@ -3576,14 +3576,6 @@
         }
     },
     "tags": [
-        {
-            "name": "Hosted sessions",
-            "description": "Hosted sessions"
-        },
-        {
-            "name": "Webhooks",
-            "description": "Webhooks"
-        },
         {
             "name": "Agents",
             "description": "Agents"
@@ -3603,6 +3595,14 @@
         {
             "name": "Templates",
             "description": "Templates"
+        },
+        {
+            "name": "Hosted sessions",
+            "description": "Hosted sessions"
+        },
+        {
+            "name": "Webhooks",
+            "description": "Webhooks"
         }
     ]
 }
