@@ -417,7 +417,7 @@
                     "Knowledge"
                 ],
                 "summary": "Add a knowledge document",
-                "description": "Send `title` and `content` (Markdown) as JSON, or upload a PDF as multipart/form-data. Refused beyond the characters of the plan (GET /agents/{agent}/knowledge/usage). The AI uses the document at once.",
+                "description": "Send `title` and `content` (Markdown) as JSON, or upload a PDF as multipart/form-data. Refused beyond the characters of the plan (`GET /agents/{agent}/knowledge/usage`). The AI uses the document at once.",
                 "operationId": "createKnowledgeDocument",
                 "parameters": [
                     {
@@ -2442,7 +2442,7 @@
                     "Dynamic links"
                 ],
                 "summary": "Create a dynamic link",
-                "description": "Share `link`: it opens the app (or its store) on the phone, and fallback_url elsewhere. Serve the verification file of each app on its domain (GET /deep-links/platforms/{id}/verification-file).",
+                "description": "Share `link`: it opens the app (or its store) on the phone, and fallback_url elsewhere. Serve the verification file of each app on its domain (`GET /deep-links/platforms/{id}/verification-file`).",
                 "operationId": "createDeepLink",
                 "requestBody": {
                     "required": true,
@@ -5821,7 +5821,7 @@
                         "type": "string"
                     },
                     "content": {
-                        "description": "Markdown; only when one document is read (GET /agents/{agent}/knowledge/{id})",
+                        "description": "Markdown; only when one document is read (`GET /agents/{agent}/knowledge/{id}`)",
                         "type": "string"
                     },
                     "characters": {
@@ -6449,7 +6449,7 @@
                         "type": "boolean"
                     },
                     "author": {
-                        "description": "Member, AI agent or \"<company> (API)\"",
+                        "description": "Member, AI agent or `<company> (API)`",
                         "type": [
                             "string",
                             "null"

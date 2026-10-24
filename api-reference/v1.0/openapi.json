@@ -1122,7 +1122,7 @@
                         "example": "button"
                     },
                     "header": {
-                        "description": "Text header doesn't allow formating like *<HEADER>* or any other format supported by WhatsApp",
+                        "description": "Text header doesn't allow formating like `*<HEADER>*` or any other format supported by WhatsApp",
                         "properties": {
                             "type": {
                                 "type": "string",
