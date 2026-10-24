@@ -752,7 +752,7 @@
                 "type": "object"
             },
             "ApiResponse": {
-                "description": "Standard lite-api envelope. Every endpoint answers with it; only `body` changes.",
+                "description": "Envelope of every response (always HTTP 200): only `body` changes from one endpoint to another.",
                 "required": [
                     "success",
                     "code",
@@ -1334,7 +1334,7 @@
         "securitySchemes": {
             "bearerAuth": {
                 "type": "http",
-                "description": "Company API token (Laravel Sanctum), sent as \"Authorization: Bearer <token>\"",
+                "description": "Company API key, sent as \"Authorization: Bearer <key>\". Create it in the dashboard (Developer > API Keys) with the permissions the integration needs.",
                 "scheme": "bearer"
             }
         }

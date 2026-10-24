@@ -2,7 +2,7 @@
     "openapi": "3.1.0",
     "info": {
         "title": "Shortext API",
-        "description": "**Versioning**: every version is a frozen contract. A released version only receives additive changes\n(new endpoints, new optional fields, new response fields); anything breaking ships in a new version.\nResponses carry `X-Shortext-Api-Version`. When a version is scheduled for removal, responses also carry\n`Deprecation` and `Sunset` headers; after the sunset date the version answers HTTP 410.\nThe list of versions and their status is available at `GET /api/versions`.\n\n**Responses**: always HTTP 200. Check `success` and `code` (`1000` = success), see `LiteApiLegacyResponse`.\nOn failure, `trace_id` identifies the request for support.",
+        "description": "**Versioning**: every version is a frozen contract. A released version only receives additive changes\n(new endpoints, new optional fields, new response fields); anything breaking ships in a new version.\nResponses carry `X-Shortext-Api-Version`. When a version is scheduled for removal, responses also carry\n`Deprecation` and `Sunset` headers; after the sunset date the version answers HTTP 410.\nThe list of versions and their status is available at `GET /api/versions`.\n\n**Responses**: always HTTP 200. Check `success` and `code` (`1000` = success), see `ApiEnvelope`.\nOn failure, `trace_id` identifies the request for support.",
         "version": "2.0"
     },
     "servers": [
@@ -26,7 +26,7 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
@@ -73,14 +73,14 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
                                                 "body": {
                                                     "allOf": [
                                                         {
-                                                            "$ref": "#/components/schemas/LiteApiPage"
+                                                            "$ref": "#/components/schemas/ApiPage"
                                                         },
                                                         {
                                                             "properties": {
@@ -135,7 +135,7 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
@@ -197,7 +197,7 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
@@ -245,7 +245,7 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
@@ -284,7 +284,7 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
@@ -337,7 +337,7 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
@@ -387,7 +387,7 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
@@ -449,7 +449,7 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
@@ -507,7 +507,7 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
@@ -554,7 +554,7 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
@@ -608,7 +608,7 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
@@ -664,7 +664,7 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
@@ -735,14 +735,14 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
                                                 "body": {
                                                     "allOf": [
                                                         {
-                                                            "$ref": "#/components/schemas/LiteApiPage"
+                                                            "$ref": "#/components/schemas/ApiPage"
                                                         },
                                                         {
                                                             "properties": {
@@ -809,7 +809,7 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
@@ -866,14 +866,14 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
                                                 "body": {
                                                     "allOf": [
                                                         {
-                                                            "$ref": "#/components/schemas/LiteApiPage"
+                                                            "$ref": "#/components/schemas/ApiPage"
                                                         },
                                                         {
                                                             "properties": {
@@ -928,7 +928,7 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
@@ -977,7 +977,7 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
@@ -1024,7 +1024,7 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
@@ -1081,7 +1081,7 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
@@ -1130,7 +1130,7 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
@@ -1193,7 +1193,7 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
@@ -1257,7 +1257,7 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
@@ -1338,7 +1338,7 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
@@ -1398,7 +1398,7 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
@@ -1528,14 +1528,14 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
                                                 "body": {
                                                     "allOf": [
                                                         {
-                                                            "$ref": "#/components/schemas/LiteApiPage"
+                                                            "$ref": "#/components/schemas/ApiPage"
                                                         },
                                                         {
                                                             "properties": {
@@ -1590,7 +1590,7 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
@@ -1646,7 +1646,7 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
@@ -1703,14 +1703,14 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
                                                 "body": {
                                                     "allOf": [
                                                         {
-                                                            "$ref": "#/components/schemas/LiteApiPage"
+                                                            "$ref": "#/components/schemas/ApiPage"
                                                         },
                                                         {
                                                             "properties": {
@@ -1775,7 +1775,7 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
@@ -1824,7 +1824,7 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
@@ -1871,7 +1871,7 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
@@ -1942,7 +1942,7 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
@@ -1981,7 +1981,7 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
@@ -2023,7 +2023,7 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
@@ -2072,7 +2072,7 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
@@ -2134,7 +2134,7 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
@@ -2192,7 +2192,7 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
@@ -2241,7 +2241,7 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
@@ -2341,14 +2341,14 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
                                                 "body": {
                                                     "allOf": [
                                                         {
-                                                            "$ref": "#/components/schemas/LiteApiPage"
+                                                            "$ref": "#/components/schemas/ApiPage"
                                                         },
                                                         {
                                                             "properties": {
@@ -2404,7 +2404,7 @@
                                 "schema": {
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                            "$ref": "#/components/schemas/ApiEnvelope"
                                         },
                                         {
                                             "properties": {
@@ -2430,7 +2430,7 @@
     },
     "components": {
         "schemas": {
-            "LiteApiLegacyResponse": {
+            "ApiEnvelope": {
                 "description": "Every response is HTTP 200. The outcome is in `success` and `code` (absolute value of the response code).",
                 "properties": {
                     "success": {
@@ -2465,8 +2465,8 @@
                 },
                 "type": "object"
             },
-            "LiteApiPage": {
-                "description": "A page of results (Laravel length-aware paginator): `data` holds the items. Ask a page with ?page=",
+            "ApiPage": {
+                "description": "A page of results: `data` holds the items. Ask another page with `?page=`",
                 "properties": {
                     "current_page": {
                         "type": "integer",
@@ -2525,9 +2525,10 @@
                 "type": "object"
             },
             "HostedSession": {
+                "description": "A signed, expiring, single-use link to one of our hosted pages, and its outcome",
                 "properties": {
                     "id": {
-                        "description": "Hosted sessions of the authenticated owner. Registered with LiteApi::hostedSessionRoutes().",
+                        "description": "Session id",
                         "type": "string",
                         "format": "uuid"
                     },
@@ -3389,7 +3390,7 @@
                 "type": "object"
             },
             "MessageInput": {
-                "description": "Grammar of a message, the same on every endpoint and version (App\\Messaging\\Payloads\\MessagePayloadInput)",
+                "description": "Grammar of a message, the same on every endpoint and version",
                 "required": [
                     "type",
                     "content"
@@ -3569,7 +3570,7 @@
         "securitySchemes": {
             "bearerAuth": {
                 "type": "http",
-                "description": "Company API token (Laravel Sanctum), sent as \"Authorization: Bearer <token>\"",
+                "description": "Company API key, sent as \"Authorization: Bearer <key>\". Create it in the dashboard (Developer > API Keys) with the permissions the integration needs.",
                 "scheme": "bearer"
             }
         }
