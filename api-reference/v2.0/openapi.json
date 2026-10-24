@@ -1,0 +1,3607 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Shortext API",
+        "description": "**Versioning**: every version is a frozen contract. A released version only receives additive changes\n(new endpoints, new optional fields, new response fields); anything breaking ships in a new version.\nResponses carry `X-Shortext-Api-Version`. When a version is scheduled for removal, responses also carry\n`Deprecation` and `Sunset` headers; after the sunset date the version answers HTTP 410.\nThe list of versions and their status is available at `GET /api/versions`.\n\n**Responses**: always HTTP 200. Check `success` and `code` (`1000` = success), see `LiteApiLegacyResponse`.\nOn failure, `trace_id` identifies the request for support.",
+        "version": "2.0"
+    },
+    "servers": [
+        {
+            "url": "https://shortext.ny-corp.io/api/v2.0"
+        }
+    ],
+    "paths": {
+        "/hosted-sessions/purposes": {
+            "get": {
+                "tags": [
+                    "Hosted sessions"
+                ],
+                "summary": "Purposes of the hosted sessions",
+                "operationId": "listHostedSessionPurposes",
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "allOf": [
+                                                        {
+                                                            "description": "purpose => description",
+                                                            "type": "object",
+                                                            "additionalProperties": {
+                                                                "type": "string"
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/hosted-sessions": {
+            "get": {
+                "tags": [
+                    "Hosted sessions"
+                ],
+                "summary": "List hosted sessions",
+                "description": "Most recent first, 50 per page.",
+                "operationId": "listHostedSessions",
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "allOf": [
+                                                        {
+                                                            "$ref": "#/components/schemas/LiteApiPage"
+                                                        },
+                                                        {
+                                                            "properties": {
+                                                                "data": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "$ref": "#/components/schemas/HostedSession"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Hosted sessions"
+                ],
+                "summary": "Create a hosted session",
+                "description": "Returns the `url` of a page hosted by us, to give to your user (redirect or new window, not an iframe). It expires and serves once. Follow the outcome with GET /hosted-sessions/{id} or the webhooks.",
+                "operationId": "createHostedSession",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/HostedSessionInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "allOf": [
+                                                        {
+                                                            "$ref": "#/components/schemas/HostedSession"
+                                                        },
+                                                        {
+                                                            "properties": {
+                                                                "url": {
+                                                                    "description": "The page to give to your user (holds a secret)",
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/hosted-sessions/{id}": {
+            "get": {
+                "tags": [
+                    "Hosted sessions"
+                ],
+                "summary": "Get a hosted session",
+                "operationId": "getHostedSession",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/HostedSession"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Hosted sessions"
+                ],
+                "summary": "Cancel a hosted session",
+                "description": "The URL stops working. A finished session cannot be cancelled.",
+                "operationId": "cancelHostedSession",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/HostedSession"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/webhooks/events": {
+            "get": {
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "Webhook event catalog",
+                "description": "Event types an endpoint can subscribe to. Subscribe with an exact type, a prefix wildcard such as `message.*`, or `*`.",
+                "operationId": "listWebhookEvents",
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "allOf": [
+                                                        {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "properties": {
+                                                                    "type": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "description": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/webhooks": {
+            "get": {
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "List webhook endpoints",
+                "operationId": "listWebhooks",
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/WebhookEndpoint"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "Create a webhook endpoint",
+                "description": "The signing `secret` is returned **only once**, keep it. Payloads follow the API version used to create the endpoint.",
+                "operationId": "createWebhook",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WebhookEndpointInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "allOf": [
+                                                        {
+                                                            "$ref": "#/components/schemas/WebhookEndpoint"
+                                                        },
+                                                        {
+                                                            "properties": {
+                                                                "secret": {
+                                                                    "description": "Signing secret, shown only here",
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/webhooks/{id}": {
+            "get": {
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "Get a webhook endpoint",
+                "operationId": "getWebhook",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/WebhookEndpoint"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "Update a webhook endpoint",
+                "description": "Setting `is_enabled` to true re-enables an endpoint disabled after repeated failures.",
+                "operationId": "updateWebhook",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WebhookEndpointInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/WebhookEndpoint"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "Delete a webhook endpoint",
+                "operationId": "deleteWebhook",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "allOf": [
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/webhooks/{id}/rotate-secret": {
+            "post": {
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "Rotate the signing secret",
+                "description": "The previous secret stops working immediately.",
+                "operationId": "rotateWebhookSecret",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "properties": {
+                                                        "secret": {
+                                                            "description": "The new signing secret",
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/webhooks/{id}/test": {
+            "post": {
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "Send a test event",
+                "description": "Sends a `webhook.test` event right away (no retry) and returns the delivery with the endpoint response.",
+                "operationId": "testWebhook",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/WebhookDelivery"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/webhooks/{id}/deliveries": {
+            "get": {
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "Delivery history",
+                "description": "Most recent first, 50 per page. Deliveries are kept 30 days.",
+                "operationId": "listWebhookDeliveries",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "pending",
+                                "succeeded",
+                                "failed"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "allOf": [
+                                                        {
+                                                            "$ref": "#/components/schemas/LiteApiPage"
+                                                        },
+                                                        {
+                                                            "properties": {
+                                                                "data": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "$ref": "#/components/schemas/WebhookDelivery"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/webhooks/{id}/deliveries/{delivery}/retry": {
+            "post": {
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "Redeliver an event",
+                "description": "Queues a new delivery of the same event (same event `id`).",
+                "operationId": "retryWebhookDelivery",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "delivery",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The new WebhookDelivery",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/WebhookDelivery"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/agents": {
+            "get": {
+                "tags": [
+                    "Agents"
+                ],
+                "summary": "List agents",
+                "description": "Most recent first, 50 per page. Filter with `name`, `active`, `use_ai`.",
+                "operationId": "listAgents",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "allOf": [
+                                                        {
+                                                            "$ref": "#/components/schemas/LiteApiPage"
+                                                        },
+                                                        {
+                                                            "properties": {
+                                                                "data": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "$ref": "#/components/schemas/Agent"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Agents"
+                ],
+                "summary": "Create an agent",
+                "description": "Refused once the plan agent limit is reached. Attach channels with PUT /channels/{type}/{id}/agent.",
+                "operationId": "createAgent",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AgentInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Agent"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/agents/{id}": {
+            "get": {
+                "tags": [
+                    "Agents"
+                ],
+                "summary": "Get an agent",
+                "operationId": "getAgent",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "AGI-XXXXX"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Agent"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Agents"
+                ],
+                "summary": "Delete an agent",
+                "description": "Refused while the agent still has channels: move or detach them first, or set `active` to false instead. Tickets, commands and tools are kept and the agent can be restored.",
+                "operationId": "deleteAgent",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The deleted Agent",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Agent"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Agents"
+                ],
+                "summary": "Update an agent",
+                "description": "Partial update: only the fields sent change (PUT is accepted too).",
+                "operationId": "updateAgent",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AgentInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Agent"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/agents/{id}/restore": {
+            "patch": {
+                "tags": [
+                    "Agents"
+                ],
+                "summary": "Restore a deleted agent",
+                "description": "Refused when the plan agent limit is reached.",
+                "operationId": "restoreAgent",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Agent"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/channels": {
+            "get": {
+                "tags": [
+                    "Channels"
+                ],
+                "summary": "List channels",
+                "description": "Every WhatsApp number, mailbox and Shortext endpoint of the company, with the agent answering on it.",
+                "operationId": "listChannels",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "whatsapp",
+                                "mail",
+                                "shortext"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "agent_id",
+                        "in": "query",
+                        "description": "Only the channels of this agent; \"none\" for detached channels",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/Channel"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/channels/{type}/{id}": {
+            "get": {
+                "tags": [
+                    "Channels"
+                ],
+                "summary": "Get a channel",
+                "operationId": "getChannel",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "whatsapp",
+                                "mail",
+                                "shortext"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Channel"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/channels/{type}/{id}/agent": {
+            "put": {
+                "tags": [
+                    "Channels"
+                ],
+                "summary": "Attach or move a channel",
+                "description": "Attaches the channel to the agent, or moves it from its current agent. The agent answers the next messages.",
+                "operationId": "attachChannelAgent",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "whatsapp",
+                                "mail",
+                                "shortext"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "agent_id"
+                                ],
+                                "properties": {
+                                    "agent_id": {
+                                        "type": "string",
+                                        "example": "AGI-XXXXX"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Channel"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Channels"
+                ],
+                "summary": "Detach a channel from its agent",
+                "description": "The channel keeps receiving and storing messages, nobody answers automatically until an agent is attached again.",
+                "operationId": "detachChannelAgent",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "whatsapp",
+                                "mail",
+                                "shortext"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Channel"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/conversations": {
+            "get": {
+                "tags": [
+                    "Conversations"
+                ],
+                "summary": "List conversations",
+                "description": "Most recent message first, 50 per page.",
+                "operationId": "listConversations",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "active",
+                                "archived"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "agent_id",
+                        "in": "query",
+                        "description": "Conversations of this agent's channels; \"none\" for detached channels",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "channel",
+                        "in": "query",
+                        "description": "Channel type",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "whatsapp",
+                                "mail",
+                                "shortext"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "channel_id",
+                        "in": "query",
+                        "description": "With `channel`: one channel (the channel_id of the webhooks)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "contact",
+                        "in": "query",
+                        "description": "Contact identifier (phone, email, or your own id for Shortext)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "assignee",
+                        "in": "query",
+                        "description": "\"me\" (user tokens only), \"none\", or a member id (GET /conversations/assignees)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "ticket_id",
+                        "in": "query",
+                        "description": "The conversation of a ticket (ticket reference)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "updated_since",
+                        "in": "query",
+                        "description": "Last message at or after this date",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "allOf": [
+                                                        {
+                                                            "$ref": "#/components/schemas/LiteApiPage"
+                                                        },
+                                                        {
+                                                            "properties": {
+                                                                "data": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "$ref": "#/components/schemas/Conversation"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Conversations"
+                ],
+                "summary": "Start a conversation",
+                "description": "Sends a first message to a contact from one of your channels, and opens the conversation (or continues the existing one). On WhatsApp, outside the 24h window opened by the contact, only an approved template can be sent (GET /templates). The AI agent keeps answering the contact unless `handover` is true.",
+                "operationId": "startConversation",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StartConversationInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "properties": {
+                                                        "conversation": {
+                                                            "$ref": "#/components/schemas/Conversation"
+                                                        },
+                                                        "message": {
+                                                            "$ref": "#/components/schemas/Message"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/conversations/{id}": {
+            "get": {
+                "tags": [
+                    "Conversations"
+                ],
+                "summary": "Get a conversation",
+                "operationId": "getConversation",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Conversation"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/conversations/{id}/messages": {
+            "get": {
+                "tags": [
+                    "Conversations"
+                ],
+                "summary": "List the messages of a conversation",
+                "description": "Most recent first, 50 per page. Same data as the message.* webhooks.",
+                "operationId": "listConversationMessages",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "allOf": [
+                                                        {
+                                                            "$ref": "#/components/schemas/LiteApiPage"
+                                                        },
+                                                        {
+                                                            "properties": {
+                                                                "data": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "$ref": "#/components/schemas/Message"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Conversations"
+                ],
+                "summary": "Reply to a conversation",
+                "description": "Same message grammar as every endpoint (text, template, interactive, media). Out of the WhatsApp 24h window a free-form message is sent as a notification template. By default the reply takes the conversation over (`handover`): the AI agent stops answering, as when a human answers in the Inbox. A user token of an agent (role) cannot answer a conversation assigned to someone else.",
+                "operationId": "replyToConversation",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReplyInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "The sent Message",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Message"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/conversations/{id}/handover": {
+            "put": {
+                "tags": [
+                    "Conversations"
+                ],
+                "summary": "Take a conversation over",
+                "description": "A human takes the conversation over: the AI agent stops answering (webhook conversation.handover). Needs an active session.",
+                "operationId": "handoverConversation",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Conversation"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Conversations"
+                ],
+                "summary": "Hand a conversation back to the agent",
+                "description": "The AI agent answers again (webhook conversation.released).",
+                "operationId": "releaseConversation",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Conversation"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/conversations/{id}/assignee": {
+            "put": {
+                "tags": [
+                    "Conversations"
+                ],
+                "summary": "Assign a conversation",
+                "description": "Assigns the current session to a member of the company (GET /conversations/assignees), or unassigns it with null.",
+                "operationId": "assignConversation",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "user_id"
+                                ],
+                                "properties": {
+                                    "user_id": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "example": "USR-XXXXX"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Conversation"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/conversations/assignees": {
+            "get": {
+                "tags": [
+                    "Conversations"
+                ],
+                "summary": "List assignees",
+                "description": "Members of the company a conversation can be assigned to.",
+                "operationId": "listAssignees",
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/Member"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/me": {
+            "get": {
+                "tags": [
+                    "Account"
+                ],
+                "summary": "Current API key",
+                "description": "Company and API key behind the token. Call it first to check your integration.",
+                "operationId": "getMe",
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Me"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/channels/shortext": {
+            "post": {
+                "tags": [
+                    "Channels"
+                ],
+                "summary": "Create a Shortext endpoint",
+                "description": "Your server then posts the messages of your users to settings.inbound_url with your API key and `to` = the endpoint id. With a webhook_url, the response holds `webhook_secret` once: keep it to verify the signature of the replies.",
+                "operationId": "createShortextEndpoint",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ShortextEndpointInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "allOf": [
+                                                        {
+                                                            "$ref": "#/components/schemas/Channel"
+                                                        },
+                                                        {
+                                                            "properties": {
+                                                                "webhook_secret": {
+                                                                    "description": "Signing secret of the replies, only when the webhook is created or rotated",
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/channels/shortext/{id}": {
+            "delete": {
+                "tags": [
+                    "Channels"
+                ],
+                "summary": "Delete a Shortext endpoint",
+                "description": "Final: the endpoint stops receiving and its conversations leave the inbox (kept for audits).",
+                "operationId": "deleteShortextEndpoint",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The deleted Channel",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Channel"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Channels"
+                ],
+                "summary": "Update a Shortext endpoint",
+                "description": "Partial update: only the fields sent change (PUT is accepted too). Setting a webhook_url for the first time returns its `webhook_secret`.",
+                "operationId": "updateShortextEndpoint",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "ste_xxx"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ShortextEndpointInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Channel"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/channels/shortext/{id}/rotate-secret": {
+            "post": {
+                "tags": [
+                    "Channels"
+                ],
+                "summary": "Rotate the webhook signing secret",
+                "description": "The previous secret stops working at once: update your verification first.",
+                "operationId": "rotateShortextWebhookSecret",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "allOf": [
+                                                        {
+                                                            "$ref": "#/components/schemas/Channel"
+                                                        },
+                                                        {
+                                                            "properties": {
+                                                                "webhook_secret": {
+                                                                    "description": "Signing secret of the replies, only when the webhook is created or rotated",
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/templates": {
+            "get": {
+                "tags": [
+                    "Templates"
+                ],
+                "summary": "List WhatsApp templates",
+                "description": "Templates of the WhatsApp Business Accounts of the company numbers, most recently updated first, 50 per page.",
+                "operationId": "listTemplates",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "channel_id",
+                        "in": "query",
+                        "description": "Only the templates this WhatsApp number can send",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "APPROVED",
+                                "PENDING",
+                                "REJECTED"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "language",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "allOf": [
+                                                        {
+                                                            "$ref": "#/components/schemas/LiteApiPage"
+                                                        },
+                                                        {
+                                                            "properties": {
+                                                                "data": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "$ref": "#/components/schemas/Template"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/templates/{id}": {
+            "get": {
+                "tags": [
+                    "Templates"
+                ],
+                "summary": "Get a WhatsApp template",
+                "operationId": "getTemplate",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: check `success` and `code`.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LiteApiLegacyResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Template"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "LiteApiLegacyResponse": {
+                "description": "Every response is HTTP 200. The outcome is in `success` and `code` (absolute value of the response code).",
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "code": {
+                        "type": "integer",
+                        "example": 1000
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Request success."
+                    },
+                    "body": {
+                        "description": "Endpoint payload, null when there is none"
+                    },
+                    "token": {
+                        "description": "Present only on authentication routes",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "trace_id": {
+                        "description": "Present only when success is false",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "type": "object"
+            },
+            "LiteApiPage": {
+                "description": "A page of results (Laravel length-aware paginator): `data` holds the items. Ask a page with ?page=",
+                "properties": {
+                    "current_page": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "data": {
+                        "type": "array",
+                        "items": {}
+                    },
+                    "per_page": {
+                        "type": "integer",
+                        "example": 50
+                    },
+                    "total": {
+                        "type": "integer",
+                        "example": 120
+                    },
+                    "last_page": {
+                        "type": "integer",
+                        "example": 3
+                    },
+                    "from": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "to": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "first_page_url": {
+                        "type": "string"
+                    },
+                    "last_page_url": {
+                        "type": "string"
+                    },
+                    "next_page_url": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "prev_page_url": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "path": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "HostedSession": {
+                "properties": {
+                    "id": {
+                        "description": "Hosted sessions of the authenticated owner. Registered with LiteApi::hostedSessionRoutes().",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "purpose": {
+                        "type": "string",
+                        "example": "whatsapp"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "pending",
+                            "opened",
+                            "completed",
+                            "failed",
+                            "cancelled",
+                            "expired"
+                        ]
+                    },
+                    "url": {
+                        "description": "Only in the creation response: the page to give to your user. It holds a secret, never log or share it.",
+                        "type": "string"
+                    },
+                    "context": {
+                        "type": "object"
+                    },
+                    "result": {
+                        "description": "What the session produced (completed)",
+                        "type": [
+                            "object",
+                            "null"
+                        ]
+                    },
+                    "error": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "return_url": {
+                        "description": "Your page the user is sent back to, with ?session_id=...&status=...",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "locale": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "expires_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "opened_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "finished_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "HostedSessionInput": {
+                "required": [
+                    "purpose"
+                ],
+                "properties": {
+                    "purpose": {
+                        "description": "GET /hosted-sessions/purposes",
+                        "type": "string",
+                        "example": "whatsapp"
+                    },
+                    "context": {
+                        "description": "Options of the purpose",
+                        "type": "object"
+                    },
+                    "return_url": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "uri"
+                    },
+                    "locale": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "fr"
+                    },
+                    "expires_in": {
+                        "description": "Minutes, default 60",
+                        "type": "integer",
+                        "maximum": 1440,
+                        "minimum": 5
+                    }
+                },
+                "type": "object"
+            },
+            "WebhookEndpointInput": {
+                "properties": {
+                    "url": {
+                        "description": "Public HTTPS URL",
+                        "type": "string",
+                        "format": "uri",
+                        "example": "https://example.com/webhooks/shortext"
+                    },
+                    "events": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "message.*",
+                            "conversation.handover"
+                        ]
+                    },
+                    "filters": {
+                        "description": "Only receive events whose context matches, e.g. one agent",
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "example": {
+                            "app": "AGI-XXXXX"
+                        }
+                    },
+                    "description": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "is_enabled": {
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "WebhookEndpoint": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "url": {
+                        "type": "string",
+                        "format": "uri"
+                    },
+                    "events": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "filters": {
+                        "type": [
+                            "object",
+                            "null"
+                        ]
+                    },
+                    "api_version": {
+                        "description": "Version of the payloads sent to this endpoint",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "v2.0"
+                    },
+                    "description": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "is_enabled": {
+                        "type": "boolean"
+                    },
+                    "disabled_reason": {
+                        "description": "Set when disabled after failing for 3 days",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "failing_since": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "last_success_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "last_failure_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "last_error": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "WebhookDelivery": {
+                "properties": {
+                    "id": {
+                        "description": "Sent in the Delivery header",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "event_id": {
+                        "type": "string",
+                        "example": "evt_01JB..."
+                    },
+                    "event_type": {
+                        "type": "string",
+                        "example": "message.received"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "pending",
+                            "succeeded",
+                            "failed"
+                        ]
+                    },
+                    "attempts": {
+                        "type": "integer"
+                    },
+                    "response_status": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "response_body": {
+                        "description": "First 2000 characters",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "duration_ms": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "error": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "next_retry_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "delivered_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "payload": {
+                        "$ref": "#/components/schemas/WebhookEventPayload"
+                    }
+                },
+                "type": "object"
+            },
+            "WebhookEventPayload": {
+                "description": "Body POSTed to your endpoint. Answer with a 2xx within 10 s and process asynchronously.\nFailed deliveries are retried after 10 s, 1 min, 5 min, 30 min, 2 h, 6 h and 12 h;\nan endpoint failing for 3 days is disabled.\nDelivery order is not guaranteed and an event may be delivered twice: dedupe on `id`.\n\n**Signature**: `X-…-Signature: sha256=hex(hmac_sha256(secret, \"{X-…-Timestamp}.{raw body}\"))`.\nCompare in constant time and reject timestamps older than 5 minutes.",
+                "properties": {
+                    "id": {
+                        "description": "Event id, identical on redeliveries",
+                        "type": "string",
+                        "example": "evt_01JB..."
+                    },
+                    "type": {
+                        "type": "string",
+                        "example": "message.received"
+                    },
+                    "api_version": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "v2.0"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "data": {
+                        "description": "Depends on the event type",
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "StartConversationInput": {
+                "required": [
+                    "channel",
+                    "channel_id",
+                    "contact",
+                    "message"
+                ],
+                "properties": {
+                    "channel": {
+                        "type": "string",
+                        "enum": [
+                            "whatsapp",
+                            "mail",
+                            "shortext"
+                        ]
+                    },
+                    "channel_id": {
+                        "description": "Your channel (GET /channels): WhatsApp phone id, mailbox, Shortext endpoint",
+                        "type": "string"
+                    },
+                    "contact": {
+                        "properties": {
+                            "identifier": {
+                                "description": "Phone (E.164 without +), email or your own id for Shortext",
+                                "type": "string"
+                            },
+                            "profile": {
+                                "properties": {
+                                    "lastname": {
+                                        "type": "string"
+                                    },
+                                    "firstname": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "preferred_language": {
+                                        "type": "string",
+                                        "enum": [
+                                            "en",
+                                            "fr",
+                                            "es",
+                                            "de"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "message": {
+                        "$ref": "#/components/schemas/MessageInput"
+                    },
+                    "handover": {
+                        "description": "true: a human follows the conversation, the AI agent does not answer the contact",
+                        "type": "boolean",
+                        "default": false
+                    }
+                },
+                "type": "object"
+            },
+            "Me": {
+                "properties": {
+                    "company": {
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "example": "CMP-XXXXX"
+                            },
+                            "name": {
+                                "type": "string",
+                                "example": "Acme"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "token": {
+                        "properties": {
+                            "name": {
+                                "type": "string",
+                                "example": "CRM integration"
+                            },
+                            "abilities": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "example": [
+                                    "send_messages"
+                                ]
+                            },
+                            "last_used_at": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "format": "date-time"
+                            },
+                            "expires_at": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "format": "date-time"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "api_version": {
+                        "type": "string",
+                        "example": "v2.0"
+                    }
+                },
+                "type": "object"
+            },
+            "ShortextEndpointInput": {
+                "properties": {
+                    "name": {
+                        "description": "Required on creation",
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "agent_id": {
+                        "description": "Agent answering on the endpoint; null detaches it",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "AGI-XXXXX"
+                    },
+                    "enabled": {
+                        "type": "boolean",
+                        "default": true
+                    },
+                    "reply_mode": {
+                        "description": "`async`: replies pushed to webhook_url (signed); `sync`: replies in the response of the inbound call",
+                        "type": "string",
+                        "default": "async",
+                        "enum": [
+                            "async",
+                            "sync"
+                        ]
+                    },
+                    "sync_timeout": {
+                        "description": "Seconds the sync mode waits for the replies",
+                        "type": "integer",
+                        "default": 25,
+                        "maximum": 25,
+                        "minimum": 1
+                    },
+                    "webhook_url": {
+                        "description": "Where the replies are pushed (https); null removes it",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "type": "object"
+            },
+            "Agent": {
+                "properties": {
+                    "id": {
+                        "description": "Public representation of an agent (API v2.0 and webhooks)",
+                        "type": "string",
+                        "example": "AGI-XXXXX"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Support"
+                    },
+                    "active": {
+                        "description": "An inactive agent stores messages without answering",
+                        "type": "boolean"
+                    },
+                    "use_ai": {
+                        "description": "The AI answers, following the instructions",
+                        "type": "boolean"
+                    },
+                    "inactive_message": {
+                        "description": "Fixed answer when the AI is off",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "instructions": {
+                        "description": "System prompt of the AI",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "channels": {
+                        "description": "Not in webhook payloads",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Channel"
+                        }
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "AgentInput": {
+                "properties": {
+                    "name": {
+                        "description": "Required on creation",
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "default": true
+                    },
+                    "use_ai": {
+                        "type": "boolean",
+                        "default": true
+                    },
+                    "inactive_message": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 1000
+                    },
+                    "instructions": {
+                        "description": "System prompt; empty or null removes it",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 15000
+                    }
+                },
+                "type": "object"
+            },
+            "Channel": {
+                "properties": {
+                    "type": {
+                        "description": "Public representation of a channel (API v2.0 and webhooks). The id is the one webhooks use as channel_id.",
+                        "type": "string",
+                        "enum": [
+                            "whatsapp",
+                            "mail",
+                            "shortext"
+                        ],
+                        "example": "whatsapp"
+                    },
+                    "id": {
+                        "description": "WhatsApp phone number id, mailbox username or Shortext endpoint id (ste_...)",
+                        "type": "string",
+                        "example": "532867649916076"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "+237 6 99 99 99 99 (Acme)"
+                    },
+                    "enabled": {
+                        "type": "boolean"
+                    },
+                    "agent": {
+                        "description": "null when the channel is detached: messages are stored, nobody answers automatically",
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "example": "AGI-XXXXX"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "type": [
+                            "object",
+                            "null"
+                        ]
+                    },
+                    "settings": {
+                        "description": "Shortext only: endpoint settings (null for the other channels)",
+                        "properties": {
+                            "client_type": {
+                                "type": "string",
+                                "example": "server"
+                            },
+                            "inbound_url": {
+                                "description": "Where your server posts the messages of your users",
+                                "type": "string"
+                            },
+                            "reply_mode": {
+                                "description": "`async`: replies pushed to webhook_url; `sync`: replies in the inbound response",
+                                "type": "string",
+                                "enum": [
+                                    "async",
+                                    "sync"
+                                ]
+                            },
+                            "sync_timeout": {
+                                "description": "Seconds the sync mode waits for the replies",
+                                "type": "integer"
+                            },
+                            "webhook_url": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        },
+                        "type": [
+                            "object",
+                            "null"
+                        ]
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "Conversation": {
+                "properties": {
+                    "id": {
+                        "description": "The conversation_id of the webhooks",
+                        "type": "string"
+                    },
+                    "status": {
+                        "description": "`active`: a session is open; `archived`: replying opens a new one",
+                        "type": "string",
+                        "enum": [
+                            "active",
+                            "archived"
+                        ]
+                    },
+                    "channel": {
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "whatsapp",
+                                    "mail",
+                                    "shortext"
+                                ]
+                            },
+                            "id": {
+                                "description": "The channel_id of the webhooks",
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "agent": {
+                        "description": "Agent answering on the channel; null when the channel is detached",
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "type": [
+                            "object",
+                            "null"
+                        ]
+                    },
+                    "contact": {
+                        "properties": {
+                            "identifier": {
+                                "type": "string"
+                            },
+                            "identifier_type": {
+                                "type": "string"
+                            },
+                            "profile": {
+                                "type": "object"
+                            },
+                            "country": {
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "session": {
+                        "description": "Current session; null when archived",
+                        "properties": {
+                            "started_at": {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            "ends_at": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "format": "date-time"
+                            },
+                            "handover": {
+                                "description": "A human took over: the AI agent does not answer",
+                                "type": "boolean"
+                            },
+                            "handover_at": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "format": "date-time"
+                            },
+                            "assignee": {
+                                "oneOf": [
+                                    {
+                                        "$ref": "#/components/schemas/Member"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            }
+                        },
+                        "type": [
+                            "object",
+                            "null"
+                        ]
+                    },
+                    "last_message_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "Member": {
+                "description": "User of the company (dashboard, mobile app)",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "example": "USR-XXXXX"
+                    },
+                    "name": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "Message": {
+                "properties": {
+                    "id": {
+                        "description": "Public representation of a message (API v2.0): exactly the data of the message.* webhooks.",
+                        "type": "string",
+                        "example": "msg.XXXXX"
+                    },
+                    "conversation_id": {
+                        "type": "string"
+                    },
+                    "direction": {
+                        "type": "string",
+                        "enum": [
+                            "inbound",
+                            "outbound"
+                        ]
+                    },
+                    "channel": {
+                        "type": "string",
+                        "enum": [
+                            "whatsapp",
+                            "mail",
+                            "shortext"
+                        ]
+                    },
+                    "channel_id": {
+                        "type": "string"
+                    },
+                    "contact": {
+                        "type": "object"
+                    },
+                    "message": {
+                        "properties": {
+                            "id": {
+                                "description": "Id on the channel (your own id for Shortext)",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "type": {
+                                "type": "string",
+                                "example": "text"
+                            },
+                            "content": {
+                                "type": "object",
+                                "example": {
+                                    "text": "Hello"
+                                }
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "MessageInput": {
+                "description": "Grammar of a message, the same on every endpoint and version (App\\Messaging\\Payloads\\MessagePayloadInput)",
+                "required": [
+                    "type",
+                    "content"
+                ],
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "text",
+                            "template",
+                            "interactive",
+                            "media"
+                        ]
+                    },
+                    "content": {
+                        "description": "`text`: { text }. `template`: { template_name, language, body?, header?, buttons?, category? }. `interactive`: { type, body, action, header?, footer? }. `media`: { media_type (image, video, document, audio), media_url, caption?, filename?, mime? }",
+                        "type": "object",
+                        "example": {
+                            "text": "Hello, how can I help?"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "ReplyInput": {
+                "required": [
+                    "message"
+                ],
+                "properties": {
+                    "message": {
+                        "$ref": "#/components/schemas/MessageInput"
+                    },
+                    "handover": {
+                        "description": "The reply takes the conversation over: the AI agent stops answering. Send false for a notification that lets the agent continue.",
+                        "type": "boolean",
+                        "default": true
+                    }
+                },
+                "type": "object"
+            },
+            "Template": {
+                "properties": {
+                    "id": {
+                        "description": "Public representation of a WhatsApp template (API v2.0). A template belongs to a WhatsApp Business\nAccount: every number of that account can send it (`channels`).",
+                        "type": "string"
+                    },
+                    "name": {
+                        "description": "message.content.template_name",
+                        "type": "string",
+                        "example": "order_update"
+                    },
+                    "language": {
+                        "description": "message.content.language",
+                        "type": "string",
+                        "example": "fr"
+                    },
+                    "status": {
+                        "description": "Only APPROVED templates can be sent",
+                        "type": "string",
+                        "enum": [
+                            "APPROVED",
+                            "PENDING",
+                            "REJECTED"
+                        ]
+                    },
+                    "rejection_reason": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "quality": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "GREEN"
+                    },
+                    "category": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "UTILITY"
+                    },
+                    "channels": {
+                        "description": "WhatsApp channel ids (channel_id) of the company that can send it",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "header": {
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "NONE",
+                                    "TEXT",
+                                    "IMAGE",
+                                    "VIDEO",
+                                    "DOCUMENT"
+                                ]
+                            },
+                            "text": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "variables": {
+                                "description": "TEXT header: message.content.header { name: value }",
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "media_url": {
+                                "description": "Media header: sent when message.content.header.url is not given",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "body": {
+                        "properties": {
+                            "text": {
+                                "type": "string",
+                                "example": "Hello {{name}}, your order {{order}} is ready."
+                            },
+                            "variables": {
+                                "description": "message.content.body { name: value }",
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "example": [
+                                    "name",
+                                    "order"
+                                ]
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "footer": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "buttons": {
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "type": {
+                                    "type": "string",
+                                    "example": "URL"
+                                },
+                                "text": {
+                                    "type": "string"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "Company API token (Laravel Sanctum), sent as \"Authorization: Bearer <token>\"",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Hosted sessions",
+            "description": "Hosted sessions"
+        },
+        {
+            "name": "Webhooks",
+            "description": "Webhooks"
+        },
+        {
+            "name": "Agents",
+            "description": "Agents"
+        },
+        {
+            "name": "Channels",
+            "description": "Channels"
+        },
+        {
+            "name": "Conversations",
+            "description": "Conversations"
+        },
+        {
+            "name": "Account",
+            "description": "Account"
+        },
+        {
+            "name": "Templates",
+            "description": "Templates"
+        }
+    ]
+}

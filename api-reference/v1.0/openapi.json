@@ -1,0 +1,1368 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Shortext API",
+        "description": "This is my API",
+        "version": "1.0"
+    },
+    "servers": [
+        {
+            "url": "https://shortext.ny-corp.io/api"
+        }
+    ],
+    "paths": {
+        "/agent/search": {
+            "get": {
+                "tags": [
+                    "Agents"
+                ],
+                "summary": "Search agents",
+                "operationId": "searchAgent",
+                "responses": {
+                    "200": {
+                        "description": "The data",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": [
+                                    {
+                                        "id": 19,
+                                        "use_ai": true,
+                                        "name": "Shortext",
+                                        "created_at": "2025-07-23T21:48:35.000000Z",
+                                        "updated_at": "2025-07-23T21:48:35.000000Z",
+                                        "hashid": "AGI-XXXXX"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/business-manager/balance": {
+            "get": {
+                "tags": [
+                    "Business - Manager"
+                ],
+                "summary": "get business balance",
+                "operationId": "getBalance",
+                "responses": {
+                    "200": {
+                        "description": "The data",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "balance": {
+                                        "amount": 634.1987,
+                                        "currency": "EUR"
+                                    },
+                                    "local_balance": {
+                                        "amount": 416618.8856,
+                                        "currency": "XAF"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/messages/send": {
+            "post": {
+                "tags": [
+                    "Messages"
+                ],
+                "summary": "Send a message",
+                "description": "Envoie un message au destinataire via l'API Shortext",
+                "operationId": "sendMessage",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SendMessageRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Message sent. The stored message is returned in body.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SendMessageResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/ticket/search": {
+            "get": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Search a ticket",
+                "operationId": "searchTicket",
+                "parameters": [
+                    {
+                        "name": "code",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "STT-XLWY6P"
+                    },
+                    {
+                        "name": "agent",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "AGI-XLWY6P"
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "description": "Use code value from status to filter tickets by status",
+                            "type": "string"
+                        },
+                        "examples": {
+                            "only": {
+                                "summary": "Use to filter only result with this value",
+                                "value": "open"
+                            },
+                            "exclude": {
+                                "summary": "Use <strong>!</strong> to exclude results with this value",
+                                "value": "!open"
+                            },
+                            "multiple": {
+                                "summary": "Use <strong>,</strong> to set multiple value each value can have or not the <strong>!</strong> exclude mark",
+                                "value": "!open,closed"
+                            }
+                        }
+                    },
+                    {
+                        "name": "priority",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "description": "Use code value from status to filter tickets by SLA priority",
+                            "type": "string"
+                        },
+                        "examples": {
+                            "only": {
+                                "summary": "Use to filter only result with this value",
+                                "value": "medium"
+                            },
+                            "exclude": {
+                                "summary": "Use <strong>!</strong> to exclude results with this value",
+                                "value": "!medium"
+                            },
+                            "multiple": {
+                                "summary": "Use <strong>,</strong> to set multiple value each value can have or not the <strong>!</strong> exclude mark",
+                                "value": "!medium,low"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The data",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": [
+                                    {
+                                        "id": 62,
+                                        "app_id": 1,
+                                        "contact_detail_id": 2728,
+                                        "whatsapp_session_id": 6023,
+                                        "ticket_status_id": 7,
+                                        "position": 1,
+                                        "subject": "Problème technique lors de la recherche d'offres en marketing et commerce",
+                                        "description": "L'utilisateur Angèle recherche des opportunités en marketing et commerce, mais un problème technique (timeout lors de la recherche) empêche de fournir les résultats. Une assistance est nécessaire pour résoudre ce problème et fournir des offres pertinentes.",
+                                        "ticket_sla_policy_id": 5,
+                                        "responded_at": null,
+                                        "response_due_at": "2025-05-19T08:00:21.000000Z",
+                                        "resolved_at": null,
+                                        "resolved_due_at": "2025-05-19T15:00:22.000000Z",
+                                        "closed_at": null,
+                                        "is_response_breached": true,
+                                        "is_resolve_breached": true,
+                                        "satisfaction_requested": false,
+                                        "satisfaction_rating": null,
+                                        "meta": null,
+                                        "created_at": "2025-05-16T19:02:22.000000Z",
+                                        "updated_at": "2025-09-10T15:16:42.000000Z",
+                                        "hashid": "STT-XLWY6P",
+                                        "ticket_status": {
+                                            "id": 7,
+                                            "name": "Resolved",
+                                            "code": "resolved"
+                                        },
+                                        "ticket_sla_policy": {
+                                            "id": 5,
+                                            "label": "Medium",
+                                            "priority": "medium"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/ticket/sla/search": {
+            "get": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Search ticket sla records",
+                "operationId": "searchTicketSla",
+                "parameters": [
+                    {
+                        "name": "agent",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "AGI-XLWY6P"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The data",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": [
+                                    {
+                                        "id": 60,
+                                        "app_id": 19,
+                                        "label": "Medium",
+                                        "priority": "medium",
+                                        "response_time": 60,
+                                        "resolve_time": 480,
+                                        "created_at": "2025-04-25T17:19:30.000000Z",
+                                        "updated_at": "2025-04-25T17:19:30.000000Z"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/ticket/status/search": {
+            "get": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Search ticket status records",
+                "operationId": "searchTicketStatus",
+                "parameters": [
+                    {
+                        "name": "agent",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "AGI-XLWY6P"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The data",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": [
+                                    {
+                                        "id": 1,
+                                        "app_id": null,
+                                        "name": "Open",
+                                        "code": "open",
+                                        "position": 1,
+                                        "is_active": true,
+                                        "is_terminal": false,
+                                        "is_resolved": false,
+                                        "created_at": "2025-04-25T17:19:31.000000Z",
+                                        "updated_at": "2025-04-25T17:19:31.000000Z"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/contact/knowledge/add": {
+            "post": {
+                "tags": [
+                    "Knowledge"
+                ],
+                "summary": "Manage contact knowledge",
+                "operationId": "manageContactKnowledge",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "description": "Add contact knowledge when ever you want to provide to an agent specific knowledge periodically base on your CRM",
+                                "required": [
+                                    "content",
+                                    "agent",
+                                    "contact"
+                                ],
+                                "properties": {
+                                    "content": {
+                                        "description": "The content of the knowledge base you want to create for this contact",
+                                        "type": "string",
+                                        "example": "This contact has a negative balance of 10000 USD"
+                                    },
+                                    "agent": {
+                                        "description": "The agent allow to access that knowledge base",
+                                        "type": "string",
+                                        "example": "AGI-XLWY6P"
+                                    },
+                                    "contact": {
+                                        "required": [
+                                            "identifier",
+                                            "profile",
+                                            "channel"
+                                        ],
+                                        "properties": {
+                                            "identifier": {
+                                                "description": "For channel whatsapp -> E.164 format without leading +",
+                                                "type": "string",
+                                                "example": "1234567890"
+                                            },
+                                            "channel": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "whatsapp",
+                                                    "mail"
+                                                ]
+                                            },
+                                            "profile": {
+                                                "description": "Use code value from status to filter tickets by status",
+                                                "required": [
+                                                    "lastname"
+                                                ],
+                                                "properties": {
+                                                    "lastname": {
+                                                        "type": "string"
+                                                    },
+                                                    "firstname": {
+                                                        "type": "string"
+                                                    },
+                                                    "email": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "The data",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": [
+                                    {
+                                        "created_at": "2026-10-03T00:04:48.000000Z"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/v1.0/messages/inbound": {
+            "post": {
+                "tags": [
+                    "Messages"
+                ],
+                "summary": "Submit an inbound message",
+                "description": "Submit a message written by one of **your** users and let the Shortext agent answer it.\n\n**Reply modes**\n- `sync`: the request waits for the agent reply (max ~25 s) and returns it in `body.replies`.\n  On timeout `body.status` is `pending` and the reply is delivered to your webhook.\n- `async`: the request returns immediately with `accepted`; replies are delivered to your webhook.\n\n**Idempotency**: `message.id` is your own message id. Sending the same id again returns\n`duplicate` with the original message, without a second reply.\n\n**Webhook**: replies (async, sync timeout, human agent answers) are POSTed to the endpoint\nwebhook as `message.sent` events (`ShortextWebhookEvent` body), signed with\n`X-Shortext-Signature: sha256=hex(hmac_sha256(secret, \"{X-Shortext-Timestamp}.{raw_body}\"))`.\nRetried for ~21 h on failure; dedupe on the event `id`.",
+                "operationId": "receiveInboundMessage",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/InboundMessageRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Message stored. See body.status for the reply outcome.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InboundMessageResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/up": {
+            "get": {
+                "tags": [
+                    "health"
+                ],
+                "summary": "Health Check",
+                "description": "Check if the service is up",
+                "operationId": "HealthCheck",
+                "responses": {
+                    "200": {
+                        "description": "The data"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "SendMessageRequest": {
+                "required": [
+                    "channel",
+                    "contact",
+                    "from",
+                    "message"
+                ],
+                "properties": {
+                    "channel": {
+                        "type": "string",
+                        "enum": [
+                            "whatsapp",
+                            "mail"
+                        ],
+                        "example": "whatsapp"
+                    },
+                    "contact": {
+                        "required": [
+                            "identifier",
+                            "profile"
+                        ],
+                        "properties": {
+                            "identifier": {
+                                "description": "For channel whatsapp -> E.164 format without leading +",
+                                "type": "string",
+                                "example": "1234567890"
+                            },
+                            "profile": {
+                                "required": [
+                                    "lastname"
+                                ],
+                                "properties": {
+                                    "lastname": {
+                                        "type": "string",
+                                        "maxLength": 250,
+                                        "example": "Yoan"
+                                    },
+                                    "firstname": {
+                                        "type": "string",
+                                        "maxLength": 250,
+                                        "example": "André"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "celia@home.io"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "maxLength": 250,
+                                        "example": "Place to be"
+                                    },
+                                    "preferred_language": {
+                                        "type": "string",
+                                        "enum": [
+                                            "en",
+                                            "fr",
+                                            "es",
+                                            "de"
+                                        ],
+                                        "example": "en"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "from": {
+                        "description": "Identifier of the sending channel (WhatsApp phone id, mailbox username)",
+                        "type": "string",
+                        "example": "1234567890"
+                    },
+                    "message": {
+                        "required": [
+                            "type",
+                            "content"
+                        ],
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "text",
+                                    "media",
+                                    "interactive",
+                                    "template"
+                                ],
+                                "example": "text"
+                            },
+                            "content": {
+                                "oneOf": [
+                                    {
+                                        "$ref": "#/components/schemas/TextMessageContent"
+                                    },
+                                    {
+                                        "$ref": "#/components/schemas/ImageMessageContent"
+                                    },
+                                    {
+                                        "$ref": "#/components/schemas/VideoMessageContent"
+                                    },
+                                    {
+                                        "$ref": "#/components/schemas/DocumentMessageContent"
+                                    },
+                                    {
+                                        "$ref": "#/components/schemas/AudioMessageContent"
+                                    },
+                                    {
+                                        "$ref": "#/components/schemas/InteractiveButtonMessageContent"
+                                    }
+                                ]
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "ResponseCode": {
+                "description": "Standard response codes defined by the system / Codes de réponse standard définis par le système.",
+                "type": "integer",
+                "enum": [
+                    -1,
+                    -2,
+                    -3,
+                    -4,
+                    -5,
+                    1000,
+                    -1001,
+                    -1002,
+                    -1003,
+                    -1004,
+                    -1005,
+                    -1006,
+                    -1007,
+                    -1008,
+                    -1009,
+                    -1010,
+                    -1100,
+                    -1101,
+                    -1102,
+                    -1103,
+                    1104,
+                    -1105
+                ],
+                "example": 1000
+            },
+            "ResponseCodeDescriptions": {
+                "description": "Explanation of the response codes used in the API. All code values are returned as absolute values. / Explication des codes de réponse utilisés dans l'API. Toutes les valeurs des codes sont renvoyées en valeurs absolues.",
+                "properties": {
+                    "TOKEN_EXPIRED": {
+                        "description": "The token has expired / Le token a expiré.",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "TOKEN_BLACK_LISTED": {
+                        "description": "The token is blacklisted / Le token est dans la liste noire.",
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "TOKEN_INVALID": {
+                        "description": "The token is invalid / Le token est invalide.",
+                        "type": "integer",
+                        "example": 3
+                    },
+                    "TOKEN_NOT_FOUND": {
+                        "description": "The token was not found / Le token n'a pas été trouvé.",
+                        "type": "integer",
+                        "example": 4
+                    },
+                    "TOKEN_USER_NOT_FOUND": {
+                        "description": "The user associated with the token was not found / L'utilisateur associé au token n'a pas été trouvé.",
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "REQUEST_SUCCESS": {
+                        "description": "The request was successful / La requête a réussi.",
+                        "type": "integer",
+                        "example": 1000
+                    },
+                    "REQUEST_FAILURE": {
+                        "description": "The request failed / La requête a échoué.",
+                        "type": "integer",
+                        "example": 1001
+                    },
+                    "REQUEST_VALIDATION_ERROR": {
+                        "description": "Request validation error / Erreur de validation de la requête.",
+                        "type": "integer",
+                        "example": 1002
+                    },
+                    "REQUEST_EXPIRED": {
+                        "description": "The request has expired / La requête a expiré.",
+                        "type": "integer",
+                        "example": 1003
+                    },
+                    "REQUEST_TRYING_TO_INSERT_DUPLICATE": {
+                        "description": "Trying to insert a duplicate entry / Tentative d'insertion d'un doublon.",
+                        "type": "integer",
+                        "example": 1004
+                    },
+                    "REQUEST_NOT_AUTHORIZED": {
+                        "description": "The request is not authorized / La requête n'est pas autorisée.",
+                        "type": "integer",
+                        "example": 1005
+                    },
+                    "REQUEST_EXCEPTION": {
+                        "description": "An exception occurred while processing the request / Une exception s'est produite lors du traitement de la requête.",
+                        "type": "integer",
+                        "example": 1006
+                    },
+                    "REQUEST_NOT_FOUND": {
+                        "description": "The request was not found / La requête n'a pas été trouvée.",
+                        "type": "integer",
+                        "example": 1007
+                    },
+                    "REQUEST_WRONG_JSON_FORMAT": {
+                        "description": "Incorrect JSON format in the request / Format JSON incorrect dans la requête.",
+                        "type": "integer",
+                        "example": 1008
+                    },
+                    "REQUEST_SERVICE_NOT_AVAILABLE": {
+                        "description": "The service is not available / Le service n'est pas disponible.",
+                        "type": "integer",
+                        "example": 1009
+                    },
+                    "REQUEST_EMERGENCY": {
+                        "description": "Emergency request / Requête d'urgence.",
+                        "type": "integer",
+                        "example": 1010
+                    },
+                    "AUTH_ACCOUNT_NOT_VERIFY": {
+                        "description": "The account is not verified / Le compte n'est pas vérifié.",
+                        "type": "integer",
+                        "example": 1100
+                    },
+                    "AUTH_WRONG_USERNAME": {
+                        "description": "Incorrect username / Nom d'utilisateur incorrect.",
+                        "type": "integer",
+                        "example": 1101
+                    },
+                    "AUTH_WRONG_PASSWORD": {
+                        "description": "Incorrect password / Mot de passe incorrect.",
+                        "type": "integer",
+                        "example": 1102
+                    },
+                    "AUTH_WRONG_CREDENTIALS": {
+                        "description": "Incorrect credentials / Identifiants incorrects.",
+                        "type": "integer",
+                        "example": 1103
+                    },
+                    "AUTH_ACCOUNT_VERIFIED": {
+                        "description": "The account is verified / Le compte est vérifié.",
+                        "type": "integer",
+                        "example": 1104
+                    },
+                    "AUTH_NOT_EXISTS": {
+                        "description": "The account does not exist / Le compte n'existe pas.",
+                        "type": "integer",
+                        "example": 1105
+                    }
+                },
+                "type": "object"
+            },
+            "ApiResponse": {
+                "description": "Standard lite-api envelope. Every endpoint answers with it; only `body` changes.",
+                "required": [
+                    "success",
+                    "code",
+                    "message"
+                ],
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "code": {
+                        "$ref": "#/components/schemas/ResponseCode"
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Request success"
+                    },
+                    "body": {
+                        "description": "Endpoint-specific payload, null on most errors",
+                        "type": [
+                            "object",
+                            "null"
+                        ]
+                    },
+                    "token": {
+                        "description": "Present only on authentication routes",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "trace_id": {
+                        "description": "Present only when success=false. Give it to support.",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "type": "object"
+            },
+            "SendMessageResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                        "properties": {
+                            "body": {
+                                "description": "The stored outbound message",
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "MessageV2": {
+                "description": "A message as exposed by the API v2 and the webhooks. Same grammar as the requests.",
+                "properties": {
+                    "id": {
+                        "description": "Shortext message id",
+                        "type": "string",
+                        "example": "msg.Xk29aB"
+                    },
+                    "conversation_id": {
+                        "type": "string",
+                        "example": "cnv.7Hq2Lm"
+                    },
+                    "direction": {
+                        "type": "string",
+                        "enum": [
+                            "inbound",
+                            "outbound"
+                        ]
+                    },
+                    "channel": {
+                        "type": "string",
+                        "example": "shortext"
+                    },
+                    "channel_id": {
+                        "description": "Channel identifier (the `to` / `from` value)",
+                        "type": "string",
+                        "example": "ste_8k2m4q9x1v7c3n5b6z0p2r4t"
+                    },
+                    "contact": {
+                        "properties": {
+                            "identifier": {
+                                "description": "Your own user id on the shortext channel",
+                                "type": "string",
+                                "example": "user-42"
+                            },
+                            "identifier_type": {
+                                "type": "string",
+                                "example": "external_id"
+                            },
+                            "profile": {
+                                "properties": {
+                                    "lastname": {
+                                        "type": "string",
+                                        "example": "Awa"
+                                    },
+                                    "firstname": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "preferred_language": {
+                                        "type": "string",
+                                        "example": "fr"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "country": {
+                                "description": "Only when known",
+                                "type": [
+                                    "object",
+                                    "null"
+                                ]
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "message": {
+                        "properties": {
+                            "id": {
+                                "description": "Your message.id for inbound messages, Shortext id otherwise",
+                                "type": "string",
+                                "example": "client-msg-001"
+                            },
+                            "type": {
+                                "type": "string",
+                                "example": "text"
+                            },
+                            "content": {
+                                "description": "Same shape as message.content in requests",
+                                "type": "object",
+                                "example": {
+                                    "text": "Oui, nous livrons à Douala."
+                                }
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "sent"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "InboundMessageRequest": {
+                "required": [
+                    "channel",
+                    "to",
+                    "contact",
+                    "message"
+                ],
+                "properties": {
+                    "channel": {
+                        "description": "Only native channels accept inbound messages",
+                        "type": "string",
+                        "enum": [
+                            "shortext"
+                        ],
+                        "example": "shortext"
+                    },
+                    "to": {
+                        "description": "Endpoint ID shown in the Shortext dashboard",
+                        "type": "string",
+                        "example": "ste_8k2m4q9x1v7c3n5b6z0p2r4t"
+                    },
+                    "contact": {
+                        "required": [
+                            "identifier"
+                        ],
+                        "properties": {
+                            "identifier": {
+                                "description": "Your own user id. Must be unique within your company (prefix it if you have several user bases).",
+                                "type": "string",
+                                "maxLength": 150,
+                                "example": "user-42"
+                            },
+                            "profile": {
+                                "properties": {
+                                    "lastname": {
+                                        "type": "string",
+                                        "maxLength": 250,
+                                        "example": "Awa"
+                                    },
+                                    "firstname": {
+                                        "type": "string",
+                                        "maxLength": 250
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "preferred_language": {
+                                        "type": "string",
+                                        "enum": [
+                                            "en",
+                                            "fr",
+                                            "es",
+                                            "de"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "message": {
+                        "required": [
+                            "id",
+                            "type",
+                            "content"
+                        ],
+                        "properties": {
+                            "id": {
+                                "description": "Your own message id, used for idempotency",
+                                "type": "string",
+                                "maxLength": 100,
+                                "example": "client-msg-001"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "text"
+                                ],
+                                "example": "text"
+                            },
+                            "content": {
+                                "$ref": "#/components/schemas/TextMessageContent"
+                            },
+                            "metadata": {
+                                "description": "Free context stored with the message (page, cart...)",
+                                "type": "object",
+                                "example": {
+                                    "page": "/checkout"
+                                }
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "reply_mode": {
+                        "description": "Defaults to the endpoint setting",
+                        "type": "string",
+                        "enum": [
+                            "sync",
+                            "async"
+                        ],
+                        "example": "sync"
+                    }
+                },
+                "type": "object"
+            },
+            "InboundMessageResult": {
+                "properties": {
+                    "status": {
+                        "description": "completed: replies included | pending: sync timeout, reply via webhook | accepted: async | no_auto_reply: stored without automatic reply (human handover, balance, no agent) | duplicate: message.id already received",
+                        "type": "string",
+                        "enum": [
+                            "completed",
+                            "pending",
+                            "accepted",
+                            "no_auto_reply",
+                            "duplicate"
+                        ]
+                    },
+                    "message": {
+                        "$ref": "#/components/schemas/MessageV2"
+                    },
+                    "replies": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/MessageV2"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "InboundMessageResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                        "properties": {
+                            "body": {
+                                "$ref": "#/components/schemas/InboundMessageResult"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "ShortextWebhookEvent": {
+                "description": "Body POSTed to the endpoint webhook (same format as every Shortext webhook).\nHeaders: X-Shortext-Event, X-Shortext-Delivery, X-Shortext-Timestamp, X-Shortext-Signature, X-Shortext-Api-Version.\nAnswer with a 2xx within 10 s; failed deliveries are retried for ~21 h. Dedupe on `id`.",
+                "properties": {
+                    "id": {
+                        "description": "Event id, identical on redeliveries",
+                        "type": "string",
+                        "example": "evt_01JB..."
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "message.sent",
+                            "webhook.test"
+                        ]
+                    },
+                    "api_version": {
+                        "type": "string",
+                        "example": "v2.0"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "data": {
+                        "$ref": "#/components/schemas/MessageV2"
+                    }
+                },
+                "type": "object"
+            },
+            "AudioMessageContent": {
+                "title": "Audio Message",
+                "description": "Audio messages display an audio icon and a link to an audio file. When the WhatsApp user taps the icon, the WhatsApp client loads and plays the audio file.",
+                "required": [
+                    "media_type",
+                    "media_url"
+                ],
+                "properties": {
+                    "media_type": {
+                        "description": "Get the validation rules that apply to the request.",
+                        "type": "string",
+                        "enum": [
+                            "audio"
+                        ],
+                        "example": "audio"
+                    },
+                    "media_url": {
+                        "type": "string",
+                        "example": "https://example.com/image.jpg"
+                    }
+                },
+                "type": "object"
+            },
+            "InteractiveButtonMessageContent": {
+                "title": "Interactive Button Reply Message",
+                "properties": {
+                    "type": {
+                        "description": "Get the validation rules that apply to the request.",
+                        "type": "string",
+                        "enum": [
+                            "button",
+                            "payment"
+                        ],
+                        "example": "button"
+                    },
+                    "header": {
+                        "description": "Text header doesn't allow formating like *<HEADER>* or any other format supported by WhatsApp",
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "text",
+                                    "image",
+                                    "video",
+                                    "document"
+                                ],
+                                "example": "text"
+                            },
+                            "value": {
+                                "type": "string",
+                                "example": "text or url to the media file"
+                            }
+                        },
+                        "type": [
+                            "object",
+                            "null"
+                        ]
+                    },
+                    "body": {
+                        "properties": {
+                            "text": {
+                                "type": "string",
+                                "example": "Voici deux options"
+                            }
+                        },
+                        "type": "string"
+                    },
+                    "footer": {
+                        "properties": {
+                            "text": {
+                                "type": "string",
+                                "example": "Sélectionnez une option"
+                            }
+                        },
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "buttons": {
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "example": "btn_1"
+                                },
+                                "title": {
+                                    "type": "string",
+                                    "example": "Option 1"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "payment_detail": {
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "amount": {
+                                    "type": "number",
+                                    "format": "float",
+                                    "example": "100"
+                                },
+                                "currency": {
+                                    "type": "string",
+                                    "example": "XAF"
+                                },
+                                "order_id": {
+                                    "type": "string",
+                                    "example": "ORDER001"
+                                },
+                                "callback_url": {
+                                    "type": "string",
+                                    "example": "https://shortext.ny-corp.io/callback"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "action": {
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "url": {
+                                    "type": "string",
+                                    "example": "https://shortext.ny-corp.io"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "ImageMessageContent": {
+                "title": "Image Message",
+                "description": "Image messages are messages that display a single image and an optional caption.",
+                "required": [
+                    "media_type",
+                    "media_url"
+                ],
+                "properties": {
+                    "media_type": {
+                        "description": "Get the validation rules that apply to the request.",
+                        "type": "string",
+                        "enum": [
+                            "image"
+                        ],
+                        "example": "image"
+                    },
+                    "media_url": {
+                        "type": "string",
+                        "example": "https://example.com/image.jpg"
+                    },
+                    "caption": {
+                        "type": "string",
+                        "maxLength": 1024,
+                        "example": "Voici une image"
+                    }
+                },
+                "type": "object"
+            },
+            "DocumentMessageContent": {
+                "title": "Document Message",
+                "description": "Document messages are messages that display a document icon, linked to a document, that a WhatsApp user can tap to download.",
+                "required": [
+                    "media_type",
+                    "media_url"
+                ],
+                "properties": {
+                    "media_type": {
+                        "type": "string",
+                        "enum": [
+                            "document"
+                        ],
+                        "example": "document"
+                    },
+                    "media_url": {
+                        "type": "string",
+                        "example": "https://example.com/document.pdf"
+                    },
+                    "name": {
+                        "description": "Document filename, with extension. The WhatsApp client will use an appropriate file type icon based on the extension.",
+                        "type": "string",
+                        "maxLength": 30,
+                        "example": "Facture.pdf"
+                    },
+                    "caption": {
+                        "type": "string",
+                        "maxLength": 1024,
+                        "example": "Voici une image"
+                    }
+                },
+                "type": "object"
+            },
+            "VideoMessageContent": {
+                "title": "Video Message",
+                "description": "Video messages display a thumbnail preview of a video image with an optional caption. When the WhatsApp user taps the preview, it loads the video and displays it to the user.",
+                "required": [
+                    "media_type",
+                    "media_url"
+                ],
+                "properties": {
+                    "media_type": {
+                        "type": "string",
+                        "enum": [
+                            "video"
+                        ],
+                        "example": "video"
+                    },
+                    "media_url": {
+                        "type": "string",
+                        "example": "https://example.com/video.mp4"
+                    },
+                    "caption": {
+                        "type": "string",
+                        "maxLength": 1024,
+                        "example": "Voici une image"
+                    }
+                },
+                "type": "object"
+            },
+            "TextMessageContent": {
+                "title": "Text Message",
+                "description": "WhatsApp allow text message only when there is already an open session between the contact and the business number",
+                "required": [
+                    "text"
+                ],
+                "properties": {
+                    "text": {
+                        "description": "for embedded url please use this format ex: https://shortext.io",
+                        "type": "string",
+                        "maxLength": 4096,
+                        "example": "Ceci est un message texte."
+                    },
+                    "preview_url": {
+                        "type": "boolean",
+                        "default": true,
+                        "example": true
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "Company API token (Laravel Sanctum), sent as \"Authorization: Bearer <token>\"",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Agents",
+            "description": "Agents"
+        },
+        {
+            "name": "Business - Manager",
+            "description": "Business - Manager"
+        },
+        {
+            "name": "Messages",
+            "description": "Messages"
+        },
+        {
+            "name": "Tickets",
+            "description": "Tickets"
+        },
+        {
+            "name": "Knowledge",
+            "description": "Knowledge"
+        },
+        {
+            "name": "health",
+            "description": "health"
+        }
+    ]
+}
