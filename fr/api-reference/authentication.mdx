@@ -15,7 +15,7 @@ Dans le tableau de bord, ouvrez **Développeur > API Keys** (il faut la permissi
 
 Vous pouvez modifier les permissions d'une clé existante sans la recréer, et supprimer une clé pour la révoquer immédiatement.
 
-{/* TODO capture : Développeur > API Keys et le formulaire de création (Filament 4). */}
+{/* TODO capture : Développeur > API Keys et le formulaire de création. */}
 
 ## Envoyer la clé
 
@@ -24,7 +24,7 @@ Envoyez la clé dans l'en-tête `Authorization` comme jeton bearer :
 ```http
 GET /api/v2.0/me HTTP/1.1
 Host: shortext.ny-corp.io
-Authorization: Bearer 12|AbCdEf...
+Authorization: Bearer YOUR_API_KEY
 Accept: application/json
 ```
 

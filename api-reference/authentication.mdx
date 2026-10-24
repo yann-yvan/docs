@@ -15,7 +15,7 @@ In the dashboard, open **Developer > API Keys** (it requires the **Access API** 
 
 You can change the permissions of an existing key without recreating it, and delete a key to revoke it at once.
 
-{/* TODO screenshot: Developer > API Keys and the creation form (Filament 4). */}
+{/* TODO screenshot: Developer > API Keys and the creation form. */}
 
 ## Send the key
 
@@ -24,7 +24,7 @@ Send the key in the `Authorization` header as a bearer token:
 ```http
 GET /api/v2.0/me HTTP/1.1
 Host: shortext.ny-corp.io
-Authorization: Bearer 12|AbCdEf...
+Authorization: Bearer YOUR_API_KEY
 Accept: application/json
 ```
 
