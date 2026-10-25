@@ -18,7 +18,7 @@ Every endpoint that sends a message (start a conversation, reply, Shortext inbou
 | --- | --- | --- |
 | `text` | Plain text | Inside only |
 | `template` | Approved WhatsApp templates | Inside and outside |
-| `interactive` | Buttons, lists, call-to-action links | Inside only |
+| `interactive` | Reply buttons, links, flows, payment requests, carousels | Inside only |
 | `media` | Images, videos, documents, audio | Inside only |
 
 Each endpoint accepts the types that make sense for it: for example a Shortext inbound message is `text` only.
@@ -71,16 +71,16 @@ In v2.0, Shortext checks a template before sending it to WhatsApp and answers `1
 ## Interactive
 
 <ParamField body="content.type" type="string" required>
-  `button` (reply buttons), `list`, `cta_url`, `quick_reply`, `carousel`, `flow` or `payment`.
+  `button` (reply buttons), `cta_url` (a button that opens a link), `flow`, `payment` or `carousel`. Their `action` is described in [WhatsApp message types](/api-reference/whatsapp-messages).
 </ParamField>
 <ParamField body="content.body" type="string" required>
-  The text of the message, up to 1,024 characters.
+  The text of the message.
 </ParamField>
-<ParamField body="content.action" type="object" required>
-  The buttons, sections or link, in the WhatsApp Cloud API `action` format.
+<ParamField body="content.action" type="array | object" required>
+  For `button`: a list of 1 to 3 buttons `{ "id", "title" }` (title up to 20 characters). For `cta_url`: `{ "parameters": { "display_text", "url" } }`. For the other types, see [WhatsApp message types](/api-reference/whatsapp-messages).
 </ParamField>
 <ParamField body="content.header" type="object">
-  `{ "type": "text" | "image" | "video" | "document" | "audio", "value": "text or URL", "filename": "for documents" }`.
+  `{ "type": "text" | "image" | "video" | "document", "value": "text or URL", "filename": "for documents" }`. A text header is limited to 60 characters; `cta_url` accepts a text or an image header.
 </ParamField>
 <ParamField body="content.footer" type="string">
   Up to 60 characters.
@@ -95,40 +95,29 @@ In v2.0, Shortext checks a template before sending it to WhatsApp and answers `1
     "header": { "type": "text", "value": "Delivery" },
     "body": "When should we deliver your order?",
     "footer": "Choose a slot",
-    "action": {
-      "buttons": [
-        { "type": "reply", "reply": { "id": "slot_morning", "title": "Morning" } },
-        { "type": "reply", "reply": { "id": "slot_evening", "title": "Evening" } }
-      ]
-    }
+    "action": [
+      { "id": "slot_morning", "title": "Morning" },
+      { "id": "slot_evening", "title": "Evening" }
+    ]
   }
 }
 ```
 
-```json List
+```json Call-to-action link
 {
   "type": "interactive",
   "content": {
-    "type": "list",
-    "body": "Which product do you need help with?",
+    "type": "cta_url",
+    "body": "Invoice A-1042 is ready: 25,000 XAF.",
     "action": {
-      "button": "See products",
-      "sections": [
-        {
-          "title": "Phones",
-          "rows": [
-            { "id": "p_x1", "title": "X1", "description": "2025 model" },
-            { "id": "p_x2", "title": "X2" }
-          ]
-        }
-      ]
+      "parameters": { "display_text": "Pay now", "url": "https://www.example.com/pay/A-1042" }
     }
   }
 }
 ```
 </CodeGroup>
 
-WhatsApp allows up to 3 reply buttons, and up to 10 sections of 10 rows in a list.
+See what they look like on WhatsApp in [WhatsApp message types](/api-reference/whatsapp-messages).
 
 ## Media
 

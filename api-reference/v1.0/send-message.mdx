@@ -27,6 +27,8 @@ On WhatsApp, text, media and interactive messages are only delivered within 24 h
 
 ## What the messages look like
 
+The payloads of each type are described in [WhatsApp message types](/api-reference/whatsapp-messages).
+
 <Tabs>
   <Tab title="Text">
     Text messages contain a body of up to 4,096 characters. WhatsApp renders a preview of the first URL of the text when it can (the URL must start with `http://` or `https://`); otherwise it shows a clickable link.
@@ -51,6 +53,8 @@ On WhatsApp, text, media and interactive messages are only delivered within 24 h
   </Tab>
 
   <Tab title="Lists">
+    <Warning>Lists cannot be sent through the API yet; this is what they look like on WhatsApp.</Warning>
+
     Interactive lists present options grouped in sections: up to 10 sections of 10 rows, with an optional header and footer.
 
     <Frame>

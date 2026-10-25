@@ -18,7 +18,7 @@ Tous les endpoints qui envoient un message (démarrer une conversation, répondr
 | --- | --- | --- |
 | `text` | Du texte simple | Dans la fenêtre uniquement |
 | `template` | Les modèles WhatsApp approuvés | Dans la fenêtre et en dehors |
-| `interactive` | Boutons, listes, liens d'appel à l'action | Dans la fenêtre uniquement |
+| `interactive` | Boutons de réponse, liens, flows, demandes de paiement, carrousels | Dans la fenêtre uniquement |
 | `media` | Images, vidéos, documents, audio | Dans la fenêtre uniquement |
 
 Chaque endpoint accepte les types qui ont du sens pour lui : par exemple, un message entrant Shortext est uniquement `text`.
@@ -71,16 +71,16 @@ En v2.0, Shortext vérifie le modèle avant de l'envoyer à WhatsApp et répond 
 ## Interactif
 
 <ParamField body="content.type" type="string" required>
-  `button` (boutons de réponse), `list`, `cta_url`, `quick_reply`, `carousel`, `flow` ou `payment`.
+  `button` (boutons de réponse), `cta_url` (un bouton qui ouvre un lien), `flow`, `payment` ou `carousel`. Leur `action` est décrite dans [Types de messages WhatsApp](/fr/api-reference/whatsapp-messages).
 </ParamField>
 <ParamField body="content.body" type="string" required>
-  Le texte du message, jusqu'à 1 024 caractères.
+  Le texte du message.
 </ParamField>
-<ParamField body="content.action" type="object" required>
-  Les boutons, sections ou le lien, au format `action` de la WhatsApp Cloud API.
+<ParamField body="content.action" type="array | object" required>
+  Pour `button` : une liste de 1 à 3 boutons `{ "id", "title" }` (titre de 20 caractères au plus). Pour `cta_url` : `{ "parameters": { "display_text", "url" } }`. Pour les autres types, voir [Types de messages WhatsApp](/fr/api-reference/whatsapp-messages).
 </ParamField>
 <ParamField body="content.header" type="object">
-  `{ "type": "text" | "image" | "video" | "document" | "audio", "value": "texte ou URL", "filename": "pour les documents" }`.
+  `{ "type": "text" | "image" | "video" | "document", "value": "texte ou URL", "filename": "pour les documents" }`. Un en-tête texte est limité à 60 caractères ; `cta_url` accepte un en-tête texte ou image.
 </ParamField>
 <ParamField body="content.footer" type="string">
   Jusqu'à 60 caractères.
@@ -95,40 +95,29 @@ En v2.0, Shortext vérifie le modèle avant de l'envoyer à WhatsApp et répond 
     "header": { "type": "text", "value": "Livraison" },
     "body": "Quand souhaitez-vous être livré ?",
     "footer": "Choisissez un créneau",
-    "action": {
-      "buttons": [
-        { "type": "reply", "reply": { "id": "slot_morning", "title": "Matin" } },
-        { "type": "reply", "reply": { "id": "slot_evening", "title": "Soir" } }
-      ]
-    }
+    "action": [
+      { "id": "slot_morning", "title": "Matin" },
+      { "id": "slot_evening", "title": "Soir" }
+    ]
   }
 }
 ```
 
-```json Liste
+```json Lien d'appel à l'action
 {
   "type": "interactive",
   "content": {
-    "type": "list",
-    "body": "Pour quel produit avez-vous besoin d'aide ?",
+    "type": "cta_url",
+    "body": "La facture A-1042 est prête : 25 000 XAF.",
     "action": {
-      "button": "Voir les produits",
-      "sections": [
-        {
-          "title": "Téléphones",
-          "rows": [
-            { "id": "p_x1", "title": "X1", "description": "Modèle 2025" },
-            { "id": "p_x2", "title": "X2" }
-          ]
-        }
-      ]
+      "parameters": { "display_text": "Payer", "url": "https://www.example.com/pay/A-1042" }
     }
   }
 }
 ```
 </CodeGroup>
 
-WhatsApp autorise jusqu'à 3 boutons de réponse, et jusqu'à 10 sections de 10 lignes dans une liste.
+Voyez leur rendu sur WhatsApp dans [Types de messages WhatsApp](/fr/api-reference/whatsapp-messages).
 
 ## Média
 

@@ -1,0 +1,281 @@
+---
+title: Types de messages WhatsApp
+description: L'apparence de chaque type de message WhatsApp sur le téléphone, et le payload qui l'envoie par l'API Shortext.
+---
+
+Chaque message envoyé par l'API suit le [format des messages](/fr/api-reference/message-format) : un `type` et un `content`. Cette page montre, pour WhatsApp, l'apparence de chaque type pour votre contact et l'objet `message` exact à envoyer, avec `POST /conversations` ou `POST /conversations/{id}/messages`.
+
+<Note>À l'exception des modèles, ces messages ne sont remis que dans la [fenêtre de 24 heures](/fr/channels/whatsapp#la-fenêtre-de-24-heures) ouverte par le dernier message du contact.</Note>
+
+## Texte
+
+Un texte de 4 096 caractères au plus. Quand le texte contient une URL commençant par `http://` ou `https://`, WhatsApp affiche un aperçu de la première, ou un lien cliquable si aucun aperçu n'est disponible.
+
+<Frame>
+  <img src="/images/text-message.png" alt="Un message texte sur WhatsApp" />
+</Frame>
+
+```json
+{
+  "type": "text",
+  "content": {
+    "text": "Votre commande A-1042 a quitté notre entrepôt. Suivez-la ici : https://www.example.com/track/A-1042"
+  }
+}
+```
+
+## Boutons de réponse
+
+Jusqu'à **trois boutons** que le contact touche pour répondre. Chaque bouton a un `id` (256 caractères au plus, qui vous est renvoyé quand le contact le touche) et un `title` (20 caractères au plus).
+
+<Frame>
+  <img height="200" src="/images/interactive-button-reply.png" alt="Un message avec des boutons de réponse" />
+</Frame>
+
+```json
+{
+  "type": "interactive",
+  "content": {
+    "type": "button",
+    "header": { "type": "text", "value": "Livraison" },
+    "body": "Quand souhaitez-vous être livré ?",
+    "footer": "Choisissez un créneau",
+    "action": [
+      { "id": "slot_morning", "title": "Matin" },
+      { "id": "slot_evening", "title": "Soir" }
+    ]
+  }
+}
+```
+
+Quand le contact touche un bouton, son choix revient sous forme de message, reçu par l'agent et par votre [webhook](/fr/api-reference/webhooks) `message.received`.
+
+<Frame>
+  <img height="150" src="/images/interactive-button-sample-response.png" alt="Le choix du contact" />
+</Frame>
+
+| Champ | Limites |
+| --- | --- |
+| `header` | Facultatif. `{ "type": "text", "value": "..." }` (60 caractères au plus), ou `image`, `video`, `document` avec l'URL du média dans `value` (et `filename` pour un document). |
+| `body` | Obligatoire. Le texte du message. |
+| `footer` | Facultatif, 60 caractères au plus. |
+| `action` | Obligatoire. 1 à 3 boutons `{ "id", "title" }`. |
+
+## Lien d'appel à l'action
+
+Un bouton qui ouvre une URL : une page de paiement, de suivi, un formulaire.
+
+{/* TODO illustration : message avec lien d'appel à l'action sur WhatsApp. */}
+
+```json
+{
+  "type": "interactive",
+  "content": {
+    "type": "cta_url",
+    "header": { "type": "text", "value": "Votre facture" },
+    "body": "La facture A-1042 est prête : 25 000 XAF.",
+    "footer": "Paiement sécurisé",
+    "action": {
+      "parameters": {
+        "display_text": "Payer",
+        "url": "https://www.example.com/pay/A-1042"
+      }
+    }
+  }
+}
+```
+
+| Champ | Limites |
+| --- | --- |
+| `header` | Facultatif. `text` (60 caractères au plus) ou `image` (URL dans `value`). |
+| `action.parameters.display_text` | Obligatoire, 20 caractères au plus. |
+| `action.parameters.url` | Obligatoire, 200 caractères au plus. |
+
+## Médias
+
+Images, vidéos, documents et fichiers audio ou vocaux, à partir d'une URL publique que Shortext télécharge.
+
+{/* TODO illustrations : messages image, vidéo, document et audio sur WhatsApp. */}
+
+<CodeGroup>
+```json Image
+{
+  "type": "media",
+  "content": {
+    "media_type": "image",
+    "media_url": "https://cdn.example.com/products/x1.jpg",
+    "caption": "Le X1 est de retour en stock"
+  }
+}
+```
+
+```json Vidéo
+{
+  "type": "media",
+  "content": {
+    "media_type": "video",
+    "media_url": "https://cdn.example.com/tutorials/setup.mp4",
+    "caption": "Comment configurer votre X1"
+  }
+}
+```
+
+```json Document
+{
+  "type": "media",
+  "content": {
+    "media_type": "document",
+    "media_url": "https://cdn.example.com/invoices/A-1042.pdf",
+    "filename": "Facture A-1042.pdf",
+    "caption": "Votre facture"
+  }
+}
+```
+
+```json Audio
+{
+  "type": "media",
+  "content": {
+    "media_type": "audio",
+    "media_url": "https://cdn.example.com/messages/welcome.ogg"
+  }
+}
+```
+</CodeGroup>
+
+La légende (1 024 caractères au plus) s'affiche sous les images, les vidéos et les documents ; les messages audio n'en ont pas. WhatsApp applique ses propres limites de taille et de format aux fichiers.
+
+## Modèle
+
+Le seul message que vous pouvez envoyer hors de la fenêtre de 24 heures : un modèle approuvé, avec son en-tête, ses variables et ses boutons. Voir [Envoyer un modèle WhatsApp](/fr/api-reference/guides/send-a-template).
+
+{/* TODO illustration : message modèle avec en-tête média et boutons sur WhatsApp. */}
+
+```json
+{
+  "type": "template",
+  "content": {
+    "template_name": "order_shipped",
+    "language": "fr",
+    "header": { "url": "https://cdn.example.com/parcels/A-1042.jpg" },
+    "body": { "name": "Brice", "order": "A-1042" }
+  }
+}
+```
+
+## Flow WhatsApp
+
+Ouvre un [Flow WhatsApp](https://developers.facebook.com/docs/whatsapp/flows) créé dans Meta Business Manager : un formulaire sur plusieurs écrans (réservation, inscription, sondage) à l'intérieur de WhatsApp.
+
+{/* TODO illustration : message flow et son premier écran sur WhatsApp. */}
+
+```json
+{
+  "type": "interactive",
+  "content": {
+    "type": "flow",
+    "header": { "type": "text", "value": "Réserver une visite" },
+    "body": "Choisissez une date et une heure pour votre rendez-vous.",
+    "action": {
+      "parameters": {
+        "flow_message_version": "3",
+        "flow_token": "booking-237699999999",
+        "flow_id": "1234567890123456",
+        "mode": "published",
+        "flow_cta": "Réserver",
+        "flow_action": "navigate",
+        "flow_action_payload": { "screen": "APPOINTMENT", "data": { "shop": "Douala" } }
+      }
+    }
+  }
+}
+```
+
+| Champ | Limites |
+| --- | --- |
+| `header` | Facultatif. `text` ou `image`. |
+| `action.parameters.flow_message_version` | Obligatoire, une chaîne, par exemple `"3"`. |
+| `action.parameters.flow_token` | Obligatoire. Votre propre jeton, renvoyé avec les réponses du flow. |
+| `action.parameters.flow_id` ou `flow_name` | L'un des deux : l'identifiant numérique ou le nom du flow. |
+| `action.parameters.mode` | Obligatoire : `published`, ou `draft` pour tester un flow pas encore publié. |
+| `action.parameters.flow_cta` | Obligatoire, le texte du bouton, 30 caractères au plus. |
+| `action.parameters.flow_action` | Obligatoire : `navigate` (ouvrir un écran) ou `data_exchange` (votre endpoint fournit le premier écran). |
+| `action.parameters.flow_action_payload` | Facultatif avec `navigate` : le premier `screen` et ses `data`. |
+
+## Demande de paiement
+
+Demande au contact de payer un montant. Vous donnez le montant ; Shortext crée le lien de paiement et envoie un message avec un bouton **Payer** qui mène à sa page de paiement sécurisée.
+
+{/* TODO illustration : message de demande de paiement sur WhatsApp. */}
+
+```json
+{
+  "type": "interactive",
+  "content": {
+    "type": "payment",
+    "body": "Votre commande A-1042 est prête à être livrée.",
+    "action": {
+      "parameters": {
+        "amount": 25000,
+        "currency": "XAF",
+        "order_id": "A-1042",
+        "callback_url": "https://api.example.com/payments/callback"
+      }
+    }
+  }
+}
+```
+
+| Champ | Description |
+| --- | --- |
+| `body` | Obligatoire. Shortext y ajoute le montant (et la référence de la commande). |
+| `action.parameters.amount` | Obligatoire, un nombre. |
+| `action.parameters.currency` | Obligatoire, par exemple `XAF` ou `EUR`. |
+| `action.parameters.order_id` | Facultatif, votre référence de commande. |
+| `action.parameters.callback_url` | Facultatif, votre URL à prévenir du paiement. |
+
+Le bouton affiche « Pay {montant} {devise} ». Sans en-tête, Shortext ajoute un en-tête image avec la référence de la commande. N'envoyez ni `display_text` ni `url` : Shortext construit le bouton.
+
+## Carrousel
+
+Plusieurs cartes que le contact fait défiler, chacune avec une image ou une vidéo, un texte et un bouton lien.
+
+{/* TODO illustration : message carrousel sur WhatsApp. */}
+
+`content.action` est transmis tel quel à WhatsApp : utilisez l'objet `action` du [message carrousel interactif de Meta](https://developers.facebook.com/docs/whatsapp/cloud-api/messages/interactive-media-carousel-messages).
+
+```json
+{
+  "type": "interactive",
+  "content": {
+    "type": "carousel",
+    "body": "Nos nouveautés",
+    "action": {
+      "cards": [
+        {
+          "card_index": 0,
+          "type": "cta_url",
+          "header": { "type": "image", "image": { "link": "https://cdn.example.com/products/x1.jpg" } },
+          "body": { "text": "X1, 120 000 XAF" },
+          "action": { "name": "cta_url", "parameters": { "display_text": "Voir le X1", "url": "https://www.example.com/x1" } }
+        },
+        {
+          "card_index": 1,
+          "type": "cta_url",
+          "header": { "type": "image", "image": { "link": "https://cdn.example.com/products/x2.jpg" } },
+          "body": { "text": "X2, 150 000 XAF" },
+          "action": { "name": "cta_url", "parameters": { "display_text": "Voir le X2", "url": "https://www.example.com/x2" } }
+        }
+      ]
+    }
+  }
+}
+```
+
+Chaque carte demande un en-tête de type `image` ou `video` et un texte de 160 caractères au plus.
+
+## Pas encore disponible
+
+Les **listes** (un menu d'options regroupées en sections) et les **réponses rapides** ne peuvent pas encore être envoyées par l'API. Cette page sera mise à jour quand elles le pourront.
+
+{/* TODO: payloads list et quick_reply quand l'API les prendra en charge. Illustrations disponibles pour les listes : /images/interactive-list.png, interactive-list-modal.png, interactive-list-reply.png. */}

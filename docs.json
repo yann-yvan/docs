@@ -62,6 +62,12 @@
                 ]
               },
               {
+                "group": "Integrators",
+                "pages": [
+                  "integrators/one-agent-per-company"
+                ]
+              },
+              {
                 "group": "Channels",
                 "pages": [
                   "channels/overview",
@@ -104,6 +110,7 @@
                     "group": "Formats",
                     "pages": [
                       "api-reference/message-format",
+                      "api-reference/whatsapp-messages",
                       "api-reference/contact-format"
                     ]
                   },
@@ -193,6 +200,12 @@
                 ]
               },
               {
+                "group": "Intégrateurs",
+                "pages": [
+                  "fr/integrators/one-agent-per-company"
+                ]
+              },
+              {
                 "group": "Canaux",
                 "pages": [
                   "fr/channels/overview",
@@ -235,6 +248,7 @@
                     "group": "Formats",
                     "pages": [
                       "fr/api-reference/message-format",
+                      "fr/api-reference/whatsapp-messages",
                       "fr/api-reference/contact-format"
                     ]
                   },
