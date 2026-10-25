@@ -47,11 +47,11 @@ Chaque endpoint accepte les types qui ont du sens pour lui : par exemple, un mes
 <ParamField body="content.header" type="object">
   Pour un en-tête **texte** avec variables : `{ "name": "valeur" }`. Pour un en-tête **média** : `{ "url": "https://..." }` (et `filename` pour un document). Sans `url`, le média enregistré avec le modèle est envoyé.
 </ParamField>
-<ParamField body="content.buttons" type="array">
-  Les paramètres des boutons dynamiques, au format de la WhatsApp Cloud API.
+<ParamField body="content.buttons" type="object">
+  La valeur de chaque bouton qui en demande une, par son index (à partir de 0, tel que listé par `GET /templates`) : `{ "0": "A-1042", "1": "SAVE20" }`. La fin d'un lien dynamique, le code promo d'un bouton de copie, ou le payload d'une réponse rapide.
 </ParamField>
-<ParamField body="content.category" type="string" default="utility">
-  `utility`, `marketing` ou `authentication`.
+<ParamField body="content.code" type="string">
+  Pour un modèle d'**authentification** uniquement : le code à usage unique (15 caractères au plus). Shortext le place dans le corps et dans le bouton du code.
 </ParamField>
 
 ```json
@@ -66,7 +66,7 @@ Chaque endpoint accepte les types qui ont du sens pour lui : par exemple, un mes
 }
 ```
 
-En v2.0, Shortext vérifie le modèle avant de l'envoyer à WhatsApp et répond `1002` avec un message explicite quand le modèle n'existe pas sur le numéro, n'est pas approuvé dans cette langue, ou qu'il manque une variable (`body.missing` les liste). Voir [Envoyer un modèle](/fr/api-reference/guides/send-a-template).
+La catégorie facturée est celle que Meta a approuvée pour le modèle. En v2.0, Shortext vérifie le modèle avant de l'envoyer à WhatsApp et répond `1002` avec un message explicite quand le modèle n'existe pas sur le numéro, n'est pas approuvé dans cette langue, ou qu'il manque une variable (`body.missing` les liste). Voir [Envoyer un modèle](/fr/api-reference/guides/send-a-template).
 
 ## Interactif
 

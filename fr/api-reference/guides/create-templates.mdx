@@ -1,0 +1,117 @@
+---
+title: Créer des modèles WhatsApp
+description: Créez et modifiez des modèles WhatsApp par l'API, ou laissez vos clients les rédiger sur une page Shortext, et suivez l'examen de Meta.
+---
+
+Un modèle est créé sur un numéro WhatsApp (son compte WhatsApp Business le possède), vérifié selon les règles de Meta, puis soumis à l'examen de Meta. Il peut être envoyé une fois approuvé. Vous pouvez créer des modèles dans le tableau de bord (voir [Modèles WhatsApp](/fr/channels/whatsapp-templates)), par l'API ou avec un lien hébergé.
+
+La création et la modification demandent une clé avec **Gérer les intégrations** ; la lecture des modèles ne demande que **Envoyer des messages**.
+
+## Créer un modèle
+
+`POST /templates`
+
+```bash
+curl -X POST https://shortext.ny-corp.io/api/v2.0/templates \
+  -H "Authorization: Bearer $SHORTEXT_API_KEY" \
+  -H "Accept: application/json" -H "Content-Type: application/json" \
+  -d '{
+    "channel_id": "532867649916076",
+    "name": "Order update",
+    "language": "fr",
+    "category": "UTILITY",
+    "header": { "type": "TEXT", "text": "Commande {{order_number}}", "examples": { "order_number": "A-42" } },
+    "body": {
+      "text": "Bonjour {{name}}, votre commande {{order_number}} est en route.",
+      "examples": { "name": "Awa", "order_number": "A-42" }
+    },
+    "footer": "Acme, livraison rapide",
+    "buttons": [
+      { "type": "URL", "text": "Suivre ma commande", "url": "https://shop.example/orders/{{1}}", "example": "https://shop.example/orders/A-42" },
+      { "type": "QUICK_REPLY", "text": "Parler à un conseiller" }
+    ]
+  }'
+```
+
+| Champ | Description |
+| --- | --- |
+| `channel_id` | Obligatoire à la création. L'un de vos numéros WhatsApp : le modèle appartient à son compte WhatsApp Business. |
+| `name` | Obligatoire à la création. Normalisé pour Meta : `Order update` devient `order_update`. |
+| `language` | Obligatoire à la création, par exemple `fr` ou `en_US`. |
+| `category` | Obligatoire à la création : `MARKETING`, `UTILITY` ou `AUTHENTICATION`. |
+| `header` | Facultatif. `type` : `NONE`, `TEXT`, `IMAGE`, `VIDEO` ou `DOCUMENT`. Un en-tête `TEXT` a un `text` (60 caractères au plus, une variable au maximum) et ses `examples` ; un en-tête média a une `media_url`, téléchargée par Shortext. |
+| `body` | `text` (1 024 caractères au plus) avec des variables nommées comme `{{name}}`, et `examples` : **un exemple par variable**, que Meta utilise pour examiner le modèle. |
+| `footer` | Facultatif, 60 caractères au plus, sans variable. |
+| `buttons` | Facultatif, 10 au plus : `type` `QUICK_REPLY`, `URL`, `PHONE_NUMBER` ou `COPY_CODE`, avec `text` (25 caractères au plus), `url` et `example` pour un lien, `phone_number` pour un bouton d'appel (20 caractères au plus), `example` pour un bouton de copie de code. |
+| `authentication` | Pour `AUTHENTICATION` uniquement, à la place de l'en-tête, du corps, du pied de page et des boutons : voir ci-dessous. |
+
+Shortext vérifie d'abord les règles de Meta (listées dans [Modèles WhatsApp](/fr/channels/whatsapp-templates#règles-vérifiées-avant-la-publication)) et répond `1002` avec les erreurs par champ. Puis il soumet le modèle à Meta :
+
+- **accepté pour examen** : la réponse est le modèle, avec le statut `PENDING` ;
+- **refusé par Meta** : rien n'est conservé, et le message `1002` en donne la raison (`Meta refused the template: ...`).
+
+### Modèles d'authentification
+
+Meta rédige le texte des modèles d'authentification. Vous ne choisissez que leurs réglages :
+
+```json
+{
+  "channel_id": "532867649916076",
+  "name": "login_code",
+  "language": "en",
+  "category": "AUTHENTICATION",
+  "authentication": {
+    "add_security_recommendation": true,
+    "code_expiration_minutes": 10,
+    "otp_type": "COPY_CODE"
+  }
+}
+```
+
+| Champ | Description |
+| --- | --- |
+| `add_security_recommendation` | Ajoute « Pour votre sécurité, ne partagez pas ce code. » |
+| `code_expiration_minutes` | De 1 à 90. |
+| `otp_type` | `COPY_CODE` (un bouton qui copie le code) ou `ONE_TAP` (remplissage automatique dans votre application Android). |
+| `package_name`, `signature_hash` | Obligatoires avec `ONE_TAP` : le nom de package Android et le hash de signature de 11 caractères de l'application. |
+
+Envoyez ces modèles avec `content.code`, voir [Envoyer un modèle](/fr/api-reference/guides/send-a-template#modèles-d’authentification).
+
+## Modifier un modèle
+
+`PATCH /templates/{id}` modifie l'en-tête, le corps, le pied de page, les boutons ou les réglages d'authentification ; ce que vous n'envoyez pas reste inchangé. Le nom, la langue et la catégorie ne peuvent pas changer.
+
+La modification est soumise à un nouvel examen de Meta (Meta limite la fréquence des modifications d'un modèle approuvé). Si Meta la refuse, le modèle reste tel qu'il était et le message `1002` en donne la raison. Un modèle d'authentification publié ne peut pas être modifié.
+
+## Suivre l'examen
+
+Meta examine les modèles en quelques minutes à quelques heures. Abonnez un [webhook](/fr/api-reference/webhooks) à `template.status_updated` : il est envoyé quand Meta approuve ou rejette un modèle, ou change sa catégorie ou sa qualité.
+
+```json
+{
+  "id": "evt_01JB8Z...",
+  "type": "template.status_updated",
+  "api_version": "v2.0",
+  "created_at": "2026-10-25T10:02:11+00:00",
+  "data": {
+    "template": { "id": "t4Hd6sFe", "name": "order_update", "language": "fr", "status": "APPROVED", "rejection_reason": null, "quality": "GREEN", "category": "UTILITY", "channels": ["532867649916076"] },
+    "previous": { "status": "PENDING" }
+  }
+}
+```
+
+`data.template` est le modèle tel que renvoyé par `GET /templates/{id}` (abrégé ici) ; `previous` contient les valeurs avant le changement. Vous pouvez aussi interroger `GET /templates/{id}`.
+
+## Laisser vos clients rédiger leurs modèles
+
+Si vous construisez un produit sur Shortext, vos clients peuvent rédiger eux-mêmes leurs modèles dans l'éditeur Shortext, sans compte sur le tableau de bord : créez une [session hébergée](/fr/api-reference/hosted-sessions) avec l'objectif `template`.
+
+```json
+{
+  "purpose": "template",
+  "context": { "channel_id": "532867649916076", "category": "MARKETING", "language": "fr" },
+  "return_url": "https://app.example.com/templates"
+}
+```
+
+`context.channel_id` est obligatoire ; `name`, `category` et `language` pré-remplissent l'éditeur. Quand le modèle est soumis, la session aboutit avec `result.template` (`PENDING`), et le webhook `hosted_session.completed` est envoyé. Si Meta refuse le modèle, la page en affiche la raison et la session reste ouverte.

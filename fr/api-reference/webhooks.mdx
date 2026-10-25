@@ -24,7 +24,7 @@ Créez les endpoints dans le tableau de bord (**Développeur > Webhooks**) ou pa
 | --- | --- |
 | `url` | Une URL **HTTPS** publique. Les adresses privées et locales sont refusées. |
 | `events` | Des types exacts (`message.received`), un préfixe générique (`message.*`) ou `*` pour tout. |
-| `filters` | Facultatif. Ne recevoir que les événements dont le contexte correspond : `app` (un identifiant d'agent), `channel` (`whatsapp`, `mail`, `shortext`), `channel_id`. |
+| `filters` | Facultatif. Ne recevoir que les événements dont le contexte correspond : `app` (un identifiant d'agent), `channel` (`whatsapp`, `mail`, `shortext`), `channel_id` ; pour `template.status_updated`, `template` (son nom) et `language`. |
 | `description` | Facultatif, pour vous. |
 
 La réponse contient le **`secret` de signature, affiché une seule fois**. Conservez-le avec vos autres secrets.
@@ -47,9 +47,12 @@ La réponse contient le **`secret` de signature, affiché une seule fois**. Cons
 | `agent.created` | Un agent a été créé. |
 | `agent.updated` | Un agent a été modifié (paramètres ou instructions). |
 | `agent.deleted` | Un agent a été supprimé. |
+| `template.status_updated` | Meta a examiné un modèle WhatsApp (approuvé, ou rejeté avec un motif), ou a changé sa catégorie ou sa qualité. |
 | `hosted_session.completed` | Une [session hébergée](/fr/api-reference/hosted-sessions) a abouti : `result` contient ce qu'elle a produit. |
 | `hosted_session.failed` | Une session hébergée a échoué : `error` dit pourquoi. |
 | `webhook.test` | Envoyé à la demande pour vérifier un endpoint. |
+
+Un modèle appartient à un compte WhatsApp Business : `template.status_updated` est envoyé à toutes les entreprises qui ont un numéro sur ce compte.
 
 De nouveaux types d'événements peuvent apparaître à tout moment : ignorez ceux que vous ne traitez pas.
 
@@ -85,6 +88,7 @@ Chaque livraison est un `POST` avec un corps JSON :
 | `conversation.*` | `conversation_id`, `channel`, `channel_id` et `contact.identifier`. |
 | `channel.*` | Un canal, tel que renvoyé par `GET /channels` ; `channel.agent_changed` ajoute `previous_agent`. |
 | `agent.*` | Un agent, tel que renvoyé par `GET /agents/{id}` (sans ses canaux). |
+| `template.status_updated` | `template` (tel que renvoyé par `GET /templates/{id}`) et `previous` : les valeurs avant le changement, parmi `status`, `category` et `quality`. |
 | `hosted_session.*` | Une session hébergée, telle que renvoyée par `GET /hosted-sessions/{id}`. |
 
 ## En-têtes

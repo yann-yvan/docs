@@ -1,11 +1,11 @@
 ---
 title: Sessions hébergées
-description: Laissez vos propres clients connecter leur numéro WhatsApp ou leur boîte mail sur une page Shortext, depuis votre produit.
+description: Laissez vos propres clients connecter leur numéro WhatsApp ou leur boîte mail, ou créer un modèle WhatsApp, sur une page Shortext, depuis votre produit.
 ---
 
 import HostedSession from '/snippets/code/hosted-session.mdx';
 
-Une session hébergée est un lien signé et temporaire vers une page **hébergée par Shortext**, où votre utilisateur réalise une étape impossible dans votre propre produit : s'identifier auprès de Meta pour connecter un numéro WhatsApp Business, ou saisir et vérifier les paramètres d'une boîte mail. Une fois terminé, il revient dans votre application et vous recevez le résultat.
+Une session hébergée est un lien signé et temporaire vers une page **hébergée par Shortext**, où votre utilisateur réalise une étape impossible dans votre propre produit : s'identifier auprès de Meta pour connecter un numéro WhatsApp Business, saisir et vérifier les paramètres d'une boîte mail, ou rédiger un modèle WhatsApp dans l'éditeur Shortext. Une fois terminé, il revient dans votre application et vous recevez le résultat.
 
 Cas typique : vous construisez un produit sur Shortext, et chacun de vos clients connecte son propre numéro WhatsApp à l'agent que vous avez configuré pour lui.
 
@@ -37,13 +37,14 @@ Cas typique : vous construisez un produit sur Shortext, et chacun de vos clients
 | --- | --- | --- |
 | `whatsapp` | Connecter des numéros WhatsApp Business avec l'inscription intégrée de Meta. | `agent_id` : l'agent qui répond sur les numéros (par défaut : votre premier agent). |
 | `mail` | Connecter une boîte mail en IMAP / SMTP ; la connexion est vérifiée avant l'enregistrement. | `agent_id` : l'agent qui répond sur la boîte (par défaut : votre premier agent). |
+| `template` | Rédiger un modèle WhatsApp dans l'éditeur Shortext et le soumettre à Meta. | `channel_id` (obligatoire) : un numéro WhatsApp, dont le compte WhatsApp Business possède le modèle. Facultatifs : `name`, `category` (`MARKETING`, `UTILITY`, `AUTHENTICATION`), `language`, pour pré-remplir l'éditeur. |
 
 ## Créer une session
 
 Demande la permission **Gérer les intégrations**.
 
 <ParamField body="purpose" type="string" required>
-  `whatsapp` ou `mail`.
+  `whatsapp`, `mail` ou `template`.
 </ParamField>
 <ParamField body="context" type="object">
   Options de l'objectif, par exemple `{ "agent_id": "AGI-XXXXX" }`. L'agent doit appartenir à votre entreprise.
@@ -98,9 +99,11 @@ Demande la permission **Gérer les intégrations**.
 
 Une session ne sert qu'**une** issue : une fois terminée, échouée, annulée ou expirée, son lien cesse de fonctionner. Créez une nouvelle session pour réessayer.
 
+La page affiche le temps restant avant `expires_at` ; à zéro, elle se recharge dans son état expiré.
+
 ## Résultat
 
-Pour les deux objectifs, `result` liste les canaux connectés, au même format que `GET /channels` :
+Pour `whatsapp` et `mail`, `result` liste les canaux connectés, au même format que `GET /channels` :
 
 ```json
 {
@@ -119,6 +122,8 @@ Pour les deux objectifs, `result` liste les canaux connectés, au même format q
 ```
 
 Conservez l'`id` du canal : c'est le `channel_id` depuis lequel vous envoyez les messages. Un webhook `channel.connected` est aussi envoyé pour chaque nouveau canal.
+
+Pour `template`, `result.template` est le modèle, tel que renvoyé par `GET /templates/{id}`. Il reste `PENDING` jusqu'à l'examen de Meta : suivez-le avec le webhook `template.status_updated`. Si Meta refuse le modèle, la page en affiche la raison et la session reste ouverte, pour que votre utilisateur le corrige et le soumette à nouveau.
 
 ## Autres endpoints
 

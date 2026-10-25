@@ -16,22 +16,37 @@ A template is a message model approved by Meta. It is the only kind of message a
 
 ## Manage templates in the dashboard
 
-Open a WhatsApp number in **Communication > Channels > WhatsApp Business** and go to its templates.
+Templates have their own page: **Communication > WhatsApp templates**. It lists the templates of all your WhatsApp Business accounts, with their category, language, status and the numbers that can send them.
 
-- **Create** a template: fill in the parts above and add variables to the body.
-- **Publish** it to submit it to Meta. It is `PENDING` until Meta approves (`APPROVED`) or rejects it (`REJECTED`, with a reason).
-- **Sync** pulls the templates created directly in Meta Business Manager, and refreshes their status.
-- **Sample API Code** shows how to send the template through the API.
+{/* TODO screenshot: WhatsApp templates page with the Use, Sync with Meta and Publish actions. */}
 
-{/* TODO screenshot: templates of a number, with the Create, Sync and Publish actions. */}
+- **Create** a template in the editor: choose the WhatsApp number, the name, the language and the category, then write the header, the body with its variables, the footer and the buttons. Give an example for each variable: Meta reviews the template with them.
+- **Publish** submits it to Meta. The editor checks Meta's rules first (see [Rules](#rules-checked-before-publishing)), so you fix a template before it is rejected. It stays `PENDING` until Meta approves it (`APPROVED`) or rejects it (`REJECTED`, with a reason).
+- **Sync with Meta** pulls the templates created directly in Meta Business Manager, and refreshes their status.
+- **Use** shows the ready-to-copy code that sends the template, filled with its examples: API v2.0, PHP SDK and API v1.0.
 
 <Note>Only `APPROVED` templates can be sent. Meta also tracks the quality of each template (green, yellow, red) from how contacts react to it.</Note>
+
+## Three ways to create a template
+
+| Way | For whom |
+| --- | --- |
+| The dashboard editor | Your team. |
+| The API (`POST /templates`) | Your systems. See [Create WhatsApp templates](/api-reference/guides/create-templates). |
+| A hosted link (hosted session with the `template` purpose) | Your own clients, from your product: they write their template in the Shortext editor, without a dashboard account. See [Hosted sessions](/api-reference/hosted-sessions). |
+
+## Rules checked before publishing
+
+Shortext checks Meta's main rules before submitting a template:
+
+- a **utility** template needs at least one variable in its body; a marketing template does not;
+- the body cannot **start or end with a variable**, and each variable is used once;
+- a text **header** takes at most one variable; the **footer** takes none;
+- at most **10 buttons**, with quick replies grouped together (before or after the other buttons), at most **2 link buttons**, **1 call button** and **1 copy-code button** (copy code only in marketing templates);
+- a button text has at most **25 characters**; a dynamic link takes one variable, **at the very end** of the URL, and an example of the full link;
+- an **authentication** template takes its settings instead: code expiration (1 to 90 minutes), copy-code or one-tap autofill (one-tap needs the Android package name and the signature hash of the app).
 
 ## Send a template
 
 - From the dashboard: in a **campaign** to a segment of contacts, or from the Inbox when the window is closed.
 - From the API: `POST /conversations` with `message.type` `template`. See [Send a template](/api-reference/guides/send-a-template).
-
-## Coming soon
-
-A hosted template builder, so your own clients can create and submit templates from your product. See [Coming soon](/channels/coming-soon).

@@ -47,11 +47,11 @@ Each endpoint accepts the types that make sense for it: for example a Shortext i
 <ParamField body="content.header" type="object">
   For a **text** header with variables: `{ "name": "value" }`. For a **media** header: `{ "url": "https://..." }` (and `filename` for a document). Without `url`, the media stored with the template is sent.
 </ParamField>
-<ParamField body="content.buttons" type="array">
-  Parameters of dynamic buttons, in the WhatsApp Cloud API format.
+<ParamField body="content.buttons" type="object">
+  The value of each button that needs one, by its index (from 0, as listed by `GET /templates`): `{ "0": "A-1042", "1": "SAVE20" }`. The end of a dynamic link, the coupon of a copy-code button, or the payload of a quick reply.
 </ParamField>
-<ParamField body="content.category" type="string" default="utility">
-  `utility`, `marketing` or `authentication`.
+<ParamField body="content.code" type="string">
+  For an **authentication** template only: the one-time code (up to 15 characters). Shortext puts it in the body and in the code button.
 </ParamField>
 
 ```json
@@ -66,7 +66,7 @@ Each endpoint accepts the types that make sense for it: for example a Shortext i
 }
 ```
 
-In v2.0, Shortext checks a template before sending it to WhatsApp and answers `1002` with an explicit message when the template does not exist on the number, is not approved in that language, or misses a variable (`body.missing` lists them). See [Send a template](/api-reference/guides/send-a-template).
+The billing category is the one Meta approved for the template. In v2.0, Shortext checks a template before sending it to WhatsApp and answers `1002` with an explicit message when the template does not exist on the number, is not approved in that language, or misses a variable (`body.missing` lists them). See [Send a template](/api-reference/guides/send-a-template).
 
 ## Interactive
 

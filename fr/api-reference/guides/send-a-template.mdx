@@ -1,15 +1,17 @@
 ---
 title: Envoyer un modèle WhatsApp
-description: Trouvez un modèle approuvé, remplissez ses variables et envoyez-le par l'API.
+description: Trouvez un modèle approuvé, remplissez ses variables et ses boutons, et envoyez-le par l'API ou le SDK PHP.
 ---
 
 import StartConversation from '/snippets/code/start-conversation.mdx';
 
-Les modèles sont les seuls messages que WhatsApp accepte hors de la fenêtre de 24 heures. Ils sont créés et approuvés dans le tableau de bord, voir [Modèles WhatsApp](/fr/channels/whatsapp-templates).
+Les modèles sont les seuls messages que WhatsApp accepte hors de la fenêtre de 24 heures. Ils doivent d'abord être approuvés par Meta : créez-les dans le tableau de bord, par l'API ou avec un lien hébergé, voir [Créer des modèles WhatsApp](/fr/api-reference/guides/create-templates).
+
+<Tip>Dans le tableau de bord, l'action **Utiliser** d'un modèle (**Communication > Modèles WhatsApp**) donne le code prêt à copier qui l'envoie, rempli avec ses exemples : API v2.0, SDK PHP et API v1.0.</Tip>
 
 ## 1. Trouver le modèle
 
-`GET /templates?channel_id={identifiant du canal WhatsApp}&status=APPROVED` liste les modèles qu'un numéro peut envoyer :
+`GET /templates?channel_id={identifiant du canal WhatsApp}&status=APPROVED` liste les modèles qu'un numéro peut envoyer (clé avec **Envoyer des messages**) :
 
 ```json
 {
@@ -22,19 +24,39 @@ Les modèles sont les seuls messages que WhatsApp accepte hors de la fenêtre de
   "header": { "type": "NONE", "text": null, "variables": [], "media_url": null },
   "body": { "text": "Bonjour {{name}}, votre commande {{order}} est prête.", "variables": ["name", "order"] },
   "footer": null,
-  "buttons": []
+  "buttons": [
+    { "index": 0, "type": "URL", "text": "Suivre ma commande", "needs_value": true },
+    { "index": 1, "type": "QUICK_REPLY", "text": "Nous contacter", "needs_value": false }
+  ]
 }
 ```
 
-`body.variables` (et `header.variables` pour un en-tête texte) sont les valeurs que vous devez fournir.
+- `body.variables` (et `header.variables` pour un en-tête texte) sont les valeurs que vous devez fournir.
+- `buttons` liste les boutons dans l'ordre, avec leur `index`. Un bouton avec `needs_value: true` demande une valeur à l'envoi : la fin d'un lien dynamique, le code promo d'un bouton de copie, ou le code d'un modèle d'authentification.
 
 ## 2. L'envoyer
 
-Utilisez `message.type` `template`, le `name` et la `language` du modèle, et les variables par nom :
+Utilisez `message.type` `template`, le `name` et la `language` du modèle, les variables par nom, et les valeurs des boutons par index :
 
 <StartConversation />
 
 Pour envoyer un modèle dans une conversation existante, postez le même `message` sur `POST /conversations/{id}/messages`.
+
+### Boutons
+
+`content.buttons` donne la valeur de chaque bouton par son index (à partir de 0) :
+
+```json
+"buttons": { "0": "A-1042", "1": "SAVE20" }
+```
+
+| Bouton | Valeur |
+| --- | --- |
+| Lien dynamique (`URL` avec une variable) | La fin du lien : pour `https://shop.example/orders/{{1}}`, envoyez `A-1042`. Obligatoire. |
+| Copie de code (`COPY_CODE`) | Le code promo. Obligatoire. |
+| Réponse rapide (`QUICK_REPLY`) | Facultatif : le payload qui vous revient quand le contact le touche. |
+
+Les liens statiques et les boutons d'appel ne prennent pas de valeur.
 
 ### En-tête média
 
@@ -46,6 +68,44 @@ Pour un modèle avec un en-tête image, vidéo ou document, donnez son URL :
 
 Sans `url`, le média enregistré avec le modèle est utilisé. Un document accepte aussi un `filename`.
 
+### Modèles d'authentification
+
+Un modèle d'authentification porte un code à usage unique. Envoyez-le dans `content.code` : Shortext le place dans le corps et dans le bouton du code.
+
+```json
+{
+  "type": "template",
+  "content": { "template_name": "login_code", "language": "en", "code": "482913" }
+}
+```
+
+### Catégorie facturée
+
+Vous êtes facturé selon la catégorie que Meta a approuvée pour le modèle (`UTILITY`, `MARKETING` ou `AUTHENTICATION`), quoi que vous envoyiez.
+
+## Avec le SDK PHP
+
+Le SDK PHP (`composer require nycorp/shortext-php`, version 2.1 ou plus récente) construit le même message :
+
+```php
+use NyCorp\Shortext\Messages\Contact;
+use NyCorp\Shortext\Messages\Message;
+use NyCorp\Shortext\Shortext;
+
+$shortext = new Shortext(getenv('SHORTEXT_API_KEY'));
+
+$result = $shortext->conversations()->start(
+    channel: 'whatsapp',
+    channelId: '532867649916076',
+    contact: Contact::make('237699999999')->lastname('Mbarga'),
+    message: Message::template('order_update', 'fr')
+        ->body(['name' => 'Brice', 'order' => 'A-1042'])
+        ->buttonValues([0 => 'A-1042']),
+);
+```
+
+Pour un modèle d'authentification : `Message::template('login_code', 'en')->code('482913')`.
+
 ## Erreurs
 
 Shortext vérifie le modèle avant de l'envoyer et répond `code` `1002` avec un message exploitable :
@@ -54,6 +114,8 @@ Shortext vérifie le modèle avant de l'envoyer et répond `code` `1002` avec un
 | --- | --- |
 | `Template order_update not found for this WhatsApp number` | Vérifiez le nom, et que le modèle appartient au compte WhatsApp Business de ce numéro. |
 | `Template order_update has no en version: fr` | Utilisez l'une des langues indiquées. |
-| `Template order_update (fr) is PENDING: only approved templates can be sent` | Attendez l'approbation de Meta. |
+| `Template order_update (fr) is PENDING: only approved templates can be sent` | Attendez l'approbation de Meta (webhook `template.status_updated`). |
 | `Missing body variables: order` | Fournissez chaque variable ; `body.missing` les liste. |
 | `Template ... has a image header: give message.content.header.url` | Fournissez l'URL du média. |
+| `Button 0 needs the end of its link: give it in content.buttons` | Donnez la valeur de chaque bouton avec `needs_value: true`. |
+| `The template has no button 2 (buttons are numbered from 0)` | Utilisez les index listés par `GET /templates`. |

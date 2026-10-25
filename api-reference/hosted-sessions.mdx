@@ -1,11 +1,11 @@
 ---
 title: Hosted sessions
-description: Let your own clients connect their WhatsApp number or mailbox on a Shortext page, from your product.
+description: Let your own clients connect their WhatsApp number or mailbox, or create a WhatsApp template, on a Shortext page, from your product.
 ---
 
 import HostedSession from '/snippets/code/hosted-session.mdx';
 
-A hosted session is a signed, expiring link to a page **hosted by Shortext**, where your user completes a step you cannot do in your own product: logging in to Meta to connect a WhatsApp Business number, or entering and checking mailbox settings. When they are done, they come back to your app and you receive the result.
+A hosted session is a signed, expiring link to a page **hosted by Shortext**, where your user completes a step you cannot do in your own product: logging in to Meta to connect a WhatsApp Business number, entering and checking mailbox settings, or writing a WhatsApp template in the Shortext editor. When they are done, they come back to your app and you receive the result.
 
 Typical case: you build a product on Shortext, and each of your clients connects their own WhatsApp number to the agent you set up for them.
 
@@ -37,13 +37,14 @@ Typical case: you build a product on Shortext, and each of your clients connects
 | --- | --- | --- |
 | `whatsapp` | Connect WhatsApp Business numbers with Meta embedded signup. | `agent_id`: the agent that answers on the numbers (default: your first agent). |
 | `mail` | Connect a mailbox with IMAP / SMTP; the connection is checked before saving. | `agent_id`: the agent that answers on the mailbox (default: your first agent). |
+| `template` | Write a WhatsApp template in the Shortext editor and submit it to Meta. | `channel_id` (required): a WhatsApp number, whose WhatsApp Business account owns the template. Optional: `name`, `category` (`MARKETING`, `UTILITY`, `AUTHENTICATION`), `language`, to prefill the editor. |
 
 ## Create a session
 
 Requires the **Manage integrations** permission.
 
 <ParamField body="purpose" type="string" required>
-  `whatsapp` or `mail`.
+  `whatsapp`, `mail` or `template`.
 </ParamField>
 <ParamField body="context" type="object">
   Options of the purpose, for example `{ "agent_id": "AGI-XXXXX" }`. The agent must belong to your company.
@@ -98,9 +99,11 @@ Requires the **Manage integrations** permission.
 
 A session serves **one** outcome: once it is completed, failed, cancelled or expired, its link stops working. Create a new session to try again.
 
+The page shows how much time is left before `expires_at`; at zero, it reloads to its expired state.
+
 ## Result
 
-For both purposes, `result` lists the connected channels, in the same format as `GET /channels`:
+For `whatsapp` and `mail`, `result` lists the connected channels, in the same format as `GET /channels`:
 
 ```json
 {
@@ -119,6 +122,8 @@ For both purposes, `result` lists the connected channels, in the same format as 
 ```
 
 Keep the channel `id`: it is the `channel_id` you send messages from. A `channel.connected` webhook is also sent for each new channel.
+
+For `template`, `result.template` is the template, as returned by `GET /templates/{id}`. It is `PENDING` until Meta reviews it: follow it with the `template.status_updated` webhook. If Meta refuses the template, the page shows why and the session stays open, so your user can fix it and submit again.
 
 ## Other endpoints
 

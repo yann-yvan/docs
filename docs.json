@@ -126,6 +126,7 @@
                     "group": "Guides",
                     "pages": [
                       "api-reference/guides/start-a-conversation",
+                      "api-reference/guides/create-templates",
                       "api-reference/guides/send-a-template",
                       "api-reference/guides/handover",
                       "api-reference/guides/connect-whatsapp",
@@ -264,6 +265,7 @@
                     "group": "Guides",
                     "pages": [
                       "fr/api-reference/guides/start-a-conversation",
+                      "fr/api-reference/guides/create-templates",
                       "fr/api-reference/guides/send-a-template",
                       "fr/api-reference/guides/handover",
                       "fr/api-reference/guides/connect-whatsapp",

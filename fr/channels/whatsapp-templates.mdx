@@ -16,22 +16,37 @@ Un modèle (template) est un message type approuvé par Meta. C'est le seul type
 
 ## Gérer les modèles dans le tableau de bord
 
-Ouvrez un numéro WhatsApp dans **Communication > Canaux > WhatsApp Business** et allez dans ses modèles.
+Les modèles ont leur propre page : **Communication > Modèles WhatsApp**. Elle liste les modèles de tous vos comptes WhatsApp Business, avec leur catégorie, leur langue, leur statut et les numéros qui peuvent les envoyer.
 
-- **Créez** un modèle : remplissez les parties ci-dessus et ajoutez des variables au corps.
-- **Publiez-le** (**Publish**) pour le soumettre à Meta. Il reste `PENDING` jusqu'à ce que Meta l'approuve (`APPROVED`) ou le rejette (`REJECTED`, avec un motif).
-- **Sync** récupère les modèles créés directement dans Meta Business Manager et met à jour leur statut.
-- **Sample API Code** montre comment envoyer le modèle par l'API.
+{/* TODO capture : page Modèles WhatsApp avec les actions Utiliser, Synchroniser avec Meta et Publier. */}
 
-{/* TODO capture : modèles d'un numéro, avec les actions Créer, Sync et Publish. */}
+- **Créez** un modèle dans l'éditeur : choisissez le numéro WhatsApp, le nom, la langue et la catégorie, puis rédigez l'en-tête, le corps avec ses variables, le pied de page et les boutons. Donnez un exemple pour chaque variable : Meta examine le modèle avec ces exemples.
+- **Publier** le soumet à Meta. L'éditeur vérifie d'abord les règles de Meta (voir [Règles](#règles-vérifiées-avant-la-publication)), pour que vous corrigiez un modèle avant qu'il ne soit rejeté. Il reste `PENDING` jusqu'à ce que Meta l'approuve (`APPROVED`) ou le rejette (`REJECTED`, avec un motif).
+- **Synchroniser avec Meta** récupère les modèles créés directement dans Meta Business Manager et met à jour leur statut.
+- **Utiliser** affiche le code prêt à copier qui envoie le modèle, rempli avec ses exemples : API v2.0, SDK PHP et API v1.0.
 
 <Note>Seuls les modèles `APPROVED` peuvent être envoyés. Meta suit aussi la qualité de chaque modèle (vert, jaune, rouge) selon la réaction des contacts.</Note>
+
+## Trois façons de créer un modèle
+
+| Moyen | Pour qui |
+| --- | --- |
+| L'éditeur du tableau de bord | Votre équipe. |
+| L'API (`POST /templates`) | Vos systèmes. Voir [Créer des modèles WhatsApp](/fr/api-reference/guides/create-templates). |
+| Un lien hébergé (session hébergée avec l'objectif `template`) | Vos propres clients, depuis votre produit : ils rédigent leur modèle dans l'éditeur Shortext, sans compte sur le tableau de bord. Voir [Sessions hébergées](/fr/api-reference/hosted-sessions). |
+
+## Règles vérifiées avant la publication
+
+Shortext vérifie les principales règles de Meta avant de soumettre un modèle :
+
+- un modèle **utility** demande au moins une variable dans son corps ; un modèle marketing, non ;
+- le corps ne peut pas **commencer ni finir par une variable**, et chaque variable n'est utilisée qu'une fois ;
+- un **en-tête** texte prend au plus une variable ; le **pied de page** n'en prend aucune ;
+- au plus **10 boutons**, avec les réponses rapides regroupées (avant ou après les autres boutons), au plus **2 boutons lien**, **1 bouton d'appel** et **1 bouton de copie de code** (copie de code uniquement dans les modèles marketing) ;
+- le texte d'un bouton fait au plus **25 caractères** ; un lien dynamique prend une variable, **tout à la fin** de l'URL, et un exemple du lien complet ;
+- un modèle d'**authentification** prend à la place ses réglages : expiration du code (1 à 90 minutes), copie du code ou remplissage automatique en un geste (ce dernier demande le nom de package Android et le hash de signature de l'application).
 
 ## Envoyer un modèle
 
 - Depuis le tableau de bord : dans une **campagne** vers un segment de contacts, ou depuis la boîte de réception quand la fenêtre est fermée.
 - Depuis l'API : `POST /conversations` avec `message.type` `template`. Voir [Envoyer un modèle](/fr/api-reference/guides/send-a-template).
-
-## Bientôt disponible
-
-Un éditeur de modèles hébergé, pour que vos propres clients créent et soumettent des modèles depuis votre produit. Voir [Bientôt disponible](/fr/channels/coming-soon).

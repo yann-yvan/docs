@@ -1,15 +1,17 @@
 ---
 title: Send a WhatsApp template
-description: Find an approved template, fill its variables and send it through the API.
+description: Find an approved template, fill its variables and buttons, and send it through the API or the PHP SDK.
 ---
 
 import StartConversation from '/snippets/code/start-conversation.mdx';
 
-Templates are the only messages WhatsApp accepts outside the 24-hour window. They are created and approved in the dashboard, see [WhatsApp templates](/channels/whatsapp-templates).
+Templates are the only messages WhatsApp accepts outside the 24-hour window. They must be approved by Meta first: create them in the dashboard, through the API or with a hosted link, see [Create WhatsApp templates](/api-reference/guides/create-templates).
+
+<Tip>In the dashboard, the **Use** action of a template (**Communication > WhatsApp templates**) gives the ready-to-copy code that sends it, filled with its examples: API v2.0, PHP SDK and API v1.0.</Tip>
 
 ## 1. Find the template
 
-`GET /templates?channel_id={whatsapp channel id}&status=APPROVED` lists the templates a number can send:
+`GET /templates?channel_id={whatsapp channel id}&status=APPROVED` lists the templates a number can send (key with **Send messages**):
 
 ```json
 {
@@ -22,19 +24,39 @@ Templates are the only messages WhatsApp accepts outside the 24-hour window. The
   "header": { "type": "NONE", "text": null, "variables": [], "media_url": null },
   "body": { "text": "Bonjour {{name}}, votre commande {{order}} est prête.", "variables": ["name", "order"] },
   "footer": null,
-  "buttons": []
+  "buttons": [
+    { "index": 0, "type": "URL", "text": "Track my order", "needs_value": true },
+    { "index": 1, "type": "QUICK_REPLY", "text": "Contact us", "needs_value": false }
+  ]
 }
 ```
 
-`body.variables` (and `header.variables` for a text header) are the values you must give.
+- `body.variables` (and `header.variables` for a text header) are the values you must give.
+- `buttons` lists the buttons in order, with their `index`. A button with `needs_value: true` needs a value when you send the template: the end of a dynamic link, the coupon of a copy-code button, or the code of an authentication template.
 
 ## 2. Send it
 
-Use `message.type` `template`, the template `name` and `language`, and the variables by name:
+Use `message.type` `template`, the template `name` and `language`, the variables by name, and the button values by index:
 
 <StartConversation />
 
 To send a template in an existing conversation, post the same `message` to `POST /conversations/{id}/messages`.
+
+### Buttons
+
+`content.buttons` gives the value of each button by its index (from 0):
+
+```json
+"buttons": { "0": "A-1042", "1": "SAVE20" }
+```
+
+| Button | Value |
+| --- | --- |
+| Dynamic link (`URL` with a variable) | The end of the link: for `https://shop.example/orders/{{1}}`, send `A-1042`. Required. |
+| Copy code (`COPY_CODE`) | The coupon code. Required. |
+| Quick reply (`QUICK_REPLY`) | Optional: the payload you get back when the contact taps it. |
+
+Static links and call buttons take no value.
 
 ### Media header
 
@@ -46,6 +68,44 @@ For a template with an image, video or document header, give its URL:
 
 Without `url`, the media stored with the template is used. A document also takes a `filename`.
 
+### Authentication templates
+
+An authentication template carries a one-time code. Send it in `content.code`: Shortext puts it in the body and in the code button.
+
+```json
+{
+  "type": "template",
+  "content": { "template_name": "login_code", "language": "en", "code": "482913" }
+}
+```
+
+### Billing category
+
+You are billed for the category Meta approved for the template (`UTILITY`, `MARKETING` or `AUTHENTICATION`), whatever you send.
+
+## With the PHP SDK
+
+The PHP SDK (`composer require nycorp/shortext-php`, version 2.1 or later) builds the same message:
+
+```php
+use NyCorp\Shortext\Messages\Contact;
+use NyCorp\Shortext\Messages\Message;
+use NyCorp\Shortext\Shortext;
+
+$shortext = new Shortext(getenv('SHORTEXT_API_KEY'));
+
+$result = $shortext->conversations()->start(
+    channel: 'whatsapp',
+    channelId: '532867649916076',
+    contact: Contact::make('237699999999')->lastname('Mbarga'),
+    message: Message::template('order_update', 'fr')
+        ->body(['name' => 'Brice', 'order' => 'A-1042'])
+        ->buttonValues([0 => 'A-1042']),
+);
+```
+
+For an authentication template: `Message::template('login_code', 'en')->code('482913')`.
+
 ## Errors
 
 Shortext checks the template before sending it and answers `code` `1002` with a message you can act on:
@@ -54,6 +114,8 @@ Shortext checks the template before sending it and answers `code` `1002` with a 
 | --- | --- |
 | `Template order_update not found for this WhatsApp number` | Check the name, and that the template belongs to the WhatsApp Business account of this number. |
 | `Template order_update has no en version: fr` | Use one of the languages listed. |
-| `Template order_update (fr) is PENDING: only approved templates can be sent` | Wait for Meta's approval. |
+| `Template order_update (fr) is PENDING: only approved templates can be sent` | Wait for Meta's approval (`template.status_updated` webhook). |
 | `Missing body variables: order` | Give every variable; `body.missing` lists them. |
 | `Template ... has a image header: give message.content.header.url` | Give the media URL. |
+| `Button 0 needs the end of its link: give it in content.buttons` | Give the value of every button with `needs_value: true`. |
+| `The template has no button 2 (buttons are numbered from 0)` | Use the indexes listed by `GET /templates`. |

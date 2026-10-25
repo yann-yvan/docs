@@ -1,0 +1,117 @@
+---
+title: Create WhatsApp templates
+description: Create and edit WhatsApp templates through the API, or let your clients write them on a Shortext page, and follow Meta's review.
+---
+
+A template is created on a WhatsApp number (its WhatsApp Business account owns it), checked against Meta's rules, then submitted to Meta for review. It can be sent once Meta approves it. You can create templates in the dashboard (see [WhatsApp templates](/channels/whatsapp-templates)), through the API, or with a hosted link.
+
+Creating and editing need a key with **Manage integrations**; reading templates only needs **Send messages**.
+
+## Create a template
+
+`POST /templates`
+
+```bash
+curl -X POST https://shortext.ny-corp.io/api/v2.0/templates \
+  -H "Authorization: Bearer $SHORTEXT_API_KEY" \
+  -H "Accept: application/json" -H "Content-Type: application/json" \
+  -d '{
+    "channel_id": "532867649916076",
+    "name": "Order update",
+    "language": "fr",
+    "category": "UTILITY",
+    "header": { "type": "TEXT", "text": "Commande {{order_number}}", "examples": { "order_number": "A-42" } },
+    "body": {
+      "text": "Bonjour {{name}}, votre commande {{order_number}} est en route.",
+      "examples": { "name": "Awa", "order_number": "A-42" }
+    },
+    "footer": "Acme, livraison rapide",
+    "buttons": [
+      { "type": "URL", "text": "Suivre ma commande", "url": "https://shop.example/orders/{{1}}", "example": "https://shop.example/orders/A-42" },
+      { "type": "QUICK_REPLY", "text": "Parler à un conseiller" }
+    ]
+  }'
+```
+
+| Field | Description |
+| --- | --- |
+| `channel_id` | Required on creation. A WhatsApp number of yours: the template belongs to its WhatsApp Business account. |
+| `name` | Required on creation. Normalized for Meta: `Order update` becomes `order_update`. |
+| `language` | Required on creation, for example `fr` or `en_US`. |
+| `category` | Required on creation: `MARKETING`, `UTILITY` or `AUTHENTICATION`. |
+| `header` | Optional. `type`: `NONE`, `TEXT`, `IMAGE`, `VIDEO` or `DOCUMENT`. A `TEXT` header has a `text` (up to 60 characters, one variable at most) and its `examples`; a media header has a `media_url`, downloaded by Shortext. |
+| `body` | `text` (up to 1,024 characters) with named variables such as `{{name}}`, and `examples`: **one example per variable**, which Meta uses to review the template. |
+| `footer` | Optional, up to 60 characters, no variable. |
+| `buttons` | Optional, up to 10: `type` `QUICK_REPLY`, `URL`, `PHONE_NUMBER` or `COPY_CODE`, with `text` (up to 25 characters), `url` and `example` for a link, `phone_number` for a call button (up to 20 characters), `example` for a copy-code button. |
+| `authentication` | For `AUTHENTICATION` only, instead of the header, body, footer and buttons: see below. |
+
+Shortext first checks Meta's rules (listed in [WhatsApp templates](/channels/whatsapp-templates#rules-checked-before-publishing)) and answers `1002` with the errors per field. Then it submits the template to Meta:
+
+- **accepted for review**: the response is the template, with the status `PENDING`;
+- **refused by Meta**: nothing is kept, and the `1002` message says why (`Meta refused the template: ...`).
+
+### Authentication templates
+
+Meta writes the text of authentication templates. You only choose their settings:
+
+```json
+{
+  "channel_id": "532867649916076",
+  "name": "login_code",
+  "language": "en",
+  "category": "AUTHENTICATION",
+  "authentication": {
+    "add_security_recommendation": true,
+    "code_expiration_minutes": 10,
+    "otp_type": "COPY_CODE"
+  }
+}
+```
+
+| Field | Description |
+| --- | --- |
+| `add_security_recommendation` | Adds "For your security, do not share this code." |
+| `code_expiration_minutes` | 1 to 90. |
+| `otp_type` | `COPY_CODE` (a button that copies the code) or `ONE_TAP` (autofill in your Android app). |
+| `package_name`, `signature_hash` | Required with `ONE_TAP`: your Android package name and the 11-character signature hash of the app. |
+
+Send these templates with `content.code`, see [Send a template](/api-reference/guides/send-a-template#authentication-templates).
+
+## Edit a template
+
+`PATCH /templates/{id}` changes the header, the body, the footer, the buttons or the authentication settings; what you do not send stays. The name, the language and the category cannot change.
+
+The change is submitted to Meta for a new review (Meta limits how often an approved template can be edited). If Meta refuses it, the template stays as it was and the `1002` message says why. A published authentication template cannot be edited.
+
+## Follow the review
+
+Meta reviews templates within minutes to a few hours. Subscribe a [webhook](/api-reference/webhooks) to `template.status_updated`: it is sent when Meta approves or rejects a template, or changes its category or its quality.
+
+```json
+{
+  "id": "evt_01JB8Z...",
+  "type": "template.status_updated",
+  "api_version": "v2.0",
+  "created_at": "2026-10-25T10:02:11+00:00",
+  "data": {
+    "template": { "id": "t4Hd6sFe", "name": "order_update", "language": "fr", "status": "APPROVED", "rejection_reason": null, "quality": "GREEN", "category": "UTILITY", "channels": ["532867649916076"] },
+    "previous": { "status": "PENDING" }
+  }
+}
+```
+
+`data.template` is the template as returned by `GET /templates/{id}` (shortened here); `previous` holds the values before the change. You can also poll `GET /templates/{id}`.
+
+## Let your clients write their templates
+
+If you build a product on Shortext, your clients can write their templates themselves in the Shortext editor, without a dashboard account: create a [hosted session](/api-reference/hosted-sessions) with the `template` purpose.
+
+```json
+{
+  "purpose": "template",
+  "context": { "channel_id": "532867649916076", "category": "MARKETING", "language": "fr" },
+  "return_url": "https://app.example.com/templates"
+}
+```
+
+`context.channel_id` is required; `name`, `category` and `language` prefill the editor. When the template is submitted, the session completes with `result.template` (`PENDING`), and the `hosted_session.completed` webhook is sent. If Meta refuses the template, the page shows why and the session stays open.

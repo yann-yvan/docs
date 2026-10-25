@@ -24,7 +24,7 @@ Create endpoints in the dashboard (**Developer > Webhooks**) or with the API (`P
 | --- | --- |
 | `url` | A public **HTTPS** URL. Private and local addresses are refused. |
 | `events` | Exact types (`message.received`), a prefix wildcard (`message.*`) or `*` for everything. |
-| `filters` | Optional. Only receive events whose context matches: `app` (an agent id), `channel` (`whatsapp`, `mail`, `shortext`), `channel_id`. |
+| `filters` | Optional. Only receive events whose context matches: `app` (an agent id), `channel` (`whatsapp`, `mail`, `shortext`), `channel_id`; for `template.status_updated`, `template` (its name) and `language`. |
 | `description` | Optional, for you. |
 
 The response contains the signing **`secret`, shown only once**. Store it with your other secrets.
@@ -47,9 +47,12 @@ The response contains the signing **`secret`, shown only once**. Store it with y
 | `agent.created` | An agent was created. |
 | `agent.updated` | An agent was updated (settings or instructions). |
 | `agent.deleted` | An agent was deleted. |
+| `template.status_updated` | Meta reviewed a WhatsApp template (approved, or rejected with a reason), or changed its category or its quality. |
 | `hosted_session.completed` | A [hosted session](/api-reference/hosted-sessions) was completed: `result` holds what it produced. |
 | `hosted_session.failed` | A hosted session failed: `error` says why. |
 | `webhook.test` | Sent on demand to check an endpoint. |
+
+A template belongs to a WhatsApp Business account: `template.status_updated` is sent to every company that has a number on that account.
 
 New event types can be added at any time: ignore the types you do not handle.
 
@@ -85,6 +88,7 @@ Every delivery is a `POST` with a JSON body:
 | `conversation.*` | `conversation_id`, `channel`, `channel_id` and `contact.identifier`. |
 | `channel.*` | A channel, as returned by `GET /channels`; `channel.agent_changed` adds `previous_agent`. |
 | `agent.*` | An agent, as returned by `GET /agents/{id}` (without its channels). |
+| `template.status_updated` | `template` (as returned by `GET /templates/{id}`) and `previous`: the values before the change, among `status`, `category` and `quality`. |
 | `hosted_session.*` | A hosted session, as returned by `GET /hosted-sessions/{id}`. |
 
 ## Headers

@@ -3379,6 +3379,53 @@
                         "bearerAuth": []
                     }
                 ]
+            },
+            "post": {
+                "tags": [
+                    "Templates"
+                ],
+                "summary": "Create a WhatsApp template",
+                "description": "Checked against Meta's rules, then sent to Meta for review: the template is PENDING until Meta approves it (webhook `template.status_updated`). Refused by Meta: nothing is kept and the error says why.",
+                "operationId": "createTemplate",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TemplateInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Template"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/templates/{id}": {
@@ -3398,6 +3445,63 @@
                         }
                     }
                 ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Template"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Templates"
+                ],
+                "summary": "Edit a WhatsApp template",
+                "description": "Header, body, footer, buttons or authentication settings; name, language and category stay. Sent to Meta for a new review (Meta limits the edits of an approved template); refused by Meta, the template stays as it was. A published authentication template cannot be edited.",
+                "operationId": "updateTemplate",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TemplateInput"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
@@ -5261,6 +5365,152 @@
                 },
                 "type": "object"
             },
+            "TemplateInput": {
+                "properties": {
+                    "channel_id": {
+                        "description": "Creation: a WhatsApp number of the company; the template belongs to its WhatsApp Business Account and every number of that account can send it",
+                        "type": "string"
+                    },
+                    "name": {
+                        "description": "Creation: normalized for Meta (`Order update` becomes `order_update`)",
+                        "type": "string"
+                    },
+                    "language": {
+                        "description": "Creation",
+                        "type": "string",
+                        "example": "fr"
+                    },
+                    "category": {
+                        "description": "Creation. A utility body has at least one variable; an authentication template only takes `authentication`",
+                        "type": "string",
+                        "enum": [
+                            "MARKETING",
+                            "UTILITY",
+                            "AUTHENTICATION"
+                        ]
+                    },
+                    "header": {
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "NONE",
+                                    "TEXT",
+                                    "IMAGE",
+                                    "VIDEO",
+                                    "DOCUMENT"
+                                ]
+                            },
+                            "text": {
+                                "description": "TEXT: 60 characters, one variable at most",
+                                "type": "string"
+                            },
+                            "examples": {
+                                "description": "`{ variable: example }`",
+                                "type": "object"
+                            },
+                            "media_url": {
+                                "description": "IMAGE, VIDEO, DOCUMENT: a public link to the file",
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "body": {
+                        "properties": {
+                            "text": {
+                                "description": "Variables like `{{order_number}}`, not at the very start or end",
+                                "type": "string",
+                                "example": "Hello {{name}}, your order {{order_number}} is ready."
+                            },
+                            "examples": {
+                                "description": "One example per variable: Meta reviews the template with them",
+                                "type": "object",
+                                "example": {
+                                    "name": "Awa",
+                                    "order_number": "A-42"
+                                }
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "footer": {
+                        "description": "60 characters, no variable",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "buttons": {
+                        "description": "Up to 10: quick replies grouped together, 2 links, 1 call, 1 copy code (marketing). A link with `{{1}}` at the end of the URL needs an `example`",
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "type": {
+                                    "type": "string",
+                                    "enum": [
+                                        "QUICK_REPLY",
+                                        "URL",
+                                        "PHONE_NUMBER",
+                                        "COPY_CODE"
+                                    ]
+                                },
+                                "text": {
+                                    "type": "string",
+                                    "maxLength": 25
+                                },
+                                "url": {
+                                    "type": "string",
+                                    "example": "https://shop.example/orders/{{1}}"
+                                },
+                                "example": {
+                                    "description": "URL: the full example link; COPY_CODE: an example code",
+                                    "type": "string"
+                                },
+                                "phone_number": {
+                                    "type": "string",
+                                    "example": "+237690000000"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "authentication": {
+                        "properties": {
+                            "add_security_recommendation": {
+                                "type": "boolean",
+                                "default": true
+                            },
+                            "code_expiration_minutes": {
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ],
+                                "maximum": 90,
+                                "minimum": 1
+                            },
+                            "otp_type": {
+                                "type": "string",
+                                "default": "COPY_CODE",
+                                "enum": [
+                                    "COPY_CODE",
+                                    "ONE_TAP"
+                                ]
+                            },
+                            "package_name": {
+                                "description": "ONE_TAP: the Android app",
+                                "type": "string"
+                            },
+                            "signature_hash": {
+                                "description": "ONE_TAP: 11 characters",
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
             "Agent": {
                 "properties": {
                     "id": {
@@ -6008,7 +6258,7 @@
                         ]
                     },
                     "content": {
-                        "description": "`text`: `{ text }`. `template`: `{ template_name, language, body?, header?, buttons?, category? }`. `interactive`: `{ type, body, action, header?, footer? }`. `media`: `{ media_type, media_url, caption?, filename?, mime? }` (media_type: image, video, document, audio)",
+                        "description": "`text`: `{ text }`. `template`: `{ template_name, language, body?, header?, buttons?, code? }` (body/header: `{ variable: value }`; buttons: `{ index: value }` for the buttons that need one, see GET /templates; code: the code of an authentication template). `interactive`: `{ type, body, action, header?, footer? }`. `media`: `{ media_type, media_url, caption?, filename?, mime? }` (media_type: image, video, document, audio)",
                         "type": "object",
                         "example": {
                             "text": "Hello, how can I help?"
@@ -6147,15 +6397,34 @@
                         ]
                     },
                     "buttons": {
+                        "description": "In order: `message.content.buttons` = `{ index: value }` for the buttons that need a value",
                         "type": "array",
                         "items": {
                             "properties": {
+                                "index": {
+                                    "type": "integer",
+                                    "example": 0
+                                },
                                 "type": {
                                     "type": "string",
+                                    "enum": [
+                                        "QUICK_REPLY",
+                                        "URL",
+                                        "PHONE_NUMBER",
+                                        "COPY_CODE",
+                                        "OTP"
+                                    ],
                                     "example": "URL"
                                 },
                                 "text": {
-                                    "type": "string"
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "needs_value": {
+                                    "description": "A dynamic link (its end), a copy code button (the coupon) or the code of an authentication template (or send `message.content.code`)",
+                                    "type": "boolean"
                                 }
                             },
                             "type": "object"
