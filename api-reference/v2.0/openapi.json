@@ -1264,7 +1264,7 @@
                     "Campaigns"
                 ],
                 "summary": "Create a campaign",
-                "description": "Created as a draft: check it (GET /campaigns/{id}/checks) and launch it (POST /campaigns/{id}/launch).",
+                "description": "Created as a draft: check it (`GET /campaigns/{id}/checks`) and launch it (`POST /campaigns/{id}/launch`).",
                 "operationId": "createCampaign",
                 "requestBody": {
                     "required": true,
