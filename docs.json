@@ -123,6 +123,14 @@
                     ]
                   },
                   {
+                    "group": "Campaigns and follow-ups",
+                    "pages": [
+                      "api-reference/guides/send-a-campaign",
+                      "api-reference/guides/campaign-report",
+                      "api-reference/guides/follow-ups"
+                    ]
+                  },
+                  {
                     "group": "Guides",
                     "pages": [
                       "api-reference/guides/start-a-conversation",
@@ -259,6 +267,14 @@
                       "fr/api-reference/webhooks",
                       "fr/api-reference/hosted-sessions",
                       "fr/api-reference/shortext-endpoint"
+                    ]
+                  },
+                  {
+                    "group": "Campagnes et relances",
+                    "pages": [
+                      "fr/api-reference/guides/send-a-campaign",
+                      "fr/api-reference/guides/campaign-report",
+                      "fr/api-reference/guides/follow-ups"
                     ]
                   },
                   {

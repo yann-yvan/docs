@@ -1,0 +1,114 @@
+---
+title: Lire le rapport d'une campagne
+description: Comptes, taux, comparaison, revenu, motifs d'échec et destinataires d'une campagne, et le calcul de chaque chiffre.
+---
+
+`GET /campaigns/{id}/report` donne les chiffres d'une campagne, au global et par canal, et ce qu'elle a coûté jusqu'ici. Il est rafraîchi toutes les quelques minutes. Il demande une clé avec **Voir les messages**.
+
+## Comptes
+
+| Compte | Signification |
+| --- | --- |
+| `total` | Destinataires de la campagne. |
+| `queued` | En attente d'envoi. |
+| `attempted` | Envoyés ou en échec : `sent` + `failed`. |
+| `sent` | Acceptés par le canal. |
+| `delivered` | Remis au destinataire. |
+| `read` | Lus par le destinataire. |
+| `responded` | Le destinataire a répondu. |
+| `failed` | Non remis. |
+
+Un message en échec compte **uniquement en échec**, même s'il a d'abord été accepté (un e-mail accepté puis rejeté). Ainsi `sent` + `failed` = `attempted`, et aucun taux ne dépasse 100.
+
+## Taux
+
+Chaque taux est un pourcentage **sur l'étape précédente**, pas sur le total :
+
+| Taux | Formule |
+| --- | --- |
+| `delivery_rate` | délivrés ÷ tentatives |
+| `open_rate` | lus ÷ délivrés |
+| `response_rate` | réponses ÷ lus |
+| `failure_rate` | échecs ÷ tentatives |
+| `intentions.rate` | destinataires avec une intention de relance ÷ réponses |
+
+Le `funnel` donne la même chaîne sous forme de liste : tentatives, délivrés, lus, réponses, intentions, chacun avec son compte et son taux sur l'étape précédente.
+
+## Comparaison
+
+`comparison` place chaque taux à côté de sa moyenne sur vos campagnes **terminées** de la même catégorie (ou sur toutes vos campagnes terminées quand aucune n'a encore cette catégorie), avec l'écart en **points** :
+
+```json
+{
+  "base": "category",
+  "campaigns": 6,
+  "rates": {
+    "delivery_rate": { "value": 96.2, "average": 94.8, "gap": 1.4 },
+    "open_rate": { "value": 71.5, "average": 76.0, "gap": -4.5 },
+    "response_rate": { "value": 18.3, "average": 12.1, "gap": 6.2 },
+    "failure_rate": { "value": 3.8, "average": 5.2, "gap": -1.4 }
+  }
+}
+```
+
+Un écart de `6.2` signifie 6,2 points au-dessus de votre moyenne (18,3 % contre 12,1 %), pas 6,2 % de plus. `gap` vaut `null` avant le premier envoi.
+
+## Rendement
+
+| Champ | Signification |
+| --- | --- |
+| `cost` | Facturé jusqu'ici. |
+| `revenue` | Les commandes d'un destinataire dans les **7 jours qui suivent la réception** de la campagne. |
+| `orders` | Le nombre de ces commandes. |
+| `profit` | revenu − coût. |
+| `roi_multiple` | revenu ÷ coût, en multiple : `4.2` signifie 4,2 gagnés par unité dépensée. `null` tant que rien n'est facturé. |
+| `cost_per_message`, `cost_per_response` | le coût divisé par les messages envoyés, et par les réponses. |
+
+## Échecs
+
+`failures` regroupe les messages en échec par motif :
+
+| Motif | Signification |
+| --- | --- |
+| `no_whatsapp` | Le numéro n'a pas de compte WhatsApp. |
+| `invalid_number` | Le numéro ou un paramètre n'est pas valide. |
+| `email_refused` | L'e-mail a été refusé ou rejeté. |
+| `limit_reached` | Une limite WhatsApp a été atteinte : débit d'envoi, protection anti-spam ou limite de messages marketing par utilisateur. |
+| `template_refused` | WhatsApp a refusé le modèle : absent, suspendu, rejeté ou paramètres erronés. |
+| `insufficient_credit` | Votre solde, ou le moyen de paiement de votre compte WhatsApp Business, n'a pas couvert l'envoi. |
+| `other` | Toute autre raison. |
+
+## Autres parties du rapport
+
+| Partie | Contenu |
+| --- | --- |
+| `timelines` | Délais moyens en secondes (jusqu'à la remise, la lecture, la réponse), sur les dates réelles de réception. |
+| `hourly` | Lectures et réponses par heure sur les 72 heures qui suivent le premier envoi, et `peak_response_hour`. |
+| `intentions` | Les destinataires avec une intention de relance, et pour chaque intention son compte et combien ont abouti à un ticket. |
+| `progress` | Pendant l'envoi : effectué, total, pourcentage, `estimated_end_at`, et `postponed` (en attente de la prochaine ouverture de la plage d'envoi). |
+| `source` | L'origine de l'audience : un segment (son nom), un fichier (son nom, ses lignes, les lignes rejetées), des contacts choisis à la main, ou automatique. |
+| `channels` | Les comptes, taux et délais de chaque canal. |
+
+## Destinataires
+
+`GET /campaigns/{id}/recipients` liste une ligne par contact et par canal, 50 par page :
+
+```json
+{
+  "contact": { "id": "...", "name": "Brice Mbarga", "identifier": "237699999999" },
+  "channel": "whatsapp",
+  "status": "failed",
+  "last_event": "2026-10-27T09:04:12+01:00",
+  "failure": { "reason": "no_whatsapp", "detail": "..." }
+}
+```
+
+`status` vaut `waiting`, `queued`, `sending`, `sent`, `delivered`, `read`, `responded` ou `failed`. Filtrez avec `filter` :
+
+| `filter` | Lignes |
+| --- | --- |
+| `all` | Tout le monde. |
+| `read_no_reply` | Lus, sans réponse : de bons candidats pour une [relance](/fr/api-reference/guides/follow-ups). |
+| `replied` | Ont répondu. |
+| `unread` | Délivrés, non lus. |
+| `failed` | En échec, avec leur motif. |

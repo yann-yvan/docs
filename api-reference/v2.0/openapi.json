@@ -1172,6 +1172,1101 @@
                 ]
             }
         },
+        "/campaigns": {
+            "get": {
+                "tags": [
+                    "Campaigns"
+                ],
+                "summary": "List campaigns",
+                "description": "Most recent first, 50 per page. Filter with `status` and `name`.",
+                "operationId": "listCampaigns",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "draft",
+                                "scheduled",
+                                "active",
+                                "paused",
+                                "ended",
+                                "failed"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "allOf": [
+                                                        {
+                                                            "$ref": "#/components/schemas/ApiPage"
+                                                        },
+                                                        {
+                                                            "properties": {
+                                                                "data": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "$ref": "#/components/schemas/Campaign"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Campaigns"
+                ],
+                "summary": "Create a campaign",
+                "description": "Created as a draft: check it (GET /campaigns/{id}/checks) and launch it (POST /campaigns/{id}/launch).",
+                "operationId": "createCampaign",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CampaignInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Campaign"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/campaigns/{id}": {
+            "get": {
+                "tags": [
+                    "Campaigns"
+                ],
+                "summary": "Get a campaign",
+                "operationId": "getCampaign",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "CMP-XXXXX"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Campaign"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Campaigns"
+                ],
+                "summary": "Delete a campaign",
+                "description": "Only a campaign that never sent anything (a draft, a failed one). Pause a running campaign instead.",
+                "operationId": "deleteCampaign",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The deleted Campaign",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Campaign"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Campaigns"
+                ],
+                "summary": "Update a campaign",
+                "description": "Partial update (PUT is accepted too) of a draft, failed or paused campaign.",
+                "operationId": "updateCampaign",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CampaignInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Campaign"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/campaigns/{id}/checks": {
+            "get": {
+                "tags": [
+                    "Campaigns"
+                ],
+                "summary": "Launch checks of a campaign",
+                "description": "What must be true before the campaign goes out; a `block` check stops the launch.",
+                "operationId": "checkCampaign",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/CampaignCheck"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/campaigns/{id}/estimate": {
+            "get": {
+                "tags": [
+                    "Campaigns"
+                ],
+                "summary": "Estimated cost of a campaign",
+                "description": "Reachable recipients per channel times the price of one message: its category (the template's on WhatsApp) and the recipient's country.",
+                "operationId": "estimateCampaign",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/CampaignEstimate"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/campaigns/{id}/launch": {
+            "post": {
+                "tags": [
+                    "Campaigns"
+                ],
+                "summary": "Launch a campaign",
+                "description": "Sends the campaign now, or at `start_at` when it is in the future. Refused with the blocking checks when one blocks. An automatic campaign becomes active and sends on each new conversation.",
+                "operationId": "launchCampaign",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "start_at": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "date-time"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Campaign"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/campaigns/{id}/pause": {
+            "post": {
+                "tags": [
+                    "Campaigns"
+                ],
+                "summary": "Pause a campaign",
+                "description": "The messages not sent yet wait; a start not reached yet is cancelled.",
+                "operationId": "pauseCampaign",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Campaign"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/campaigns/{id}/resume": {
+            "post": {
+                "tags": [
+                    "Campaigns"
+                ],
+                "summary": "Resume a paused campaign",
+                "description": "Sends the messages left waiting (within the send window).",
+                "operationId": "resumeCampaign",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Campaign"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/campaigns/{id}/duplicate": {
+            "post": {
+                "tags": [
+                    "Campaigns"
+                ],
+                "summary": "Duplicate a campaign",
+                "description": "A draft copy with the same settings, channels and messages, without audience (a segment is kept), dates or statistics.",
+                "operationId": "duplicateCampaign",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The new draft",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Campaign"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/campaigns/{id}/report": {
+            "get": {
+                "tags": [
+                    "Campaigns"
+                ],
+                "summary": "Report of a campaign",
+                "description": "Counts, rates and delays of the campaign, per channel too, and its cost so far. Refreshed every few minutes.",
+                "operationId": "getCampaignReport",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/CampaignReport"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/campaigns/{id}/recipients": {
+            "get": {
+                "tags": [
+                    "Campaigns"
+                ],
+                "summary": "Recipients of a campaign",
+                "description": "One row per contact and channel, 50 per page. `filter`: all, read_no_reply, replied, unread or failed.",
+                "operationId": "listCampaignRecipients",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "all",
+                                "read_no_reply",
+                                "replied",
+                                "unread",
+                                "failed"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "allOf": [
+                                                        {
+                                                            "$ref": "#/components/schemas/ApiPage"
+                                                        },
+                                                        {
+                                                            "properties": {
+                                                                "data": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "$ref": "#/components/schemas/CampaignRecipient"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/campaign-imports": {
+            "post": {
+                "tags": [
+                    "Campaigns"
+                ],
+                "summary": "Upload a contact file",
+                "description": "A .xlsx or .csv file (multipart, field `file`) with a phone number column. The columns are guessed from their headers; numbers without a country code get the company's.",
+                "operationId": "uploadCampaignImport",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "file": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/CampaignImport"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/campaign-imports/{id}": {
+            "get": {
+                "tags": [
+                    "Campaigns"
+                ],
+                "summary": "Get a contact file",
+                "description": "Its columns and, once checked, its report.",
+                "operationId": "getCampaignImport",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "IMP-XXXXX"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/CampaignImport"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Campaigns"
+                ],
+                "summary": "Map the columns of a contact file",
+                "description": "What each column holds, by index: `phone` (one column, required), `first_name`, `last_name`, `email`, `var:<key>` or `ignore`.",
+                "operationId": "mapCampaignImport",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "columns": {
+                                        "type": "object",
+                                        "example": [
+                                            "phone",
+                                            "first_name",
+                                            "var:amount"
+                                        ]
+                                    },
+                                    "has_header": {
+                                        "type": "boolean",
+                                        "default": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/CampaignImport"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/campaign-imports/{id}/check": {
+            "post": {
+                "tags": [
+                    "Campaigns"
+                ],
+                "summary": "Check a contact file",
+                "description": "Counts valid numbers, merged duplicates, invalid numbers (with their row), unsubscribed contacts and new contacts. A large file is checked in the background: GET it until its status is `checked`.",
+                "operationId": "checkCampaignImport",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "marketing": {
+                                        "description": "Count unsubscribed contacts out (they get no marketing campaign)",
+                                        "type": "boolean",
+                                        "default": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/CampaignImport"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/campaign-segments": {
+            "get": {
+                "tags": [
+                    "Campaigns"
+                ],
+                "summary": "List segments",
+                "description": "50 per page.",
+                "operationId": "listCampaignSegments",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "allOf": [
+                                                        {
+                                                            "$ref": "#/components/schemas/ApiPage"
+                                                        },
+                                                        {
+                                                            "properties": {
+                                                                "data": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "$ref": "#/components/schemas/CampaignSegment"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/campaign-segments/{id}": {
+            "get": {
+                "tags": [
+                    "Campaigns"
+                ],
+                "summary": "Get a segment",
+                "operationId": "getCampaignSegment",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "SEG-XXXXX"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/CampaignSegment"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/channels": {
             "get": {
                 "tags": [
@@ -2693,6 +3788,678 @@
                                                             "type": "object"
                                                         }
                                                     ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/follow-ups": {
+            "get": {
+                "tags": [
+                    "Follow-ups"
+                ],
+                "summary": "List follow-ups",
+                "description": "Next follow-up first, 50 per page. Filter with `status`, `conversation_id`, `type_id` and `campaign_id`.",
+                "operationId": "listFollowUps",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "scheduled",
+                                "resolved",
+                                "exhausted",
+                                "cancelled",
+                                "failed"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "conversation_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "type_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "campaign_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "allOf": [
+                                                        {
+                                                            "$ref": "#/components/schemas/ApiPage"
+                                                        },
+                                                        {
+                                                            "properties": {
+                                                                "data": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "$ref": "#/components/schemas/FollowUp"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Follow-ups"
+                ],
+                "summary": "Schedule a follow-up",
+                "description": "Follow-ups are sent until the contact replies, at the interval and up to the maximum of the type (or of its override for the sender). The text is written by the AI from `reason`, unless `message` is given. When a follow-up of the same type is already scheduled on the conversation, that one is returned.",
+                "operationId": "createFollowUp",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/FollowUpInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/FollowUp"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/follow-ups/{id}": {
+            "get": {
+                "tags": [
+                    "Follow-ups"
+                ],
+                "summary": "Get a follow-up",
+                "operationId": "getFollowUp",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "FUP-XXXXX"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/FollowUp"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/follow-ups/{id}/reschedule": {
+            "post": {
+                "tags": [
+                    "Follow-ups"
+                ],
+                "summary": "Reschedule a follow-up",
+                "description": "Moves the next follow-up of a scheduled one.",
+                "operationId": "rescheduleFollowUp",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "scheduled_at"
+                                ],
+                                "properties": {
+                                    "scheduled_at": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/FollowUp"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/follow-ups/{id}/resolve": {
+            "post": {
+                "tags": [
+                    "Follow-ups"
+                ],
+                "summary": "Resolve a follow-up",
+                "description": "The goal is reached: no more follow-ups are sent.",
+                "operationId": "resolveFollowUp",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "note": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/FollowUp"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/follow-ups/{id}/cancel": {
+            "post": {
+                "tags": [
+                    "Follow-ups"
+                ],
+                "summary": "Cancel a follow-up",
+                "description": "No more follow-ups are sent.",
+                "operationId": "cancelFollowUp",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "note": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/FollowUp"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/follow-up-types": {
+            "get": {
+                "tags": [
+                    "Follow-ups"
+                ],
+                "summary": "List follow-up types",
+                "description": "By name, 50 per page. Filter with `active`.",
+                "operationId": "listFollowUpTypes",
+                "parameters": [
+                    {
+                        "name": "active",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "allOf": [
+                                                        {
+                                                            "$ref": "#/components/schemas/ApiPage"
+                                                        },
+                                                        {
+                                                            "properties": {
+                                                                "data": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "$ref": "#/components/schemas/FollowUpType"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Follow-ups"
+                ],
+                "summary": "Create a follow-up type",
+                "operationId": "createFollowUpType",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/FollowUpTypeInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/FollowUpType"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/follow-up-types/{id}": {
+            "get": {
+                "tags": [
+                    "Follow-ups"
+                ],
+                "summary": "Get a follow-up type",
+                "operationId": "getFollowUpType",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "FUI-XXXXX"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/FollowUpType"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Follow-ups"
+                ],
+                "summary": "Delete a follow-up type",
+                "description": "Its follow-ups already scheduled still go out; set `active` to false to stop new ones only.",
+                "operationId": "deleteFollowUpType",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The deleted type",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/FollowUpType"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Follow-ups"
+                ],
+                "summary": "Update a follow-up type",
+                "description": "Partial update (PUT is accepted too). Scheduled follow-ups use the new settings from their next round.",
+                "operationId": "updateFollowUpType",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/FollowUpTypeInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/FollowUpType"
                                                 }
                                             },
                                             "type": "object"
@@ -5595,6 +7362,602 @@
                 },
                 "type": "object"
             },
+            "Campaign": {
+                "properties": {
+                    "id": {
+                        "description": "Public representation of campaigns, their contact files and segments (API v2.0)",
+                        "type": "string",
+                        "example": "CMP-XXXXX"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "category": {
+                        "type": "string",
+                        "enum": [
+                            "marketing",
+                            "transactional",
+                            "specialized"
+                        ]
+                    },
+                    "objective": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "trigger": {
+                        "description": "`scheduled`: sent once to an audience. `new_conversation`: sent on each new conversation while active.",
+                        "type": "string",
+                        "enum": [
+                            "scheduled",
+                            "new_conversation"
+                        ]
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "draft",
+                            "scheduled",
+                            "active",
+                            "paused",
+                            "ended",
+                            "failed"
+                        ]
+                    },
+                    "failure_reason": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "once_per_contact": {
+                        "description": "Automatic campaigns: a contact gets the message once",
+                        "type": [
+                            "boolean",
+                            "null"
+                        ]
+                    },
+                    "channels": {
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "channel": {
+                                    "type": "string",
+                                    "enum": [
+                                        "whatsapp",
+                                        "mail"
+                                    ]
+                                },
+                                "channel_id": {
+                                    "description": "The sender: WhatsApp phone number id or mailbox id (mbx_...)",
+                                    "type": "string"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "messages": {
+                        "description": "One message per channel, by channel",
+                        "type": "object",
+                        "example": {
+                            "whatsapp": {
+                                "type": "template",
+                                "template": {
+                                    "id": "TPL-XXXXX",
+                                    "name": "promo",
+                                    "language": "fr"
+                                },
+                                "variables": {
+                                    "name": {
+                                        "source": "field:firstname",
+                                        "fallback": "client"
+                                    }
+                                },
+                                "buttons": [
+                                    "promo-@firstname"
+                                ]
+                            },
+                            "mail": {
+                                "type": "email",
+                                "subject": "Our offer, @{firstname|dear customer}"
+                            }
+                        }
+                    },
+                    "audience": {
+                        "properties": {
+                            "source": {
+                                "type": "string",
+                                "enum": [
+                                    "segment",
+                                    "file",
+                                    "contacts"
+                                ]
+                            },
+                            "segment_id": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "import_id": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "recipients": {
+                                "description": "Recipients written to the campaign (a segment is evaluated when it starts)",
+                                "type": "integer"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "start_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "end_at": {
+                        "description": "Replies count for the campaign until this date",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "send_window": {
+                        "description": "Hours of the day it may send, in the company time zone",
+                        "properties": {
+                            "start": {
+                                "type": "string",
+                                "example": "08:00"
+                            },
+                            "end": {
+                                "type": "string",
+                                "example": "20:00"
+                            }
+                        },
+                        "type": [
+                            "object",
+                            "null"
+                        ]
+                    },
+                    "follow_up_intention_ids": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "paused_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "duplicated_from": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "CampaignInput": {
+                "description": "On update, only the fields given change. A scheduled or running campaign cannot be edited: pause it first.",
+                "properties": {
+                    "name": {
+                        "description": "Required on creation",
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "category": {
+                        "description": "Required on creation. Contacts who unsubscribed get no marketing campaign.",
+                        "type": "string",
+                        "enum": [
+                            "marketing",
+                            "transactional",
+                            "specialized"
+                        ]
+                    },
+                    "objective": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "trigger": {
+                        "description": "Required on creation",
+                        "type": "string",
+                        "enum": [
+                            "scheduled",
+                            "new_conversation"
+                        ]
+                    },
+                    "once_per_contact": {
+                        "type": "boolean"
+                    },
+                    "send_delay_minutes": {
+                        "description": "Automatic campaigns: wait after the conversation starts",
+                        "type": "integer"
+                    },
+                    "min_inactive_minutes": {
+                        "description": "Automatic campaigns: wait for the conversation to be quiet",
+                        "type": "integer"
+                    },
+                    "channels": {
+                        "description": "The senders, by their channel_id (GET /channels)",
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "channel_id": {
+                                    "type": "string"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "messages": {
+                        "description": "`whatsapp`: `{ template_id, variables: { name: { source, value?, fallback? } }, buttons?: { index: value }, header_url? }` (source: `field:firstname|lastname|name|email|phone|address|identifier`, `column:<key>` of the imported file, or `text` with `value`); an automatic campaign may send `{ text }` instead. `mail`: `{ subject, html }`. Texts accept `@firstname`, `@<column>` and `@{key|fallback}`.",
+                        "type": "object"
+                    },
+                    "audience": {
+                        "description": "Scheduled campaigns: `{ source: \"segment\", segment_id }`, `{ source: \"file\", import_id, save_as_segment? }` (a checked file, POST /campaign-imports) or `{ source: \"contacts\", contact_ids }`",
+                        "type": "object"
+                    },
+                    "start_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "end_at": {
+                        "description": "Required to launch",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "send_window": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "example": {
+                            "start": "08:00",
+                            "end": "20:00"
+                        }
+                    },
+                    "follow_up_intention_ids": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "CampaignCheck": {
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "enum": [
+                            "senders",
+                            "messages",
+                            "template",
+                            "audience",
+                            "variables",
+                            "dates",
+                            "credit"
+                        ]
+                    },
+                    "state": {
+                        "description": "`block` stops the launch",
+                        "type": "string",
+                        "enum": [
+                            "ok",
+                            "warn",
+                            "block"
+                        ]
+                    },
+                    "label": {
+                        "type": "string"
+                    },
+                    "detail": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "type": "object"
+            },
+            "CampaignEstimate": {
+                "properties": {
+                    "currency": {
+                        "type": "string",
+                        "example": "EUR"
+                    },
+                    "total": {
+                        "type": "number"
+                    },
+                    "channels": {
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "channel": {
+                                    "type": "string"
+                                },
+                                "recipients": {
+                                    "type": "integer"
+                                },
+                                "cost": {
+                                    "type": "number"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "plan_remaining": {
+                        "description": "Left in the plan, when the company has one",
+                        "type": [
+                            "number",
+                            "null"
+                        ]
+                    },
+                    "balance": {
+                        "type": "number"
+                    },
+                    "balance_after": {
+                        "type": "number"
+                    }
+                },
+                "type": "object"
+            },
+            "CampaignReport": {
+                "description": "A message that failed counts as failed only (an email accepted then bounced, for example): sent + failed = attempted, and no rate goes over 100.",
+                "properties": {
+                    "counts": {
+                        "description": "total, queued, attempted (sent or failed), sent, delivered, read, responded, failed",
+                        "type": "object"
+                    },
+                    "rates": {
+                        "description": "Percentages, each on its own base: delivery = delivered / attempted, open = read / delivered, response = responded / read, intention = intentions / responded, failure = failed / attempted",
+                        "type": "object"
+                    },
+                    "comparison": {
+                        "description": "Each rate next to its average over your ended campaigns (same category when there are some), and the gap in points (null before the first send)",
+                        "type": "object"
+                    },
+                    "funnel": {
+                        "description": "attempted, delivered, read, responded, intentions: count and rate on the step before",
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    },
+                    "timelines": {
+                        "description": "Average delays in seconds, on real receipt dates",
+                        "type": "object"
+                    },
+                    "hourly": {
+                        "description": "Reads and replies per hour since the first send (72 hours), with the peak reply hour of the day",
+                        "type": "object"
+                    },
+                    "failures": {
+                        "description": "Failures by motif: no_whatsapp, invalid_number, email_refused, limit_reached, template_refused, insufficient_credit, other",
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    },
+                    "intentions": {
+                        "description": "Recipients with a follow-up intention, and per intention: count and how many went on to a ticket",
+                        "type": "object"
+                    },
+                    "return": {
+                        "description": "cost, revenue (orders of a recipient within 7 days after receipt), orders, profit, roi_multiple (revenue per unit spent), cost_per_message, cost_per_response",
+                        "type": "object"
+                    },
+                    "progress": {
+                        "description": "done, total, percent, estimated_end_at (while sending), postponed (to the next opening of the send window)",
+                        "type": "object"
+                    },
+                    "source": {
+                        "description": "type: segment (name), file (name, rows, rejected), manual (contacts) or automatic",
+                        "type": "object"
+                    },
+                    "channels": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    },
+                    "cost": {
+                        "description": "Charged so far (same as return.cost)",
+                        "type": "number"
+                    }
+                },
+                "type": "object"
+            },
+            "CampaignRecipient": {
+                "properties": {
+                    "contact": {
+                        "properties": {
+                            "id": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "name": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "identifier": {
+                                "description": "Where the message went: phone number, or email address on the email channel",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "channel": {
+                        "type": "string",
+                        "example": "whatsapp"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "waiting",
+                            "queued",
+                            "sending",
+                            "sent",
+                            "delivered",
+                            "read",
+                            "responded",
+                            "failed"
+                        ]
+                    },
+                    "last_event": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "failure": {
+                        "properties": {
+                            "reason": {
+                                "type": "string",
+                                "enum": [
+                                    "no_whatsapp",
+                                    "invalid_number",
+                                    "email_refused",
+                                    "limit_reached",
+                                    "template_refused",
+                                    "insufficient_credit",
+                                    "other"
+                                ]
+                            },
+                            "detail": {
+                                "description": "The channel's message",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        },
+                        "type": [
+                            "object",
+                            "null"
+                        ]
+                    }
+                },
+                "type": "object"
+            },
+            "CampaignImport": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "example": "IMP-XXXXX"
+                    },
+                    "file_name": {
+                        "type": "string"
+                    },
+                    "rows": {
+                        "type": "integer"
+                    },
+                    "has_header": {
+                        "type": "boolean"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "uploaded",
+                            "mapped",
+                            "checking",
+                            "checked",
+                            "applying",
+                            "validated",
+                            "failed"
+                        ]
+                    },
+                    "columns": {
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "index": {
+                                    "type": "integer"
+                                },
+                                "header": {
+                                    "type": "string"
+                                },
+                                "samples": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "target": {
+                                    "description": "`phone` (required), `first_name`, `last_name`, `email`, `var:<key>` (a variable for the message) or `ignore`",
+                                    "type": "string"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "report": {
+                        "description": "After the check: rows, valid, duplicates, invalid (with invalid_rows: row, value, reason), opted_out, new_contacts",
+                        "type": [
+                            "object",
+                            "null"
+                        ]
+                    }
+                },
+                "type": "object"
+            },
+            "CampaignSegment": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "example": "SEG-XXXXX"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "type": {
+                        "description": "`rules`: contacts matching its rules when the campaign starts. `list`: a fixed list (saved from a file).",
+                        "type": "string",
+                        "enum": [
+                            "rules",
+                            "list"
+                        ]
+                    }
+                },
+                "type": "object"
+            },
             "Channel": {
                 "properties": {
                     "type": {
@@ -6056,6 +8419,329 @@
                 },
                 "type": "object"
             },
+            "FollowUp": {
+                "description": "A follow-up on a conversation: messages sent to the contact until they reply, or until the maximum of the type is reached.",
+                "properties": {
+                    "id": {
+                        "description": "Public representation of follow-ups and their types (API v2.0)",
+                        "type": "string",
+                        "example": "FUP-XXXXX"
+                    },
+                    "status": {
+                        "description": "`scheduled`: follow-ups still to send. `resolved`: the customer replied or someone closed it as done. `exhausted`: every follow-up was sent without a reply. `cancelled`. `failed`: the channel refused the sends.",
+                        "type": "string",
+                        "enum": [
+                            "scheduled",
+                            "resolved",
+                            "exhausted",
+                            "cancelled",
+                            "failed"
+                        ]
+                    },
+                    "type": {
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "example": "FUI-XXXXX"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "conversation_id": {
+                        "type": "string"
+                    },
+                    "channel": {
+                        "type": "string",
+                        "example": "whatsapp"
+                    },
+                    "contact": {
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "identifier": {
+                                "description": "Phone number or email address",
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "campaign_id": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "reason": {
+                        "description": "What is expected from the contact; the AI writes the follow-ups from it",
+                        "type": "string"
+                    },
+                    "message": {
+                        "description": "Fixed text sent instead of the AI-written one",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "set_by": {
+                        "type": "string",
+                        "enum": [
+                            "ai",
+                            "agent",
+                            "api"
+                        ]
+                    },
+                    "scheduled_at": {
+                        "description": "Next follow-up, while scheduled",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "sent": {
+                        "description": "Follow-ups sent so far",
+                        "type": "integer"
+                    },
+                    "max_follow_ups": {
+                        "type": "integer"
+                    },
+                    "last_sent_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "failed": {
+                        "description": "Sends the channel refused (not counted in `sent`)",
+                        "type": "integer"
+                    },
+                    "last_error": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "closed_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "closed_by": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "enum": [
+                            "customer_replied",
+                            "agent",
+                            "ai",
+                            "api",
+                            "max_followups_reached",
+                            "expired",
+                            "cancelled",
+                            "send_failed"
+                        ]
+                    },
+                    "note": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "FollowUpInput": {
+                "required": [
+                    "conversation_id",
+                    "type_id",
+                    "reason"
+                ],
+                "properties": {
+                    "conversation_id": {
+                        "description": "The conversation to follow up (GET /conversations)",
+                        "type": "string"
+                    },
+                    "type_id": {
+                        "description": "GET /follow-up-types",
+                        "type": "string",
+                        "example": "FUI-XXXXX"
+                    },
+                    "reason": {
+                        "description": "What is expected from the contact; the AI writes each follow-up from it",
+                        "type": "string",
+                        "maxLength": 2000
+                    },
+                    "message": {
+                        "description": "Fixed text to send instead of the AI-written one",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 4096
+                    },
+                    "scheduled_at": {
+                        "description": "First follow-up; by default after the delay of the type",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "campaign_id": {
+                        "description": "The campaign the follow-up belongs to",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "type": "object"
+            },
+            "FollowUpType": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "example": "FUI-XXXXX"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "slug": {
+                        "type": "string",
+                        "example": "payment_follow_up"
+                    },
+                    "description": {
+                        "description": "Tells the AI when to set this type",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "color": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "delay_minutes": {
+                        "description": "Before the first follow-up",
+                        "type": "integer"
+                    },
+                    "interval_minutes": {
+                        "description": "Between two follow-ups",
+                        "type": "integer"
+                    },
+                    "max_follow_ups": {
+                        "type": "integer"
+                    },
+                    "active": {
+                        "type": "boolean"
+                    },
+                    "overrides": {
+                        "description": "Settings for one sender, over the type's own",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/FollowUpTypeOverride"
+                        }
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "FollowUpTypeOverride": {
+                "properties": {
+                    "channel_id": {
+                        "description": "The sender: WhatsApp phone number id or mailbox id (GET /channels)",
+                        "type": "string"
+                    },
+                    "delay_minutes": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "interval_minutes": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "max_follow_ups": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    }
+                },
+                "type": "object"
+            },
+            "FollowUpTypeInput": {
+                "description": "On update, only the fields given change; `overrides`, when given, replaces them all.",
+                "properties": {
+                    "name": {
+                        "description": "Required on creation",
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "description": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "color": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "#22c55e"
+                    },
+                    "delay_minutes": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "example": 60
+                    },
+                    "interval_minutes": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "example": 1440
+                    },
+                    "max_follow_ups": {
+                        "type": "integer",
+                        "maximum": 10,
+                        "minimum": 1,
+                        "example": 2
+                    },
+                    "active": {
+                        "type": "boolean"
+                    },
+                    "overrides": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/FollowUpTypeOverride"
+                        }
+                    }
+                },
+                "type": "object"
+            },
             "KnowledgeDocument": {
                 "properties": {
                     "id": {
@@ -6233,6 +8919,20 @@
                     },
                     "status": {
                         "type": "string"
+                    },
+                    "source": {
+                        "description": "What sent the message",
+                        "type": "string",
+                        "enum": [
+                            "contact",
+                            "user",
+                            "ai",
+                            "api",
+                            "campaign",
+                            "follow_up",
+                            "external",
+                            "system"
+                        ]
                     },
                     "created_at": {
                         "type": "string",
@@ -7206,12 +9906,20 @@
             "description": "Billing"
         },
         {
+            "name": "Campaigns",
+            "description": "Campaigns"
+        },
+        {
             "name": "Channels",
             "description": "Channels"
         },
         {
             "name": "Conversations",
             "description": "Conversations"
+        },
+        {
+            "name": "Follow-ups",
+            "description": "Follow-ups"
         },
         {
             "name": "Account",

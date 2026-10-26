@@ -1,0 +1,114 @@
+---
+title: Read a campaign report
+description: Counts, rates, comparison, revenue, failure motifs and recipients of a campaign, and how each figure is computed.
+---
+
+`GET /campaigns/{id}/report` gives the figures of a campaign, overall and per channel, and what it cost so far. It is refreshed every few minutes. It needs a key with **View messages**.
+
+## Counts
+
+| Count | Meaning |
+| --- | --- |
+| `total` | Recipients of the campaign. |
+| `queued` | Waiting to be sent. |
+| `attempted` | Sent or failed: `sent` + `failed`. |
+| `sent` | Accepted by the channel. |
+| `delivered` | Delivered to the recipient. |
+| `read` | Read by the recipient. |
+| `responded` | The recipient replied. |
+| `failed` | Not delivered. |
+
+A message that failed counts as **failed only**, even if it was first accepted (an email accepted, then bounced). So `sent` + `failed` = `attempted`, and no rate goes over 100.
+
+## Rates
+
+Each rate is a percentage **on the step before**, not on the total:
+
+| Rate | Formula |
+| --- | --- |
+| `delivery_rate` | delivered ÷ attempted |
+| `open_rate` | read ÷ delivered |
+| `response_rate` | responded ÷ read |
+| `failure_rate` | failed ÷ attempted |
+| `intentions.rate` | recipients with a follow-up intention ÷ responded |
+
+The `funnel` gives the same chain as a list: attempted, delivered, read, responded, intentions, each with its count and its rate on the step before.
+
+## Comparison
+
+`comparison` puts each rate next to its average over your **ended** campaigns of the same category (or over all your ended campaigns when none has this category yet), with the gap in **points**:
+
+```json
+{
+  "base": "category",
+  "campaigns": 6,
+  "rates": {
+    "delivery_rate": { "value": 96.2, "average": 94.8, "gap": 1.4 },
+    "open_rate": { "value": 71.5, "average": 76.0, "gap": -4.5 },
+    "response_rate": { "value": 18.3, "average": 12.1, "gap": 6.2 },
+    "failure_rate": { "value": 3.8, "average": 5.2, "gap": -1.4 }
+  }
+}
+```
+
+A gap of `6.2` means 6.2 points above your average (18.3 % against 12.1 %), not 6.2 % more. `gap` is `null` before the first send.
+
+## Return
+
+| Field | Meaning |
+| --- | --- |
+| `cost` | Charged so far. |
+| `revenue` | The orders of a recipient within **7 days after receiving** the campaign. |
+| `orders` | The number of those orders. |
+| `profit` | revenue − cost. |
+| `roi_multiple` | revenue ÷ cost, as a multiple: `4.2` means 4.2 earned per unit spent. `null` while nothing is charged. |
+| `cost_per_message`, `cost_per_response` | cost divided by the messages sent, and by the replies. |
+
+## Failures
+
+`failures` groups the failed messages by motif:
+
+| Motif | Meaning |
+| --- | --- |
+| `no_whatsapp` | The number has no WhatsApp account. |
+| `invalid_number` | The number or a parameter is not valid. |
+| `email_refused` | The email was refused or bounced. |
+| `limit_reached` | A WhatsApp limit was reached: sending rate, spam protection or the limit of marketing messages per user. |
+| `template_refused` | WhatsApp refused the template: missing, paused, rejected or wrong parameters. |
+| `insufficient_credit` | Your balance, or the payment method of your WhatsApp Business account, did not cover the send. |
+| `other` | Any other reason. |
+
+## Other parts of the report
+
+| Part | Content |
+| --- | --- |
+| `timelines` | Average delays in seconds (to delivery, to reading, to reply), on real receipt dates. |
+| `hourly` | Reads and replies per hour over the 72 hours after the first send, and `peak_response_hour`. |
+| `intentions` | Recipients with a follow-up intention, and per intention its count and how many went on to a ticket. |
+| `progress` | While sending: done, total, percent, `estimated_end_at`, and `postponed` (waiting for the next opening of the send window). |
+| `source` | Where the audience comes from: a segment (its name), a file (its name, rows, rejected rows), contacts picked by hand, or automatic. |
+| `channels` | The counts, rates and delays of each channel. |
+
+## Recipients
+
+`GET /campaigns/{id}/recipients` lists one row per contact and channel, 50 per page:
+
+```json
+{
+  "contact": { "id": "...", "name": "Brice Mbarga", "identifier": "237699999999" },
+  "channel": "whatsapp",
+  "status": "failed",
+  "last_event": "2026-10-27T09:04:12+01:00",
+  "failure": { "reason": "no_whatsapp", "detail": "..." }
+}
+```
+
+`status` is `waiting`, `queued`, `sending`, `sent`, `delivered`, `read`, `responded` or `failed`. Filter with `filter`:
+
+| `filter` | Rows |
+| --- | --- |
+| `all` | Everyone. |
+| `read_no_reply` | Read, without a reply: good candidates for a [follow-up](/api-reference/guides/follow-ups). |
+| `replied` | Replied. |
+| `unread` | Delivered, not read. |
+| `failed` | Failed, with their motif. |
