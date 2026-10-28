@@ -28,9 +28,26 @@ Every endpoint that addresses a contact uses the same `contact` object:
 | --- | --- | --- |
 | WhatsApp | The phone number in E.164 format **without** the `+`, for example `237699999999` | `phone` |
 | Mailbox | The email address | `email` |
-| Shortext endpoint | Your own user id, for example `user-42` | `external_id` |
+| Shortext endpoint | Your own user id (`user-42`), or a phone number, an email address or a username, as set by `identifier_type` | `external_id` by default |
 
-On a Shortext endpoint, the identifier is only unique within your company: the same `user-42` in two companies is two different contacts. The API always gives you back your own id.
+### Identifier type on a Shortext endpoint
+
+<ParamField body="identifier_type" type="string" default="external_id">
+  Shortext endpoints only: what the `identifier` is. `external_id`, `phone`, `email` or `username`.
+</ParamField>
+
+| `identifier_type` | `identifier` |
+| --- | --- |
+| `external_id` (default) | Any value of yours, up to 200 characters, for example `user-42`. |
+| `username` | A username, up to 200 characters. |
+| `phone` | A phone number. It is normalized like a WhatsApp number: digits only, international format without `+`. `+237 6 90 00 00 01` is stored as `237690000001`. |
+| `email` | A valid email address, matched exactly as given (same case). |
+
+The identifier is stored and returned as you give it (normalized for `phone`).
+
+With `phone` or `email`, your user is **the same contact** as on WhatsApp or by email: a user who writes in your app and on your WhatsApp number is recognized as one person. Searching by identifier (`GET /conversations?contact=`, the [contact knowledge](/api-reference/guides/agent-knowledge#contact-knowledge) of the agent) then finds both channels, and the contact can also be reached by your WhatsApp and email [campaigns](/api-reference/guides/send-a-campaign).
+
+On WhatsApp and mailboxes, `identifier_type` is ignored: the channel sets the type.
 
 ## Profile
 

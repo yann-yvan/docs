@@ -57,7 +57,7 @@ The response is a channel with its id (`ste_...`) and `settings.inbound_url`. Wh
 | --- | --- |
 | `channel` | `shortext`. |
 | `to` | The endpoint id, `ste_...`. |
-| `contact` | Your user, see [Contact format](/api-reference/contact-format): `identifier` is your own user id; the profile is optional. |
+| `contact` | Your user, see [Contact format](/api-reference/contact-format): `identifier` is your own user id, or a phone number or an email address with `identifier_type` (`external_id` by default, `phone`, `email`, `username`); the profile is optional. |
 | `message.id` | **Your** id for this message, up to 100 characters. Used for idempotency. |
 | `message.type` | `text`. |
 | `message.content.text` | The text, up to 4,096 characters. |
@@ -65,6 +65,8 @@ The response is a channel with its id (`ste_...`) and `settings.inbound_url`. Wh
 | `reply_mode` | Optional: `sync` or `async`, overrides the endpoint setting for this message. |
 
 <Inbound />
+
+<Tip>If your users sign in with their phone number or email address, send it with `"identifier_type": "phone"` or `"email"`: the same person is then one contact across your app, WhatsApp and email. See [Contact format](/api-reference/contact-format#identifier-type-on-a-shortext-endpoint).</Tip>
 
 <Note>This endpoint is served under `/api/v1.0` and works with the same API keys as v2.0. It does not check key permissions.</Note>
 

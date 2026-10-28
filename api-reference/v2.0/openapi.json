@@ -6993,8 +6993,18 @@
                     "contact": {
                         "properties": {
                             "identifier": {
-                                "description": "Phone (E.164 without +), email or your own id for Shortext",
+                                "description": "Phone (E.164 without +), email or, on Shortext, any identifier typed by identifier_type",
                                 "type": "string"
+                            },
+                            "identifier_type": {
+                                "description": "Shortext only, external_id by default. phone and email are matched with the same contact on WhatsApp and email.",
+                                "type": "string",
+                                "enum": [
+                                    "external_id",
+                                    "phone",
+                                    "email",
+                                    "username"
+                                ]
                             },
                             "profile": {
                                 "properties": {

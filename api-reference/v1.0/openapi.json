@@ -841,7 +841,7 @@
                     "contact": {
                         "properties": {
                             "identifier": {
-                                "description": "Your own user id on the shortext channel",
+                                "description": "The identifier your server gave on the shortext channel",
                                 "type": "string",
                                 "example": "user-42"
                             },
@@ -937,10 +937,21 @@
                         ],
                         "properties": {
                             "identifier": {
-                                "description": "Your own user id. Must be unique within your company (prefix it if you have several user bases).",
+                                "description": "Your own user id, a phone number or an email address, as typed by identifier_type",
                                 "type": "string",
-                                "maxLength": 150,
+                                "maxLength": 200,
                                 "example": "user-42"
+                            },
+                            "identifier_type": {
+                                "description": "external_id by default. With phone (E.164) or email, the contact is the same as on WhatsApp or email.",
+                                "type": "string",
+                                "enum": [
+                                    "external_id",
+                                    "phone",
+                                    "email",
+                                    "username"
+                                ],
+                                "example": "external_id"
                             },
                             "profile": {
                                 "properties": {

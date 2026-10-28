@@ -57,7 +57,7 @@ La réponse est un canal avec son identifiant (`ste_...`) et `settings.inbound_u
 | --- | --- |
 | `channel` | `shortext`. |
 | `to` | L'identifiant de l'endpoint, `ste_...`. |
-| `contact` | Votre utilisateur, voir [Format des contacts](/fr/api-reference/contact-format) : `identifier` est votre propre identifiant utilisateur ; le profil est facultatif. |
+| `contact` | Votre utilisateur, voir [Format des contacts](/fr/api-reference/contact-format) : `identifier` est votre propre identifiant utilisateur, ou un numéro de téléphone ou une adresse e-mail avec `identifier_type` (`external_id` par défaut, `phone`, `email`, `username`) ; le profil est facultatif. |
 | `message.id` | **Votre** identifiant pour ce message, jusqu'à 100 caractères. Sert à l'idempotence. |
 | `message.type` | `text`. |
 | `message.content.text` | Le texte, jusqu'à 4 096 caractères. |
@@ -65,6 +65,8 @@ La réponse est un canal avec son identifiant (`ste_...`) et `settings.inbound_u
 | `reply_mode` | Facultatif : `sync` ou `async`, remplace le réglage de l'endpoint pour ce message. |
 
 <Inbound />
+
+<Tip>Si vos utilisateurs se connectent avec leur numéro de téléphone ou leur adresse e-mail, envoyez-le avec `"identifier_type": "phone"` ou `"email"` : une même personne forme alors un seul contact entre votre application, WhatsApp et l'e-mail. Voir [Format des contacts](/fr/api-reference/contact-format#type-d’identifiant-sur-un-endpoint-shortext).</Tip>
 
 <Note>Cet endpoint est servi sous `/api/v1.0` et fonctionne avec les mêmes clés API que la v2.0. Il ne vérifie pas les permissions des clés.</Note>
 
