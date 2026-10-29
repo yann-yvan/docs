@@ -218,8 +218,7 @@ Demande au contact de payer un montant. Vous donnez le montant ; Shortext crée 
       "parameters": {
         "amount": 25000,
         "currency": "XAF",
-        "order_id": "A-1042",
-        "callback_url": "https://api.example.com/payments/callback"
+        "order_id": "A-1042"
       }
     }
   }
@@ -232,9 +231,11 @@ Demande au contact de payer un montant. Vous donnez le montant ; Shortext crée 
 | `action.parameters.amount` | Obligatoire, un nombre. |
 | `action.parameters.currency` | Obligatoire, par exemple `XAF` ou `EUR`. |
 | `action.parameters.order_id` | Facultatif, votre référence de commande. |
-| `action.parameters.callback_url` | Facultatif, votre URL à prévenir du paiement. |
+| `action.parameters.callback_url` | **Déprécié**, sera retiré. Ne l'utilisez pas dans une nouvelle intégration. |
 
 Le bouton affiche « Pay {montant} {devise} ». Sans en-tête, Shortext ajoute un en-tête image avec la référence de la commande. N'envoyez ni `display_text` ni `url` : Shortext construit le bouton.
+
+<Warning>`callback_url` est déprécié et sera retiré : il ne reçoit plus de notification signée. Pour être prévenu quand le contact paie, abonnez un [endpoint webhook](/fr/api-reference/webhooks) à [`payment.succeeded`](/fr/api-reference/webhooks#paiement-reçu).</Warning>
 
 ## Carrousel
 

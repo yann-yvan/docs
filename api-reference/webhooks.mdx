@@ -47,6 +47,7 @@ The response contains the signing **`secret`, shown only once**. Store it with y
 | `agent.created` | An agent was created. |
 | `agent.updated` | An agent was updated (settings or instructions). |
 | `agent.deleted` | An agent was deleted. |
+| `payment.succeeded` | A payment link ([payment request](/api-reference/whatsapp-messages#payment-request) message) was paid. See [Payment received](#payment-received). |
 | `template.status_updated` | Meta reviewed a WhatsApp template (approved, or rejected with a reason), or changed its category or its quality. |
 | `hosted_session.completed` | A [hosted session](/api-reference/hosted-sessions) was completed: `result` holds what it produced. |
 | `hosted_session.failed` | A hosted session failed: `error` says why. |
@@ -90,6 +91,55 @@ Every delivery is a `POST` with a JSON body:
 | `agent.*` | An agent, as returned by `GET /agents/{id}` (without its channels). |
 | `template.status_updated` | `template` (as returned by `GET /templates/{id}`) and `previous`: the values before the change, among `status`, `category` and `quality`. |
 | `hosted_session.*` | A hosted session, as returned by `GET /hosted-sessions/{id}`. |
+| `payment.succeeded` | The paid link, the conversation and the contact, see below. |
+
+### Payment received
+
+`payment.succeeded` is sent when a contact pays a payment link, for example the one of a [payment request](/api-reference/whatsapp-messages#payment-request) message. Like every event, only the endpoints subscribed to it receive it (`payment.succeeded`, `payment.*` or `*`), signed, retried and listed in the deliveries.
+
+```json
+{
+  "id": "evt_01JB9A2C4E6G8J0L2N4Q6S8U0W",
+  "type": "payment.succeeded",
+  "api_version": "v2.0",
+  "created_at": "2026-10-29T17:00:00+00:00",
+  "data": {
+    "payment": {
+      "order_id": "A-1042",
+      "ref": "9b2f6c1e-4a7d-4c3b-8e5f-1d2a3b4c5d6e",
+      "amount": 5000,
+      "currency": "XAF",
+      "description": "Order A-1042",
+      "paid_at": "2026-10-29T17:00:00+00:00"
+    },
+    "conversation_id": "c9Lw3nYb",
+    "channel": "whatsapp",
+    "channel_id": "532867649916076",
+    "contact": {
+      "identifier": "237699999999",
+      "lastname": "Mbarga",
+      "firstname": "Brice",
+      "email": "brice@example.com"
+    }
+  }
+}
+```
+
+| Field | Description |
+| --- | --- |
+| `payment.order_id` | The order reference of the link. |
+| `payment.ref` | The reference of the payment link (a uuid). |
+| `payment.amount` | The amount paid, a number. |
+| `payment.currency` | The currency, for example `XAF`. |
+| `payment.description` | The description of the link. |
+| `payment.paid_at` | When the payment was received. |
+| `conversation_id` | The conversation the link was sent in, or `null`. |
+| `channel`, `channel_id` | The channel of that conversation, or `null`. |
+| `contact` | The contact who paid: `identifier`, `lastname`, `firstname`, `email`. |
+
+The `app`, `channel` and `channel_id` filters apply, taken from the conversation the link was sent in. A link created outside a conversation has no context: only the endpoints **without filters** receive its payment.
+
+<Tip>Deduplicate on the event `id`, and use `payment.order_id` or `payment.ref` to match the payment with your order.</Tip>
 
 ## Headers
 

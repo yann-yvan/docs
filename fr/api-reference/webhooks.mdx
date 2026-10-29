@@ -47,6 +47,7 @@ La réponse contient le **`secret` de signature, affiché une seule fois**. Cons
 | `agent.created` | Un agent a été créé. |
 | `agent.updated` | Un agent a été modifié (paramètres ou instructions). |
 | `agent.deleted` | Un agent a été supprimé. |
+| `payment.succeeded` | Un lien de paiement (message de [demande de paiement](/fr/api-reference/whatsapp-messages#demande-de-paiement)) a été réglé. Voir [Paiement reçu](#paiement-reçu). |
 | `template.status_updated` | Meta a examiné un modèle WhatsApp (approuvé, ou rejeté avec un motif), ou a changé sa catégorie ou sa qualité. |
 | `hosted_session.completed` | Une [session hébergée](/fr/api-reference/hosted-sessions) a abouti : `result` contient ce qu'elle a produit. |
 | `hosted_session.failed` | Une session hébergée a échoué : `error` dit pourquoi. |
@@ -90,6 +91,55 @@ Chaque livraison est un `POST` avec un corps JSON :
 | `agent.*` | Un agent, tel que renvoyé par `GET /agents/{id}` (sans ses canaux). |
 | `template.status_updated` | `template` (tel que renvoyé par `GET /templates/{id}`) et `previous` : les valeurs avant le changement, parmi `status`, `category` et `quality`. |
 | `hosted_session.*` | Une session hébergée, telle que renvoyée par `GET /hosted-sessions/{id}`. |
+| `payment.succeeded` | Le lien réglé, la conversation et le contact, voir ci-dessous. |
+
+### Paiement reçu
+
+`payment.succeeded` est envoyé quand un contact règle un lien de paiement, par exemple celui d'un message de [demande de paiement](/fr/api-reference/whatsapp-messages#demande-de-paiement). Comme tout événement, seuls les endpoints abonnés le reçoivent (`payment.succeeded`, `payment.*` ou `*`), signé, relancé et listé dans les livraisons.
+
+```json
+{
+  "id": "evt_01JB9A2C4E6G8J0L2N4Q6S8U0W",
+  "type": "payment.succeeded",
+  "api_version": "v2.0",
+  "created_at": "2026-10-29T17:00:00+00:00",
+  "data": {
+    "payment": {
+      "order_id": "A-1042",
+      "ref": "9b2f6c1e-4a7d-4c3b-8e5f-1d2a3b4c5d6e",
+      "amount": 5000,
+      "currency": "XAF",
+      "description": "Commande A-1042",
+      "paid_at": "2026-10-29T17:00:00+00:00"
+    },
+    "conversation_id": "c9Lw3nYb",
+    "channel": "whatsapp",
+    "channel_id": "532867649916076",
+    "contact": {
+      "identifier": "237699999999",
+      "lastname": "Mbarga",
+      "firstname": "Brice",
+      "email": "brice@example.com"
+    }
+  }
+}
+```
+
+| Champ | Description |
+| --- | --- |
+| `payment.order_id` | La référence de commande du lien. |
+| `payment.ref` | La référence du lien de paiement (un uuid). |
+| `payment.amount` | Le montant payé, un nombre. |
+| `payment.currency` | La devise, par exemple `XAF`. |
+| `payment.description` | La description du lien. |
+| `payment.paid_at` | La date de réception du paiement. |
+| `conversation_id` | La conversation dans laquelle le lien a été envoyé, ou `null`. |
+| `channel`, `channel_id` | Le canal de cette conversation, ou `null`. |
+| `contact` | Le contact qui a payé : `identifier`, `lastname`, `firstname`, `email`. |
+
+Les filtres `app`, `channel` et `channel_id` s'appliquent, repris de la conversation dans laquelle le lien a été envoyé. Un lien créé hors conversation n'a pas de contexte : seuls les endpoints **sans filtre** reçoivent son paiement.
+
+<Tip>Dédupliquez sur l'`id` de l'événement, et utilisez `payment.order_id` ou `payment.ref` pour rapprocher le paiement de votre commande.</Tip>
 
 ## En-têtes
 
