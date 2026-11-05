@@ -88,9 +88,13 @@ Only private conversations with the bot are supported, not groups.
 | Text | Formatting is rendered: `*bold*`, `_italic_`, `~strikethrough~` and `` `code` ``. |
 | Images, videos, documents | Sent and received. |
 | Voice messages | Sent and received; the agent can answer with a voice message. |
-| Stickers, locations | Received. |
+| Stickers | Sent and received. |
+| Locations | Sent and received; with a name and an address, a named place. |
+| Contact cards | Sent: one number shown, the others in the card. A phone number shared by the customer is received. |
 | Reply buttons and lists | Shown as buttons under the message. A tap comes back as a button reply. |
 | Call to action, payment link | Shown as a link button under the message. |
+
+See [Message format](/api-reference/message-format#rendering-by-channel) for the payloads.
 
 Limits:
 

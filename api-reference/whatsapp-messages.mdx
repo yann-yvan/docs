@@ -145,6 +145,58 @@ Images, videos, documents and voice or audio files, from a public URL Shortext d
 
 The caption (up to 1,024 characters) is shown under images, videos and documents; audio messages have none. WhatsApp applies its own limits on the size and the formats of media files.
 
+A **sticker** is a WebP image of 512 x 512 pixels, 100 KB at most (500 KB animated), sent without caption:
+
+```json
+{
+  "type": "media",
+  "content": {
+    "media_type": "sticker",
+    "media_url": "https://cdn.example.com/stickers/thanks.webp"
+  }
+}
+```
+
+## Location
+
+A position on a map. With a `name` and an `address`, WhatsApp shows them with the position.
+
+{/* TODO illustration: location message on WhatsApp. */}
+
+```json
+{
+  "type": "location",
+  "content": {
+    "latitude": 3.8667,
+    "longitude": 11.5167,
+    "name": "Acme Bastos",
+    "address": "Rue 1.750, Bastos, Yaoundé"
+  }
+}
+```
+
+## Contact card
+
+A contact card the customer can save, with 1 to 5 numbers.
+
+{/* TODO illustration: contact card message on WhatsApp. */}
+
+```json
+{
+  "type": "contact",
+  "content": {
+    "firstname": "Customer service",
+    "lastname": "Acme",
+    "phones": [
+      { "number": "+237 6 99 99 99 99", "type": "work" },
+      { "number": "+237 2 22 22 22 22", "type": "main" }
+    ]
+  }
+}
+```
+
+Fields and rendering on the other channels: [Message format](/api-reference/message-format#location).
+
 ## Template
 
 The only message you can send outside the 24-hour window: an approved model, with its header, its variables and its buttons. Give the value of its dynamic buttons in `content.buttons` (`{ "0": "A-1042" }`) and, for an authentication template, the code in `content.code`. See [Send a WhatsApp template](/api-reference/guides/send-a-template).
