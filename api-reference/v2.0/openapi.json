@@ -2273,7 +2273,7 @@
                     "Channels"
                 ],
                 "summary": "List channels",
-                "description": "Every WhatsApp number, mailbox and Shortext endpoint of the company, with the agent answering on it.",
+                "description": "Every WhatsApp number, mailbox, Shortext endpoint and Telegram bot of the company, with the agent answering on it.",
                 "operationId": "listChannels",
                 "parameters": [
                     {
@@ -2285,7 +2285,8 @@
                             "enum": [
                                 "whatsapp",
                                 "mail",
-                                "shortext"
+                                "shortext",
+                                "telegram"
                             ]
                         }
                     },
@@ -2350,7 +2351,8 @@
                             "enum": [
                                 "whatsapp",
                                 "mail",
-                                "shortext"
+                                "shortext",
+                                "telegram"
                             ]
                         }
                     },
@@ -2412,7 +2414,8 @@
                             "enum": [
                                 "whatsapp",
                                 "mail",
-                                "shortext"
+                                "shortext",
+                                "telegram"
                             ]
                         }
                     },
@@ -2491,7 +2494,8 @@
                             "enum": [
                                 "whatsapp",
                                 "mail",
-                                "shortext"
+                                "shortext",
+                                "telegram"
                             ]
                         }
                     },
@@ -2923,7 +2927,8 @@
                             "enum": [
                                 "whatsapp",
                                 "mail",
-                                "shortext"
+                                "shortext",
+                                "telegram"
                             ]
                         }
                     },
@@ -5046,6 +5051,162 @@
                 ]
             }
         },
+        "/channels/telegram": {
+            "post": {
+                "tags": [
+                    "Channels"
+                ],
+                "summary": "Connect a Telegram bot",
+                "description": "The token is checked with Telegram and the bot starts receiving at once. A bot can be connected once only. Your customers write to `https://t.me/<username>` and tap Start; add `?start=<code>` (64 characters at most, letters, digits, _ and -) to know where they come from.",
+                "operationId": "createTelegramBot",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TelegramBotInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Channel"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/channels/telegram/{id}": {
+            "delete": {
+                "tags": [
+                    "Channels"
+                ],
+                "summary": "Delete a Telegram bot",
+                "description": "Final: the bot stops receiving and its conversations leave the inbox (kept for audits). The bot itself stays yours in @BotFather.",
+                "operationId": "deleteTelegramBot",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The deleted Channel",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Channel"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Channels"
+                ],
+                "summary": "Update a Telegram bot",
+                "description": "Partial update: only the fields sent change (PUT is accepted too). Disabling stops the reception, enabling installs it again.",
+                "operationId": "updateTelegramBot",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "tga_xxx"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TelegramBotInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Channel"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/templates": {
             "get": {
                 "tags": [
@@ -6983,7 +7144,8 @@
                         "enum": [
                             "whatsapp",
                             "mail",
-                            "shortext"
+                            "shortext",
+                            "telegram"
                         ]
                     },
                     "channel_id": {
@@ -7138,6 +7300,34 @@
                             "string",
                             "null"
                         ]
+                    }
+                },
+                "type": "object"
+            },
+            "TelegramBotInput": {
+                "properties": {
+                    "bot_token": {
+                        "description": "Token given by @BotFather (/newbot). Required on creation; on update only to replace a regenerated token of the same bot. Never returned.",
+                        "type": "string",
+                        "example": "123456789:AAH..."
+                    },
+                    "name": {
+                        "description": "Internal name, the name of the bot by default",
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "agent_id": {
+                        "description": "Agent answering on the bot; null detaches it",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "AGI-XXXXX"
+                    },
+                    "enabled": {
+                        "description": "Disabled, the bot no longer receives messages",
+                        "type": "boolean",
+                        "default": true
                     }
                 },
                 "type": "object"
@@ -7976,12 +8166,13 @@
                         "enum": [
                             "whatsapp",
                             "mail",
-                            "shortext"
+                            "shortext",
+                            "telegram"
                         ],
                         "example": "whatsapp"
                     },
                     "id": {
-                        "description": "Channel id (the channel_id of the webhooks): WhatsApp phone number id, mailbox id (mbx_...) or Shortext endpoint id (ste_...)",
+                        "description": "Channel id (the channel_id of the webhooks): WhatsApp phone number id, mailbox id (mbx_...), Shortext endpoint id (ste_...) or Telegram bot id (tga_...)",
                         "type": "string",
                         "example": "532867649916076"
                     },
@@ -8009,7 +8200,7 @@
                         ]
                     },
                     "settings": {
-                        "description": "Shortext only: endpoint settings (null for the other channels)",
+                        "description": "Shortext: endpoint settings. Telegram: username, bot_url, receiving, last_error. Null for the other channels",
                         "properties": {
                             "client_type": {
                                 "type": "string",
@@ -8032,6 +8223,26 @@
                                 "type": "integer"
                             },
                             "webhook_url": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "username": {
+                                "description": "Telegram: the @username of the bot, without @",
+                                "type": "string"
+                            },
+                            "bot_url": {
+                                "description": "Telegram: link your customers open (add ?start=<code> to know where they come from)",
+                                "type": "string",
+                                "example": "https://t.me/AcmeBot"
+                            },
+                            "receiving": {
+                                "description": "Telegram: the bot is enabled and Telegram delivers its messages",
+                                "type": "boolean"
+                            },
+                            "last_error": {
+                                "description": "Telegram: last refusal of Telegram, null when all is well",
                                 "type": [
                                     "string",
                                     "null"
@@ -9322,6 +9533,10 @@
                     "terminal": {
                         "description": "Tickets moved here are closed",
                         "type": "boolean"
+                    },
+                    "pending": {
+                        "description": "Waiting on the customer or a third party: the status « Put on hold » moves tickets to",
+                        "type": "boolean"
                     }
                 },
                 "type": "object"
@@ -9346,6 +9561,10 @@
                         "default": false
                     },
                     "terminal": {
+                        "type": "boolean",
+                        "default": false
+                    },
+                    "pending": {
                         "type": "boolean",
                         "default": false
                     }

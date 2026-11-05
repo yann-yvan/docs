@@ -1210,8 +1210,10 @@
                                     "example": "ORDER001"
                                 },
                                 "callback_url": {
+                                    "description": "Deprecated: subscribe a webhook endpoint to payment.succeeded instead",
                                     "type": "string",
-                                    "example": "https://shortext.ny-corp.io/callback"
+                                    "example": "https://shortext.ny-corp.io/callback",
+                                    "deprecated": true
                                 }
                             },
                             "type": "object"

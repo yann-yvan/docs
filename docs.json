@@ -74,6 +74,7 @@
                   "channels/whatsapp",
                   "channels/whatsapp-templates",
                   "channels/mailbox",
+                  "channels/telegram",
                   "channels/shortext-endpoint",
                   "channels/coming-soon"
                 ]
@@ -221,6 +222,7 @@
                   "fr/channels/whatsapp",
                   "fr/channels/whatsapp-templates",
                   "fr/channels/mailbox",
+                  "fr/channels/telegram",
                   "fr/channels/shortext-endpoint",
                   "fr/channels/coming-soon"
                 ]
