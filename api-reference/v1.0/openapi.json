@@ -489,6 +489,107 @@
     },
     "components": {
         "schemas": {
+            "StickerMessageContent": {
+                "description": "message.type media: a WebP image, 512x512, 100 KB at most (500 KB animated)",
+                "required": [
+                    "media_type",
+                    "media_url"
+                ],
+                "properties": {
+                    "media_type": {
+                        "type": "string",
+                        "enum": [
+                            "sticker"
+                        ]
+                    },
+                    "media_url": {
+                        "type": "string",
+                        "format": "uri",
+                        "example": "https://example.com/sticker.webp"
+                    }
+                },
+                "type": "object"
+            },
+            "LocationMessageContent": {
+                "description": "message.type location. With a name and an address, the place shows as a card",
+                "required": [
+                    "latitude",
+                    "longitude"
+                ],
+                "properties": {
+                    "latitude": {
+                        "type": "number",
+                        "maximum": 90,
+                        "minimum": -90,
+                        "example": 3.8667
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "maximum": 180,
+                        "minimum": -180,
+                        "example": 11.5167
+                    },
+                    "name": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "Acme Bastos"
+                    },
+                    "address": {
+                        "type": "string",
+                        "maxLength": 1000,
+                        "example": "Rue 1.750, Bastos, Yaoundé"
+                    }
+                },
+                "type": "object"
+            },
+            "ContactMessageContent": {
+                "description": "message.type contact: a contact card the customer can save",
+                "required": [
+                    "firstname",
+                    "phones"
+                ],
+                "properties": {
+                    "firstname": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "Service client"
+                    },
+                    "lastname": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "Acme"
+                    },
+                    "phones": {
+                        "type": "array",
+                        "items": {
+                            "required": [
+                                "number"
+                            ],
+                            "properties": {
+                                "number": {
+                                    "type": "string",
+                                    "example": "+237 6 99 99 99 99"
+                                },
+                                "type": {
+                                    "type": "string",
+                                    "default": "cell",
+                                    "enum": [
+                                        "cell",
+                                        "main",
+                                        "iphone",
+                                        "home",
+                                        "work"
+                                    ]
+                                }
+                            },
+                            "type": "object"
+                        },
+                        "maxItems": 5,
+                        "minItems": 1
+                    }
+                },
+                "type": "object"
+            },
             "SendMessageRequest": {
                 "required": [
                     "channel",
@@ -501,7 +602,8 @@
                         "type": "string",
                         "enum": [
                             "whatsapp",
-                            "mail"
+                            "mail",
+                            "telegram"
                         ],
                         "example": "whatsapp"
                     },
@@ -558,7 +660,7 @@
                         "type": "object"
                     },
                     "from": {
-                        "description": "Id of the sending channel: WhatsApp phone id, mailbox id (mbx_...) or Shortext endpoint id (ste_...)",
+                        "description": "Id of the sending channel: WhatsApp phone id, mailbox id (mbx_...), Shortext endpoint id (ste_...) or Telegram bot id (tga_...)",
                         "type": "string",
                         "example": "1234567890"
                     },
@@ -574,7 +676,9 @@
                                     "text",
                                     "media",
                                     "interactive",
-                                    "template"
+                                    "template",
+                                    "location",
+                                    "contact"
                                 ],
                                 "example": "text"
                             },
@@ -597,6 +701,15 @@
                                     },
                                     {
                                         "$ref": "#/components/schemas/InteractiveButtonMessageContent"
+                                    },
+                                    {
+                                        "$ref": "#/components/schemas/StickerMessageContent"
+                                    },
+                                    {
+                                        "$ref": "#/components/schemas/LocationMessageContent"
+                                    },
+                                    {
+                                        "$ref": "#/components/schemas/ContactMessageContent"
                                     }
                                 ]
                             }

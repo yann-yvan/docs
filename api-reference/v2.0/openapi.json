@@ -9107,7 +9107,8 @@
                         "enum": [
                             "whatsapp",
                             "mail",
-                            "shortext"
+                            "shortext",
+                            "telegram"
                         ]
                     },
                     "channel_id": {
@@ -9175,11 +9176,13 @@
                             "text",
                             "template",
                             "interactive",
-                            "media"
+                            "media",
+                            "location",
+                            "contact"
                         ]
                     },
                     "content": {
-                        "description": "`text`: `{ text }`. `template`: `{ template_name, language, body?, header?, buttons?, code? }` (body/header: `{ variable: value }`; buttons: `{ index: value }` for the buttons that need one, see GET /templates; code: the code of an authentication template). `interactive`: `{ type, body, action, header?, footer? }`. `media`: `{ media_type, media_url, caption?, filename?, mime? }` (media_type: image, video, document, audio)",
+                        "description": "`text`: `{ text }`. `template`: `{ template_name, language, body?, header?, buttons?, code? }` (body/header: `{ variable: value }`; buttons: `{ index: value }` for the buttons that need one, see GET /templates; code: the code of an authentication template). `interactive`: `{ type, body, action, header?, footer? }`. `media`: `{ media_type, media_url, caption?, filename?, mime? }` (media_type: image, video, document, audio, sticker; a sticker is a WebP image, 512x512, 100 KB at most or 500 KB animated, without caption). `location`: `{ latitude, longitude, name?, address? }` (with a name and an address, the place shows as a card). `contact`: `{ firstname, lastname?, phones: [{ number, type? }] }` (1 to 5 numbers, type: cell, main, iphone, home, work). On email, a location or a contact is sent as text: name, address and map link, or name and numbers",
                         "type": "object",
                         "example": {
                             "text": "Hello, how can I help?"

@@ -145,6 +145,58 @@ Images, vidéos, documents et fichiers audio ou vocaux, à partir d'une URL publ
 
 La légende (1 024 caractères au plus) s'affiche sous les images, les vidéos et les documents ; les messages audio n'en ont pas. WhatsApp applique ses propres limites de taille et de format aux fichiers.
 
+Un **sticker** est une image WebP de 512 x 512 pixels, 100 Ko au plus (500 Ko animé), envoyée sans légende :
+
+```json
+{
+  "type": "media",
+  "content": {
+    "media_type": "sticker",
+    "media_url": "https://cdn.example.com/stickers/thanks.webp"
+  }
+}
+```
+
+## Position
+
+Une position sur une carte. Avec un `name` et une `address`, WhatsApp les affiche avec la position.
+
+{/* TODO illustration : message de position sur WhatsApp. */}
+
+```json
+{
+  "type": "location",
+  "content": {
+    "latitude": 3.8667,
+    "longitude": 11.5167,
+    "name": "Acme Bastos",
+    "address": "Rue 1.750, Bastos, Yaoundé"
+  }
+}
+```
+
+## Fiche contact
+
+Une fiche contact que le client peut enregistrer, avec 1 à 5 numéros.
+
+{/* TODO illustration : fiche contact sur WhatsApp. */}
+
+```json
+{
+  "type": "contact",
+  "content": {
+    "firstname": "Service client",
+    "lastname": "Acme",
+    "phones": [
+      { "number": "+237 6 99 99 99 99", "type": "work" },
+      { "number": "+237 2 22 22 22 22", "type": "main" }
+    ]
+  }
+}
+```
+
+Champs et rendu sur les autres canaux : [Format des messages](/fr/api-reference/message-format#position).
+
 ## Modèle
 
 Le seul message que vous pouvez envoyer hors de la fenêtre de 24 heures : un modèle approuvé, avec son en-tête, ses variables et ses boutons. Donnez la valeur de ses boutons dynamiques dans `content.buttons` (`{ "0": "A-1042" }`) et, pour un modèle d'authentification, le code dans `content.code`. Voir [Envoyer un modèle WhatsApp](/fr/api-reference/guides/send-a-template).

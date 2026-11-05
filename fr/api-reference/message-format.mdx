@@ -1,6 +1,6 @@
 ---
 title: Format des messages
-description: La grammaire unique qu'utilisent tous les endpoints pour décrire un message - texte, modèle, interactif et média.
+description: La grammaire unique qu'utilisent tous les endpoints pour décrire un message - texte, modèle, interactif, média, position et contact.
 ---
 
 Tous les endpoints qui envoient un message (démarrer une conversation, répondre, entrant Shortext, envoi v1.0), ainsi que chaque message d'une réponse ou d'un webhook, utilisent le même objet `message` :
@@ -12,14 +12,16 @@ Tous les endpoints qui envoient un message (démarrer une conversation, répondr
 }
 ```
 
-`type` vaut `text`, `template`, `interactive` ou `media` ; `content` en dépend.
+`type` vaut `text`, `template`, `interactive`, `media`, `location` ou `contact` ; `content` en dépend.
 
 | Type | À utiliser pour | Fenêtre WhatsApp de 24 heures |
 | --- | --- | --- |
 | `text` | Du texte simple | Dans la fenêtre uniquement |
 | `template` | Les modèles WhatsApp approuvés | Dans la fenêtre et en dehors |
 | `interactive` | Boutons de réponse, liens, flows, demandes de paiement, carrousels | Dans la fenêtre uniquement |
-| `media` | Images, vidéos, documents, audio | Dans la fenêtre uniquement |
+| `media` | Images, vidéos, documents, audio, stickers | Dans la fenêtre uniquement |
+| `location` | Une position ou un lieu sur une carte | Dans la fenêtre uniquement |
+| `contact` | Une fiche contact que le client peut enregistrer | Dans la fenêtre uniquement |
 
 Chaque endpoint accepte les types qui ont du sens pour lui : par exemple, un message entrant Shortext est uniquement `text`.
 
@@ -122,13 +124,13 @@ Voyez leur rendu sur WhatsApp dans [Types de messages WhatsApp](/fr/api-referenc
 ## Média
 
 <ParamField body="content.media_type" type="string" required>
-  `image`, `video`, `document` ou `audio`.
+  `image`, `video`, `document`, `audio` ou `sticker`.
 </ParamField>
 <ParamField body="content.media_url" type="string" required>
   Une URL publique depuis laquelle Shortext peut télécharger le fichier.
 </ParamField>
 <ParamField body="content.caption" type="string">
-  Jusqu'à 1 024 caractères (pas pour l'audio).
+  Jusqu'à 1 024 caractères (pas pour l'audio ni les stickers).
 </ParamField>
 <ParamField body="content.filename" type="string">
   Le nom de fichier affiché pour un document.
@@ -148,6 +150,83 @@ Voyez leur rendu sur WhatsApp dans [Types de messages WhatsApp](/fr/api-referenc
   }
 }
 ```
+
+### Sticker
+
+Un sticker est un message `media` avec `media_type` `sticker` : une image **WebP** de **512 x 512** pixels, **100 Ko** au plus (**500 Ko** s'il est animé), sans légende.
+
+```json
+{
+  "type": "media",
+  "content": {
+    "media_type": "sticker",
+    "media_url": "https://cdn.example.com/stickers/thanks.webp"
+  }
+}
+```
+
+## Position
+
+<ParamField body="content.latitude" type="number" required>
+  De `-90` à `90`.
+</ParamField>
+<ParamField body="content.longitude" type="number" required>
+  De `-180` à `180`.
+</ParamField>
+<ParamField body="content.name" type="string">
+  Le nom du lieu, 255 caractères au plus.
+</ParamField>
+<ParamField body="content.address" type="string">
+  Son adresse, 1 000 caractères au plus.
+</ParamField>
+
+```json
+{
+  "type": "location",
+  "content": {
+    "latitude": 3.8667,
+    "longitude": 11.5167,
+    "name": "Acme Bastos",
+    "address": "Rue 1.750, Bastos, Yaoundé"
+  }
+}
+```
+
+Avec un `name` **et** une `address`, le lieu s'affiche comme une carte de lieu ; sinon comme une position sur une carte.
+
+## Contact
+
+<ParamField body="content.firstname" type="string" required>
+  Le prénom (ou le nom du service), 255 caractères au plus.
+</ParamField>
+<ParamField body="content.lastname" type="string">
+  255 caractères au plus.
+</ParamField>
+<ParamField body="content.phones" type="array" required>
+  1 à 5 numéros `{ "number", "type" }`. `type` vaut `cell` (par défaut), `main`, `iphone`, `home` ou `work`.
+</ParamField>
+
+```json
+{
+  "type": "contact",
+  "content": {
+    "firstname": "Service client",
+    "lastname": "Acme",
+    "phones": [
+      { "number": "+237 6 99 99 99 99", "type": "work" },
+      { "number": "+237 2 22 22 22 22", "type": "main" }
+    ]
+  }
+}
+```
+
+## Rendu par canal
+
+| Message | WhatsApp | Telegram | E-mail | Endpoint Shortext |
+| --- | --- | --- | --- | --- |
+| `location` | Une position, avec le nom et l'adresse s'ils sont fournis | Un lieu nommé avec un nom et une adresse, sinon une position | Du texte : nom, adresse et lien Google Maps | Les données structurées, telles quelles |
+| `contact` | Une fiche contact | Une fiche contact : un numéro affiché, les autres dans la fiche | Du texte : nom et numéros | Les données structurées, telles quelles |
+| Sticker | Un sticker | Un sticker | Une pièce jointe | Les données structurées, telles quelles |
 
 ## Les messages dans les réponses et les webhooks
 
@@ -173,4 +252,5 @@ Les messages renvoyés par l'API et envoyés dans les webhooks `message.*` envel
 
 - `direction` vaut `inbound` (venant du contact) ou `outbound` (de l'agent IA, d'un membre de votre équipe ou de l'API).
 - `message.id` est l'identifiant sur le canal (identifiant de message WhatsApp ; sur un endpoint Shortext, votre propre identifiant de message).
+- Une position partagée par un contact (WhatsApp ou Telegram) arrive avec `message.type` `location` et son `content` (`latitude`, `longitude`, `name`, `address`) ; son texte lisible est « nom, adresse, lien vers la carte ». Sur Telegram, un numéro partagé par un contact arrive avec le type `contacts`. L'agent IA lit ces messages et y répond.
 - `status` vaut `received` pour les messages entrants, puis `sent`, `delivered`, `read` ou `failed` pour les messages sortants ; les changements sont envoyés par le webhook `message.status`.
