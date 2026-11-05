@@ -14,7 +14,7 @@ Demande une clé avec **Envoyer des messages**.
 
 | Champ | Description |
 | --- | --- |
-| `channel` | `whatsapp`, `mail` ou `shortext`. |
+| `channel` | `whatsapp`, `mail`, `shortext` ou `telegram`. |
 | `channel_id` | Votre canal, issu de `GET /channels`. |
 | `contact` | La personne à qui vous écrivez, voir [Format des contacts](/fr/api-reference/contact-format). |
 | `message` | Ce que vous envoyez, voir [Format des messages](/fr/api-reference/message-format). |
@@ -34,7 +34,7 @@ WhatsApp n'accepte les messages libres (texte, média, interactif) que dans les 
 | `POST /conversations` avec un modèle | Envoyé. |
 | `POST /conversations/{id}/messages` (réponse) | Une réponse libre est envoyée sous forme de modèle de notification, pour qu'elle atteigne le contact. |
 
-Les boîtes mail et les endpoints Shortext n'ont pas de fenêtre de ce type.
+Les boîtes mail, les endpoints Shortext et Telegram n'ont pas de fenêtre de ce type. Sur Telegram, vous ne pouvez écrire qu'à un contact qui a déjà démarré votre bot, voir [Telegram](/fr/channels/telegram#comment-les-clients-vous-joignent).
 
 <Tip>Pour décider à l'avance, regardez le dernier message entrant de la conversation (`GET /conversations/{id}/messages`) ou gardez l'heure du dernier webhook `message.received`.</Tip>
 

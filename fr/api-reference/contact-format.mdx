@@ -28,6 +28,7 @@ Tous les endpoints qui s'adressent à un contact utilisent le même objet `conta
 | --- | --- | --- |
 | WhatsApp | Le numéro au format E.164 **sans** le `+`, par exemple `237699999999` | `phone` |
 | Boîte mail | L'adresse e-mail | `email` |
+| Telegram | L'identifiant d'utilisateur Telegram du contact, par exemple `123456789` | `telegram_chat` |
 | Endpoint Shortext | Votre propre identifiant utilisateur (`user-42`), ou un numéro de téléphone, une adresse e-mail ou un nom d'utilisateur, selon `identifier_type` | `external_id` par défaut |
 
 ### Type d'identifiant sur un endpoint Shortext
@@ -47,7 +48,7 @@ L'identifiant est enregistré et renvoyé tel que vous le donnez (normalisé pou
 
 Avec `phone` ou `email`, votre utilisateur est **le même contact** que sur WhatsApp ou par e-mail : un utilisateur qui écrit dans votre application et sur votre numéro WhatsApp est reconnu comme une seule personne. La recherche par identifiant (`GET /conversations?contact=`, les [connaissances de contact](/fr/api-reference/guides/agent-knowledge#connaissances-de-contact) de l'agent) retrouve alors les deux canaux, et le contact devient aussi joignable par vos [campagnes](/fr/api-reference/guides/send-a-campaign) WhatsApp et e-mail.
 
-Sur WhatsApp et les boîtes mail, `identifier_type` est ignoré : le canal fixe le type.
+Sur WhatsApp, les boîtes mail et Telegram, `identifier_type` est ignoré : le canal fixe le type.
 
 ## Profil
 

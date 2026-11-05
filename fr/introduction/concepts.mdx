@@ -21,19 +21,20 @@ Votre forfait fixe le nombre d'agents que votre entreprise peut avoir.
 
 ## Canal
 
-Un **canal** est l'endroit où ont lieu les conversations. Shortext prend en charge trois types :
+Un **canal** est l'endroit où ont lieu les conversations. Shortext prend en charge quatre types :
 
 | Type | Ce que c'est | Identifiant du canal |
 | --- | --- | --- |
 | `whatsapp` | Un numéro WhatsApp Business connecté via Meta | L'identifiant du numéro de téléphone WhatsApp |
 | `mail` | Une boîte mail connectée en IMAP / SMTP | `mbx_...` |
 | `shortext` | Un endpoint avec lequel votre serveur ou votre application dialogue via l'API | `ste_...` |
+| `telegram` | Un bot Telegram connecté avec son token | `tga_...` |
 
 Chaque canal est rattaché à **un agent**, qui y répond. Un canal peut aussi être **détaché** : les messages sont toujours enregistrés, mais personne ne répond automatiquement.
 
 ## Contact
 
-Un **contact** est un client. Il est identifié par son **identifiant** sur le canal : un numéro de téléphone sur WhatsApp, une adresse e-mail sur une boîte mail, votre propre identifiant utilisateur sur un endpoint Shortext. Sur un endpoint Shortext, vous pouvez aussi identifier vos utilisateurs par leur numéro de téléphone ou leur adresse e-mail : une même personne forme alors un seul contact entre votre application, WhatsApp et l'e-mail.
+Un **contact** est un client. Il est identifié par son **identifiant** sur le canal : un numéro de téléphone sur WhatsApp, une adresse e-mail sur une boîte mail, votre propre identifiant utilisateur sur un endpoint Shortext, l'identifiant d'utilisateur Telegram sur Telegram. Sur un endpoint Shortext, vous pouvez aussi identifier vos utilisateurs par leur numéro de téléphone ou leur adresse e-mail : une même personne forme alors un seul contact entre votre application, WhatsApp et l'e-mail.
 
 ## Conversation et session
 

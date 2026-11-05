@@ -24,7 +24,7 @@ flowchart LR
 ```
 
 - **Une entreprise = un agent.** L'agent porte l'identité de l'entreprise : son nom, ses instructions (ton, règles, ce qu'il peut dire), sa base de connaissances, ses outils, ses tickets.
-- **Un agent, plusieurs canaux.** Un agent peut répondre sur autant de canaux que l'entreprise en possède : plusieurs numéros WhatsApp, des boîtes mail, des endpoints Shortext pour ses applications. Toutes les conversations de ces canaux reçoivent la réponse de l'agent de l'entreprise.
+- **Un agent, plusieurs canaux.** Un agent peut répondre sur autant de canaux que l'entreprise en possède : plusieurs numéros WhatsApp, des bots Telegram, des boîtes mail, des endpoints Shortext pour ses applications. Toutes les conversations de ces canaux reçoivent la réponse de l'agent de l'entreprise.
 - **Un compte, une facture.** Toute la consommation est débitée du portefeuille unique de votre compte. Vous gérez un abonnement, un solde et une série de factures, quel que soit le nombre d'entreprises.
 
 ## Ce que chaque agent garde séparé
@@ -36,7 +36,7 @@ Tout ce qui définit la façon dont une entreprise est servie appartient à son 
 | Instructions et réglages de l'IA | [Créer un agent](/fr/agents/creating-an-agent) |
 | Base de connaissances et connaissances de contact | [Connaissances de l'agent](/fr/api-reference/guides/agent-knowledge) |
 | Outils (appels aux API de l'entreprise) | [Outils](/fr/agents/tools-configuration) |
-| Canaux (numéros WhatsApp, boîtes mail, endpoints Shortext) | [Canaux](/fr/channels/overview) |
+| Canaux (numéros WhatsApp, bots Telegram, boîtes mail, endpoints Shortext) | [Canaux](/fr/channels/overview) |
 | Statuts de tickets et politiques de SLA | [Gérer les tickets](/fr/api-reference/guides/manage-tickets) |
 | Applications ouvertes par les liens dynamiques | [Liens dynamiques](/fr/api-reference/guides/dynamic-links) |
 
@@ -49,7 +49,7 @@ Et l'API permet de travailler entreprise par entreprise : filtrer les conversati
     Dans **Communication > Agents IA**, ou avec `POST /agents`. Donnez-lui le nom de l'entreprise, pour que votre équipe le reconnaisse dans la boîte de réception. Rédigez des instructions qui parlent au nom de cette entreprise.
   </Step>
   <Step title="Rattachez les canaux de l'entreprise à son agent">
-    Connectez chaque numéro WhatsApp, boîte mail ou endpoint Shortext et choisissez l'agent de l'entreprise. Vous pouvez aussi laisser l'entreprise connecter elle-même son numéro WhatsApp ou sa boîte mail depuis votre produit grâce à une [session hébergée](/fr/api-reference/guides/connect-whatsapp), en passant `context.agent_id` : le nouveau canal est directement rattaché au bon agent.
+    Connectez chaque numéro WhatsApp, bot Telegram, boîte mail ou endpoint Shortext et choisissez l'agent de l'entreprise. Vous pouvez aussi laisser l'entreprise connecter elle-même son numéro WhatsApp ou sa boîte mail depuis votre produit grâce à une [session hébergée](/fr/api-reference/guides/connect-whatsapp), en passant `context.agent_id` : le nouveau canal est directement rattaché au bon agent.
 
     <Warning>Passez toujours `context.agent_id` quand vous servez plusieurs entreprises : sans lui, le nouveau canal est rattaché au premier agent de votre compte.</Warning>
   </Step>

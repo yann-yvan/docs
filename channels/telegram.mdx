@@ -1,0 +1,110 @@
+---
+title: Telegram
+description: Connect a Telegram bot with its token so an agent answers your customers on Telegram.
+---
+
+Connect a Telegram bot to Shortext and an agent answers the customers who write to it. You create the bot yourself with ＠BotFather, Telegram's official bot, then give its token to Shortext: there is no page to log in to, the token is enough.
+
+## Connect a bot
+
+<Steps>
+  <Step title="Create the bot with ＠BotFather">
+    In Telegram, open [＠BotFather](https://t.me/BotFather), send `/newbot` and choose a name and a username for your bot (it must end with `bot`, for example `AcmeSupportBot`).
+
+    ＠BotFather answers with the bot's **token**, in the form `123456789:AA...`. Copy it.
+
+    <Warning>The token gives full control of the bot. Do not share it outside Shortext.</Warning>
+  </Step>
+  <Step title="Add the bot to Shortext">
+    Open **Communication > Channels > Telegram**, create a bot and paste the token.
+
+    {/* TODO screenshot: Telegram bot creation form. */}
+  </Step>
+  <Step title="Choose the agent">
+    Choose the agent that answers on this bot. You can change it at any time.
+  </Step>
+  <Step title="Save">
+    Shortext checks the token with Telegram and the bot starts receiving messages at once.
+  </Step>
+</Steps>
+
+The token is encrypted and never shown again, in the dashboard or the API.
+
+A bot can be connected only once. If the token is badly formed, refused by Telegram, or belongs to a bot that is already connected, the bot is not saved and the error says why.
+
+### With the API
+
+`POST /channels/telegram` connects a bot (**Manage integrations** permission):
+
+```json
+{
+  "bot_token": "123456789:AAH...",
+  "name": "Acme support",
+  "agent_id": "AGI-XXXXX",
+  "enabled": true
+}
+```
+
+| Field | Description |
+| --- | --- |
+| `bot_token` | Required. The token given by ＠BotFather. Never returned. |
+| `name` | Optional, an internal name. Default: the name of the bot. |
+| `agent_id` | Optional, the agent answering on the bot; `null` leaves it detached. |
+| `enabled` | Optional, `true` by default. |
+
+The response is the channel, as returned by `GET /channels`, with the id `tga_...` and these `settings`:
+
+| Setting | Description |
+| --- | --- |
+| `username` | The username of the bot, without `@`. |
+| `bot_url` | The link to share with your customers, for example `https://t.me/AcmeSupportBot`. |
+| `receiving` | `true` when the bot is enabled and Telegram delivers its messages. |
+| `last_error` | The last refusal from Telegram, `null` when all is well. |
+
+A wrong, refused or already connected token is a validation error (`1002`) on `bot_token`.
+
+`PATCH /channels/telegram/{id}` changes the fields you send, and `DELETE /channels/telegram/{id}` deletes the bot. List your bots with `GET /channels?type=telegram`, and attach or detach the agent with `PUT` and `DELETE /channels/telegram/{id}/agent`, as for the other channels.
+
+## How customers reach you
+
+On Telegram, the customer writes first: they open your bot and tap **Start**. A bot cannot write to someone who has never started it.
+
+Share the link of your bot, `https://t.me/<username>`, on your website, your emails or a QR code. To know where a customer comes from, add `?start=` followed by a code, for example `https://t.me/AcmeSupportBot?start=website`. The code is up to 64 characters: letters, digits, `_` and `-`.
+
+Once the customer has started the bot, you can write to them at any time: there is no 24-hour window and no template on Telegram.
+
+## Contacts
+
+A Telegram contact is identified by their **Telegram user id**. Telegram does not give their phone number or country, unless the customer chooses to share their number.
+
+A customer who blocks the bot is unsubscribed. If they start the bot again, they are subscribed again.
+
+Only private conversations with the bot are supported, not groups.
+
+## Messages
+
+| Type | On Telegram |
+| --- | --- |
+| Text | Formatting is rendered: `*bold*`, `_italic_`, `~strikethrough~` and `` `code` ``. |
+| Images, videos, documents | Sent and received. |
+| Voice messages | Sent and received; the agent can answer with a voice message. |
+| Stickers, locations | Received. |
+| Reply buttons and lists | Shown as buttons under the message. A tap comes back as a button reply. |
+| Call to action, payment link | Shown as a link button under the message. |
+
+Limits:
+
+- **4,096 characters** per message, **1,024** for a media caption;
+- files received from customers up to **20 MB**;
+- about **one message per second** in each conversation.
+
+Telegram sends no delivery or read receipts: a message accepted by Telegram is marked `delivered`.
+
+## Billing
+
+Each message sent on Telegram is billed at your company's **service** rate (plus the AI reply beyond your plan), with no provider fee: Telegram charges nothing. See [Balance and wallet movements](/api-reference/guides/balance).
+
+## Disable or delete a bot
+
+- **Disable** the bot to stop receiving messages; enable it again to resume. If you regenerate the token in ＠BotFather, update it in Shortext (`PATCH` with the new `bot_token`): only a token of the same bot is accepted.
+- **Delete** it when you no longer need it. It is final: the bot stops receiving and its conversations leave the Inbox (they are kept for audits). The bot itself stays yours in ＠BotFather.

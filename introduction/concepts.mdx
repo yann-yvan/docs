@@ -21,19 +21,20 @@ Your plan sets how many agents your company can have.
 
 ## Channel
 
-A **channel** is where conversations happen. Shortext supports three types:
+A **channel** is where conversations happen. Shortext supports four types:
 
 | Type | What it is | Channel id |
 | --- | --- | --- |
 | `whatsapp` | A WhatsApp Business number connected through Meta | The WhatsApp phone number id |
 | `mail` | A mailbox connected through IMAP / SMTP | `mbx_...` |
 | `shortext` | An endpoint your own server or app talks to through the API | `ste_...` |
+| `telegram` | A Telegram bot connected with its token | `tga_...` |
 
 Each channel is attached to **one agent**, which answers on it. A channel can also be **detached**: messages are still stored, nobody answers automatically.
 
 ## Contact
 
-A **contact** is a customer. It is identified by its **identifier** on the channel: a phone number on WhatsApp, an email address on a mailbox, your own user id on a Shortext endpoint. On a Shortext endpoint you can also identify users by their phone number or email address: the same person is then one contact across your app, WhatsApp and email.
+A **contact** is a customer. It is identified by its **identifier** on the channel: a phone number on WhatsApp, an email address on a mailbox, your own user id on a Shortext endpoint, the Telegram user id on Telegram. On a Shortext endpoint you can also identify users by their phone number or email address: the same person is then one contact across your app, WhatsApp and email.
 
 ## Conversation and session
 
