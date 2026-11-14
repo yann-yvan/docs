@@ -9,7 +9,7 @@ Chaque message envoyé par l'API suit le [format des messages](/fr/api-reference
 
 ## Texte
 
-Un texte de 4 096 caractères au plus. Quand le texte contient une URL commençant par `http://` ou `https://`, WhatsApp affiche un aperçu de la première, ou un lien cliquable si aucun aperçu n'est disponible.
+Un texte de 4 096 caractères au plus. Quand le texte contient une URL commençant par `http://` ou `https://`, WhatsApp affiche un aperçu de la première, ou un lien cliquable si aucun aperçu n'est disponible. Pour envoyer le lien sans son aperçu, mettez `preview_url` à `false`.
 
 <Frame>
   <img src="/images/text-message.png" alt="Un message texte sur WhatsApp" />
@@ -19,7 +19,8 @@ Un texte de 4 096 caractères au plus. Quand le texte contient une URL commença
 {
   "type": "text",
   "content": {
-    "text": "Votre commande A-1042 a quitté notre entrepôt. Suivez-la ici : https://www.example.com/track/A-1042"
+    "text": "Votre commande A-1042 a quitté notre entrepôt. Suivez-la ici : https://www.example.com/track/A-1042",
+    "preview_url": true
   }
 }
 ```
@@ -60,6 +61,70 @@ Quand le contact touche un bouton, son choix revient sous forme de message, reç
 | `body` | Obligatoire. Le texte du message. |
 | `footer` | Facultatif, 60 caractères au plus. |
 | `action` | Obligatoire. 1 à 3 boutons `{ "id", "title" }`. |
+
+`"type": "quick_reply"` est un alias de `button` : même `action`, mêmes limites, affiché sur WhatsApp en boutons de réponse.
+
+## Liste
+
+Un menu d'options regroupées en sections. Le contact touche le bouton pour ouvrir la liste, puis choisit une option.
+
+<Frame>
+  <img height="200" src="/images/interactive-list.png" alt="Un message liste" />
+</Frame>
+
+```json
+{
+  "type": "interactive",
+  "content": {
+    "type": "list",
+    "header": { "type": "text", "value": "Menu" },
+    "body": "Que souhaitez-vous commander ?",
+    "footer": "Livraison en 30 minutes",
+    "action": {
+      "button": "Voir le menu",
+      "sections": [
+        {
+          "title": "Pizzas",
+          "rows": [
+            { "id": "pizza_margherita", "title": "Margherita", "description": "Tomate, mozzarella, basilic" },
+            { "id": "pizza_regina", "title": "Regina", "description": "Jambon, champignons" }
+          ]
+        },
+        {
+          "title": "Boissons",
+          "rows": [
+            { "id": "drink_water", "title": "Eau" },
+            { "id": "drink_juice", "title": "Jus d'orange" }
+          ]
+        }
+      ]
+    }
+  }
+}
+```
+
+Toucher le bouton ouvre les options :
+
+<Frame>
+  <img height="150" src="/images/interactive-list-modal.png" alt="Les options d'une liste" />
+</Frame>
+
+L'option choisie revient comme un message, reçu par l'agent et par votre [webhook](/fr/api-reference/webhooks) `message.received`, comme pour les boutons de réponse.
+
+<Frame>
+  <img height="150" src="/images/interactive-list-reply.png" alt="La sélection du contact" />
+</Frame>
+
+| Champ | Limites |
+| --- | --- |
+| `header` | Facultatif, un en-tête texte `{ "type": "text", "value": "..." }` (60 caractères au plus). |
+| `body` | Obligatoire. Le texte du message. |
+| `footer` | Facultatif, 60 caractères au plus. |
+| `action.button` | Obligatoire. Le texte du bouton qui ouvre la liste, 20 caractères au plus. |
+| `action.sections` | Obligatoire. 1 à 10 sections, chacune avec un `title` et 1 à 10 `rows`. |
+| `rows[].id` | Obligatoire, unique dans la liste : il vous est renvoyé quand le contact choisit la ligne. |
+| `rows[].title` | Obligatoire, 24 caractères au plus. |
+| `rows[].description` | Facultatif, 72 caractères au plus. |
 
 ## Lien d'appel à l'action
 
@@ -326,9 +391,3 @@ Plusieurs cartes que le contact fait défiler, chacune avec une image ou une vid
 ```
 
 Chaque carte demande un en-tête de type `image` ou `video` et un texte de 160 caractères au plus.
-
-## Pas encore disponible
-
-Les **listes** (un menu d'options regroupées en sections) et les **réponses rapides** ne peuvent pas encore être envoyées par l'API. Cette page sera mise à jour quand elles le pourront.
-
-{/* TODO: payloads list et quick_reply quand l'API les prendra en charge. Illustrations disponibles pour les listes : /images/interactive-list.png, interactive-list-modal.png, interactive-list-reply.png. */}

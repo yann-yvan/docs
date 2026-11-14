@@ -9,7 +9,7 @@ Every message you send through the API uses the [message format](/api-reference/
 
 ## Text
 
-A text of up to 4,096 characters. When the text contains a URL starting with `http://` or `https://`, WhatsApp shows a preview of the first one, or a clickable link when no preview is available.
+A text of up to 4,096 characters. When the text contains a URL starting with `http://` or `https://`, WhatsApp shows a preview of the first one, or a clickable link when no preview is available. To send the link without its preview, set `preview_url` to `false`.
 
 <Frame>
   <img src="/images/text-message.png" alt="A text message on WhatsApp" />
@@ -19,7 +19,8 @@ A text of up to 4,096 characters. When the text contains a URL starting with `ht
 {
   "type": "text",
   "content": {
-    "text": "Your order A-1042 has left our warehouse. Track it here: https://www.example.com/track/A-1042"
+    "text": "Your order A-1042 has left our warehouse. Track it here: https://www.example.com/track/A-1042",
+    "preview_url": true
   }
 }
 ```
@@ -60,6 +61,70 @@ When the contact taps a button, their choice comes back as a message, received b
 | `body` | Required. The text of the message. |
 | `footer` | Optional, up to 60 characters. |
 | `action` | Required. 1 to 3 buttons `{ "id", "title" }`. |
+
+`"type": "quick_reply"` is an alias of `button`: same `action`, same limits, shown on WhatsApp as reply buttons.
+
+## List
+
+A menu of options grouped in sections. The contact taps the button to open the list, then picks one option.
+
+<Frame>
+  <img height="200" src="/images/interactive-list.png" alt="A list message" />
+</Frame>
+
+```json
+{
+  "type": "interactive",
+  "content": {
+    "type": "list",
+    "header": { "type": "text", "value": "Menu" },
+    "body": "What would you like to order?",
+    "footer": "Delivery in 30 minutes",
+    "action": {
+      "button": "See the menu",
+      "sections": [
+        {
+          "title": "Pizzas",
+          "rows": [
+            { "id": "pizza_margherita", "title": "Margherita", "description": "Tomato, mozzarella, basil" },
+            { "id": "pizza_regina", "title": "Regina", "description": "Ham, mushrooms" }
+          ]
+        },
+        {
+          "title": "Drinks",
+          "rows": [
+            { "id": "drink_water", "title": "Water" },
+            { "id": "drink_juice", "title": "Orange juice" }
+          ]
+        }
+      ]
+    }
+  }
+}
+```
+
+Tapping the button opens the options:
+
+<Frame>
+  <img height="150" src="/images/interactive-list-modal.png" alt="The options of a list" />
+</Frame>
+
+The chosen option comes back as a message, received by the agent and by your `message.received` [webhook](/api-reference/webhooks), as for reply buttons.
+
+<Frame>
+  <img height="150" src="/images/interactive-list-reply.png" alt="The contact's selection" />
+</Frame>
+
+| Field | Limits |
+| --- | --- |
+| `header` | Optional, a text header `{ "type": "text", "value": "..." }` (up to 60 characters). |
+| `body` | Required. The text of the message. |
+| `footer` | Optional, up to 60 characters. |
+| `action.button` | Required. The text of the button that opens the list, up to 20 characters. |
+| `action.sections` | Required. 1 to 10 sections, each with a `title` and 1 to 10 `rows`. |
+| `rows[].id` | Required, unique across the list: returned to you when the contact picks the row. |
+| `rows[].title` | Required, up to 24 characters. |
+| `rows[].description` | Optional, up to 72 characters. |
 
 ## Call-to-action link
 
@@ -326,9 +391,3 @@ Several cards the contact swipes, each with an image or a video, a text and a li
 ```
 
 Each card needs a header of type `image` or `video` and a body text of up to 160 characters.
-
-## Not available yet
-
-**Lists** (a menu of options grouped in sections) and **quick replies** cannot be sent through the API yet. This page will be updated when they are.
-
-{/* TODO: list and quick_reply payloads once the API supports them. Illustrations exist for lists: /images/interactive-list.png, interactive-list-modal.png, interactive-list-reply.png. */}

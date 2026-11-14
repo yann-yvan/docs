@@ -30,6 +30,9 @@ Each endpoint accepts the types that make sense for it: for example a Shortext i
 <ParamField body="content.text" type="string" required>
   The text, up to **4,096 characters**. On WhatsApp, a URL in the text is rendered as a link.
 </ParamField>
+<ParamField body="content.preview_url" type="boolean" default="true">
+  On WhatsApp, show a preview of the first link of the text. `false` sends the link without its preview.
+</ParamField>
 
 ```json
 { "type": "text", "content": { "text": "Your order A-1042 has left our warehouse." } }
@@ -73,13 +76,13 @@ The billing category is the one Meta approved for the template. In v2.0, Shortex
 ## Interactive
 
 <ParamField body="content.type" type="string" required>
-  `button` (reply buttons), `cta_url` (a button that opens a link), `flow`, `payment` or `carousel`. Their `action` is described in [WhatsApp message types](/api-reference/whatsapp-messages).
+  `button` (reply buttons), `quick_reply` (an alias of `button`), `list` (a menu of options in sections), `cta_url` (a button that opens a link), `flow`, `payment` or `carousel`. Their `action` is described in [WhatsApp message types](/api-reference/whatsapp-messages).
 </ParamField>
 <ParamField body="content.body" type="string" required>
   The text of the message.
 </ParamField>
 <ParamField body="content.action" type="array | object" required>
-  For `button`: a list of 1 to 3 buttons `{ "id", "title" }` (title up to 20 characters). For `cta_url`: `{ "parameters": { "display_text", "url" } }`. For the other types, see [WhatsApp message types](/api-reference/whatsapp-messages).
+  For `button` and `quick_reply`: a list of 1 to 3 buttons `{ "id", "title" }` (title up to 20 characters). For `list`: `{ "button", "sections": [ { "title", "rows": [ { "id", "title", "description" } ] } ] }`. For `cta_url`: `{ "parameters": { "display_text", "url" } }`. For the other types, see [WhatsApp message types](/api-reference/whatsapp-messages).
 </ParamField>
 <ParamField body="content.header" type="object">
   `{ "type": "text" | "image" | "video" | "document", "value": "text or URL", "filename": "for documents" }`. A text header is limited to 60 characters; `cta_url` accepts a text or an image header.

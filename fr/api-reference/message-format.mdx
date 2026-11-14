@@ -30,6 +30,9 @@ Chaque endpoint accepte les types qui ont du sens pour lui : par exemple, un mes
 <ParamField body="content.text" type="string" required>
   Le texte, jusqu'à **4 096 caractères**. Sur WhatsApp, une URL dans le texte s'affiche comme un lien.
 </ParamField>
+<ParamField body="content.preview_url" type="boolean" default="true">
+  Sur WhatsApp, afficher un aperçu du premier lien du texte. `false` envoie le lien sans son aperçu.
+</ParamField>
 
 ```json
 { "type": "text", "content": { "text": "Votre commande A-1042 a quitté notre entrepôt." } }
@@ -73,13 +76,13 @@ La catégorie facturée est celle que Meta a approuvée pour le modèle. En v2.0
 ## Interactif
 
 <ParamField body="content.type" type="string" required>
-  `button` (boutons de réponse), `cta_url` (un bouton qui ouvre un lien), `flow`, `payment` ou `carousel`. Leur `action` est décrite dans [Types de messages WhatsApp](/fr/api-reference/whatsapp-messages).
+  `button` (boutons de réponse), `quick_reply` (un alias de `button`), `list` (un menu d'options en sections), `cta_url` (un bouton qui ouvre un lien), `flow`, `payment` ou `carousel`. Leur `action` est décrite dans [Types de messages WhatsApp](/fr/api-reference/whatsapp-messages).
 </ParamField>
 <ParamField body="content.body" type="string" required>
   Le texte du message.
 </ParamField>
 <ParamField body="content.action" type="array | object" required>
-  Pour `button` : une liste de 1 à 3 boutons `{ "id", "title" }` (titre de 20 caractères au plus). Pour `cta_url` : `{ "parameters": { "display_text", "url" } }`. Pour les autres types, voir [Types de messages WhatsApp](/fr/api-reference/whatsapp-messages).
+  Pour `button` et `quick_reply` : une liste de 1 à 3 boutons `{ "id", "title" }` (titre de 20 caractères au plus). Pour `list` : `{ "button", "sections": [ { "title", "rows": [ { "id", "title", "description" } ] } ] }`. Pour `cta_url` : `{ "parameters": { "display_text", "url" } }`. Pour les autres types, voir [Types de messages WhatsApp](/fr/api-reference/whatsapp-messages).
 </ParamField>
 <ParamField body="content.header" type="object">
   `{ "type": "text" | "image" | "video" | "document", "value": "texte ou URL", "filename": "pour les documents" }`. Un en-tête texte est limité à 60 caractères ; `cta_url` accepte un en-tête texte ou image.
