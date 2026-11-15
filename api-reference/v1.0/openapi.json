@@ -1234,14 +1234,24 @@
                 "type": "object"
             },
             "InteractiveButtonMessageContent": {
-                "title": "Interactive Button Reply Message",
+                "title": "Interactive Message",
+                "required": [
+                    "type",
+                    "body",
+                    "action"
+                ],
                 "properties": {
                     "type": {
-                        "description": "Get the validation rules that apply to the request.",
+                        "description": "quick_reply is the same as button: reply buttons",
                         "type": "string",
                         "enum": [
                             "button",
-                            "payment"
+                            "quick_reply",
+                            "list",
+                            "cta_url",
+                            "payment",
+                            "flow",
+                            "carousel"
                         ],
                         "example": "button"
                     },
@@ -1261,6 +1271,13 @@
                             "value": {
                                 "type": "string",
                                 "example": "text or url to the media file"
+                            },
+                            "filename": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "example": "invoice.pdf"
                             }
                         },
                         "type": [
@@ -1269,80 +1286,116 @@
                         ]
                     },
                     "body": {
-                        "properties": {
-                            "text": {
-                                "type": "string",
-                                "example": "Voici deux options"
-                            }
-                        },
-                        "type": "string"
+                        "type": "string",
+                        "maxLength": 1024,
+                        "example": "Voici deux options"
                     },
                     "footer": {
-                        "properties": {
-                            "text": {
-                                "type": "string",
-                                "example": "Sélectionnez une option"
-                            }
-                        },
                         "type": [
                             "string",
                             "null"
-                        ]
-                    },
-                    "buttons": {
-                        "type": "array",
-                        "items": {
-                            "properties": {
-                                "id": {
-                                    "type": "string",
-                                    "example": "btn_1"
-                                },
-                                "title": {
-                                    "type": "string",
-                                    "example": "Option 1"
-                                }
-                            },
-                            "type": "object"
-                        }
-                    },
-                    "payment_detail": {
-                        "type": "array",
-                        "items": {
-                            "properties": {
-                                "amount": {
-                                    "type": "number",
-                                    "format": "float",
-                                    "example": "100"
-                                },
-                                "currency": {
-                                    "type": "string",
-                                    "example": "XAF"
-                                },
-                                "order_id": {
-                                    "type": "string",
-                                    "example": "ORDER001"
-                                },
-                                "callback_url": {
-                                    "description": "Deprecated: subscribe a webhook endpoint to payment.succeeded instead",
-                                    "type": "string",
-                                    "example": "https://shortext.ny-corp.io/callback",
-                                    "deprecated": true
-                                }
-                            },
-                            "type": "object"
-                        }
+                        ],
+                        "maxLength": 60,
+                        "example": "Sélectionnez une option"
                     },
                     "action": {
-                        "type": "array",
-                        "items": {
-                            "properties": {
-                                "url": {
-                                    "type": "string",
-                                    "example": "https://shortext.ny-corp.io"
-                                }
+                        "description": "button / quick_reply: the list of the buttons (up to 3). list: the button text and the sections. cta_url: parameters.display_text and parameters.url. payment: parameters.amount, parameters.currency, parameters.order_id.",
+                        "oneOf": [
+                            {
+                                "type": "array",
+                                "items": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "string",
+                                            "example": "btn_1"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "maxLength": 20,
+                                            "example": "Option 1"
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "maxItems": 3
                             },
-                            "type": "object"
-                        }
+                            {
+                                "properties": {
+                                    "button": {
+                                        "type": "string",
+                                        "maxLength": 20,
+                                        "example": "Voir les choix"
+                                    },
+                                    "sections": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "title": {
+                                                    "type": "string",
+                                                    "example": "Livraison"
+                                                },
+                                                "rows": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "example": "slot_morning"
+                                                            },
+                                                            "title": {
+                                                                "type": "string",
+                                                                "maxLength": 24,
+                                                                "example": "Matin"
+                                                            },
+                                                            "description": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ],
+                                                                "maxLength": 72
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            {
+                                "properties": {
+                                    "parameters": {
+                                        "properties": {
+                                            "display_text": {
+                                                "type": "string",
+                                                "example": "Ouvrir"
+                                            },
+                                            "url": {
+                                                "type": "string",
+                                                "example": "https://example.com"
+                                            },
+                                            "amount": {
+                                                "type": "number",
+                                                "example": 100
+                                            },
+                                            "currency": {
+                                                "type": "string",
+                                                "example": "XAF"
+                                            },
+                                            "order_id": {
+                                                "type": "string",
+                                                "example": "ORDER001"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        ]
                     }
                 },
                 "type": "object"
