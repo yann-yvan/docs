@@ -603,7 +603,9 @@
                         "enum": [
                             "whatsapp",
                             "mail",
-                            "telegram"
+                            "telegram",
+                            "messenger",
+                            "instagram"
                         ],
                         "example": "whatsapp"
                     },
@@ -660,7 +662,7 @@
                         "type": "object"
                     },
                     "from": {
-                        "description": "Id of the sending channel: WhatsApp phone id, mailbox id (mbx_...), Shortext endpoint id (ste_...) or Telegram bot id (tga_...)",
+                        "description": "Id of the sending channel: WhatsApp phone id, mailbox id (mbx_...), Shortext endpoint id (ste_...), Telegram bot id (tga_...), Messenger Page id (fbp_...) or Instagram account id (iga_...)",
                         "type": "string",
                         "example": "1234567890"
                     },

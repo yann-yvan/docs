@@ -3,14 +3,16 @@ title: Messenger et Instagram
 description: Connectez vos Pages Facebook et vos comptes Instagram professionnels pour qu'un agent réponde à vos messages Messenger et Instagram.
 ---
 
+<Note>Messenger et Instagram sont en accès anticipé pendant que Meta examine Shortext. Pour connecter votre Page dès maintenant, écrivez à [hello@ny-corp.io](mailto:hello@ny-corp.io).</Note>
+
 Connectez une Page Facebook et un agent répond aux clients qui lui écrivent sur **Messenger**. Connectez le compte **Instagram** professionnel lié à la Page et l'agent répond aussi à ses messages privés. Vous les connectez en vous identifiant sur Facebook depuis Shortext : aucun token à copier, aucun webhook à configurer.
 
 ## Avant de commencer
 
-- Une **Page Facebook** que vous gérez, avec le droit d'en gérer les messages.
-- Pour Instagram : un compte Instagram **professionnel** (entreprise ou créateur) **lié à cette Page**.
+- Une **Page Facebook** dont vous pouvez gérer les messages : contrôle total, ou accès Facebook avec les messages. Sans ce droit, la Page s'affiche mais ne peut pas être cochée.
+- Pour Instagram : un compte Instagram **professionnel** (entreprise ou créateur) **lié à cette Page**, avec **Autoriser l'accès aux messages** activé dans l'appli Instagram (**Paramètres > Messages > Outils connectés**).
 
-{/* TODO : confirmer le rôle exact demandé sur la Page. */}
+Vous connectez les deux avec votre compte Facebook, pas avec un identifiant Instagram.
 
 ## Connecter une Page ou un compte Instagram
 
@@ -48,7 +50,7 @@ Vos propres clients peuvent connecter leur Page et leur compte Instagram depuis 
 
 C'est le client qui écrit en premier : il ouvre votre Page sur Messenger, ou envoie un message privé à votre compte Instagram. Partagez le lien pour vous écrire, donné dans le canal (`contact_url` dans l'API) : `https://m.me/<page>` pour Messenger, `https://ig.me/m/<compte>` pour Instagram, sur votre site, vos réseaux sociaux ou en QR code.
 
-{/* TODO : confirmer le paramètre ?ref= pour savoir d'où vient un contact. */}
+Pour savoir d'où vient un contact, ajoutez `?ref=` suivi d'un code, par exemple `https://m.me/acme?ref=site`. Le code est rattaché au premier message envoyé depuis le lien (dans les métadonnées du message) ; une personne qui ouvre la conversation sans écrire n'envoie rien.
 
 ## La fenêtre de 24 heures
 
@@ -60,7 +62,10 @@ Meta ne permet à une entreprise de répondre que dans une fenêtre ouverte par 
 | De 24 heures à **7 jours** | Seulement une personne de votre équipe, depuis l'Inbox. |
 | Plus de 7 jours | Rien, jusqu'à ce que le client écrive à nouveau. |
 
-Hors de la fenêtre, un message est refusé avec un motif explicite. Il n'y a pas de modèles sur Messenger et Instagram.
+Hors de la fenêtre, un message est refusé avec un motif explicite. C'est une règle de Meta : il n'y a pas de modèles sur Messenger et Instagram pour écrire en premier, donc :
+
+- une [relance](/fr/api-reference/guides/follow-ups) automatique ne part que dans les 24 heures qui suivent le dernier message du client ;
+- les [campagnes](/fr/api-reference/guides/send-a-campaign) ne peuvent pas être envoyées sur Messenger et Instagram.
 
 ## Contacts
 
@@ -85,7 +90,7 @@ Voir [Format des messages](/fr/api-reference/message-format) pour le contenu de 
 
 ## Facturation
 
-{/* TODO : confirmer la facturation (tarif service, sans frais fournisseur). */}
+Chaque message envoyé sur Messenger ou Instagram est facturé au tarif **service** de votre entreprise, sans frais fournisseur : Meta ne facture rien sur ces canaux. Voir [Solde et mouvements du portefeuille](/fr/api-reference/guides/balance).
 
 ## Désactiver ou supprimer un canal
 

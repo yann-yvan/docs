@@ -3,14 +3,16 @@ title: Messenger and Instagram
 description: Connect your Facebook Pages and Instagram professional accounts so an agent answers your Messenger and Instagram direct messages.
 ---
 
+<Note>Messenger and Instagram are in early access while Meta reviews Shortext. To connect your Page now, write to [hello@ny-corp.io](mailto:hello@ny-corp.io).</Note>
+
 Connect a Facebook Page and an agent answers the customers who write to it on **Messenger**. Connect the **Instagram** professional account linked to the Page and the agent also answers its direct messages. You connect them by logging in to Facebook from Shortext: no token to copy, no webhook to configure.
 
 ## Before you start
 
-- A **Facebook Page** you manage, with the right to manage its messages.
-- For Instagram: an Instagram **professional** account (business or creator) **linked to that Page**.
+- A **Facebook Page** on which you can manage the messages: full control, or Facebook access with messages. Without this right, the Page is shown but cannot be ticked.
+- For Instagram: an Instagram **professional** account (business or creator) **linked to that Page**, with **Allow access to messages** turned on in the Instagram app (**Settings > Messages > Connected tools**).
 
-{/* TODO: confirm the exact Page role needed. */}
+You connect both with your Facebook account, not with an Instagram login.
 
 ## Connect a Page or an Instagram account
 
@@ -48,7 +50,7 @@ Your own clients can connect their Page and their Instagram account from your pr
 
 Customers write first: they open your Page on Messenger, or send a direct message to your Instagram account. Share the link to write to you, given in the channel (`contact_url` in the API): `https://m.me/<page>` for Messenger, `https://ig.me/m/<account>` for Instagram, on your website, your social networks or a QR code.
 
-{/* TODO: confirm the ?ref= parameter to know where a contact comes from. */}
+To know where a contact comes from, add `?ref=` followed by a code, for example `https://m.me/acme?ref=website`. The code is attached to the first message sent from the link (in the message metadata); a person who opens the conversation without writing sends nothing.
 
 ## The 24-hour window
 
@@ -60,7 +62,10 @@ Meta only allows a business to answer within a window opened by the customer's l
 | From 24 hours to **7 days** | Only a person of your team, from the Inbox. |
 | More than 7 days | Nothing, until the customer writes again. |
 
-Outside the window, a message is refused with an explicit reason. There are no templates on Messenger and Instagram.
+Outside the window, a message is refused with an explicit reason. This is a rule of Meta: there are no templates on Messenger and Instagram to write first, so:
+
+- an automatic [follow-up](/api-reference/guides/follow-ups) is only sent within 24 hours of the customer's last message;
+- [campaigns](/api-reference/guides/send-a-campaign) cannot be sent on Messenger and Instagram.
 
 ## Contacts
 
@@ -85,7 +90,7 @@ See [Message format](/api-reference/message-format) for the payloads.
 
 ## Billing
 
-{/* TODO: confirm billing (service rate, no provider fee). */}
+Each message sent on Messenger or Instagram is billed at your company's **service** rate, with no provider fee: Meta charges nothing on these channels. See [Balance and wallet movements](/api-reference/guides/balance).
 
 ## Disable or delete a channel
 

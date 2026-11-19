@@ -2286,7 +2286,9 @@
                                 "whatsapp",
                                 "mail",
                                 "shortext",
-                                "telegram"
+                                "telegram",
+                                "messenger",
+                                "instagram"
                             ]
                         }
                     },
@@ -2352,7 +2354,9 @@
                                 "whatsapp",
                                 "mail",
                                 "shortext",
-                                "telegram"
+                                "telegram",
+                                "messenger",
+                                "instagram"
                             ]
                         }
                     },
@@ -2415,7 +2419,9 @@
                                 "whatsapp",
                                 "mail",
                                 "shortext",
-                                "telegram"
+                                "telegram",
+                                "messenger",
+                                "instagram"
                             ]
                         }
                     },
@@ -2495,7 +2501,9 @@
                                 "whatsapp",
                                 "mail",
                                 "shortext",
-                                "telegram"
+                                "telegram",
+                                "messenger",
+                                "instagram"
                             ]
                         }
                     },
@@ -2928,7 +2936,9 @@
                                 "whatsapp",
                                 "mail",
                                 "shortext",
-                                "telegram"
+                                "telegram",
+                                "messenger",
+                                "instagram"
                             ]
                         }
                     },
@@ -4504,6 +4514,220 @@
                                             "properties": {
                                                 "body": {
                                                     "$ref": "#/components/schemas/Me"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/channels/messenger/{id}": {
+            "delete": {
+                "tags": [
+                    "Channels"
+                ],
+                "summary": "Delete a Messenger channel",
+                "description": "Final: the Page stops receiving on Shortext and its conversations leave the inbox (kept for audits).",
+                "operationId": "deleteMessengerChannel",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The deleted Channel",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Channel"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Channels"
+                ],
+                "summary": "Update a Messenger channel",
+                "description": "Partial update: only the fields sent change (PUT is accepted too). To connect a Facebook Page, create a hosted session with the purpose `meta`.",
+                "operationId": "updateMessengerChannel",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "fbp_xxx"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/MetaChannelInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Channel"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/channels/instagram/{id}": {
+            "delete": {
+                "tags": [
+                    "Channels"
+                ],
+                "summary": "Delete an Instagram channel",
+                "description": "Final: the account stops receiving on Shortext and its conversations leave the inbox (kept for audits).",
+                "operationId": "deleteInstagramChannel",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The deleted Channel",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Channel"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Channels"
+                ],
+                "summary": "Update an Instagram channel",
+                "description": "Partial update: only the fields sent change (PUT is accepted too). To connect an Instagram account, create a hosted session with the purpose `meta`.",
+                "operationId": "updateInstagramChannel",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "iga_xxx"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/MetaChannelInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Always HTTP 200: the outcome is in `success` and `code` (absolute value of the response code).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiEnvelope"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/Channel"
                                                 }
                                             },
                                             "type": "object"
@@ -7145,7 +7369,9 @@
                             "whatsapp",
                             "mail",
                             "shortext",
-                            "telegram"
+                            "telegram",
+                            "messenger",
+                            "instagram"
                         ]
                     },
                     "channel_id": {
@@ -7255,6 +7481,31 @@
                     "api_version": {
                         "type": "string",
                         "example": "v2.0"
+                    }
+                },
+                "type": "object"
+            },
+            "MetaChannelInput": {
+                "properties": {
+                    "name": {
+                        "description": "Internal name, the name of the Page or of the Instagram account by default",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 255
+                    },
+                    "agent_id": {
+                        "description": "Agent answering on the channel; null detaches it",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "AGI-XXXXX"
+                    },
+                    "enabled": {
+                        "description": "Disabled, received messages are ignored and nothing is sent",
+                        "type": "boolean"
                     }
                 },
                 "type": "object"
@@ -8167,7 +8418,9 @@
                             "whatsapp",
                             "mail",
                             "shortext",
-                            "telegram"
+                            "telegram",
+                            "messenger",
+                            "instagram"
                         ],
                         "example": "whatsapp"
                     },
@@ -8200,7 +8453,7 @@
                         ]
                     },
                     "settings": {
-                        "description": "Shortext: endpoint settings. Telegram: username, bot_url, receiving, last_error. Null for the other channels",
+                        "description": "Shortext: endpoint settings. Telegram: username, bot_url, receiving, last_error. Messenger and Instagram: page_id, page_name, username, contact_url, receiving, last_error. Null for the other channels",
                         "properties": {
                             "client_type": {
                                 "type": "string",
@@ -8229,7 +8482,7 @@
                                 ]
                             },
                             "username": {
-                                "description": "Telegram: the @username of the bot, without @",
+                                "description": "Telegram: the @username of the bot, without @. Messenger: the username of the Page. Instagram: the @username of the account, without @",
                                 "type": "string"
                             },
                             "bot_url": {
@@ -8238,15 +8491,28 @@
                                 "example": "https://t.me/AcmeBot"
                             },
                             "receiving": {
-                                "description": "Telegram: the bot is enabled and Telegram delivers its messages",
+                                "description": "Telegram, Messenger, Instagram: the channel is enabled and its messages are delivered to us",
                                 "type": "boolean"
                             },
                             "last_error": {
-                                "description": "Telegram: last refusal of Telegram, null when all is well",
+                                "description": "Telegram, Messenger, Instagram: last refusal of the platform, null when all is well",
                                 "type": [
                                     "string",
                                     "null"
                                 ]
+                            },
+                            "page_id": {
+                                "description": "Messenger, Instagram: the Facebook Page of the channel",
+                                "type": "string"
+                            },
+                            "page_name": {
+                                "description": "Messenger, Instagram: the name of the Facebook Page",
+                                "type": "string"
+                            },
+                            "contact_url": {
+                                "description": "Messenger, Instagram: link your customers open to write to you (m.me / ig.me)",
+                                "type": "string",
+                                "example": "https://m.me/acme"
                             }
                         },
                         "type": [
@@ -8282,7 +8548,10 @@
                                 "enum": [
                                     "whatsapp",
                                     "mail",
-                                    "shortext"
+                                    "shortext",
+                                    "telegram",
+                                    "messenger",
+                                    "instagram"
                                 ]
                             },
                             "id": {
@@ -9108,7 +9377,9 @@
                             "whatsapp",
                             "mail",
                             "shortext",
-                            "telegram"
+                            "telegram",
+                            "messenger",
+                            "instagram"
                         ]
                     },
                     "channel_id": {
