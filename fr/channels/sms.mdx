@@ -1,0 +1,66 @@
+---
+title: SMS
+description: Envoyez vos messages texte par SMS sous votre propre Sender ID, et recevez les accusés de réception et les réponses.
+---
+
+{/* TODO quand le canal SMS sera fusionné : chemin du menu dans le tableau de bord, captures d'écran, valeur du type de canal et format de l'identifiant du canal, longueur et caractères du Sender ID, longueur des messages et segments, tarifs, pays et opérateurs couverts. */}
+
+Le canal SMS envoie vos messages par SMS sur le téléphone de vos contacts. Vos messages sont signés de votre **Sender ID**, le nom affiché comme expéditeur sur le téléphone (par exemple `ACME`), et passent par la même API de messages que les autres canaux.
+
+Shortext ouvre le SMS d'abord au **Cameroun**, puis dans d'autres pays d'Afrique.
+
+## Votre Sender ID
+
+Le Sender ID est le nom que vos contacts voient comme expéditeur de vos SMS. Vous ne gérez que ce Sender ID : Shortext s'occupe des routes vers les opérateurs mobiles.
+
+Un Sender ID ne peut écrire aux clients d'un opérateur (par exemple MTN ou Orange) qu'une fois **validé par cet opérateur**. Shortext se charge des validations pour vous, opérateur par opérateur.
+
+<Steps>
+  <Step title="Demandez votre Sender ID">
+    Depuis le tableau de bord, demandez un Sender ID : le nom à afficher, son usage (messages transactionnels, marketing, codes à usage unique), les pays visés et quelques exemples de messages.
+
+    {/* TODO capture d'écran : formulaire de demande de Sender ID. */}
+  </Step>
+  <Step title="Déposez vos documents">
+    Déposez les documents qui prouvent que le nom appartient à votre entreprise, dont une lettre d'autorisation : téléchargez le modèle, signez-le et redéposez-le.
+
+    {/* TODO : liste exacte des documents exigés par pays. */}
+  </Step>
+  <Step title="Suivez les validations">
+    Shortext vérifie vos documents et soumet votre Sender ID aux opérateurs. Vous suivez l'avancement opérateur par opérateur, et vous êtes prévenu à chaque étape.
+  </Step>
+  <Step title="Envoyez">
+    Votre Sender ID est actif dès qu'un premier opérateur l'a validé. Un message vers un contact dont l'opérateur ne l'a pas encore validé est refusé, avec un motif explicite.
+  </Step>
+</Steps>
+
+Shortext peut aussi vous donner accès à un **Sender ID partagé** : un Sender ID de test, ou un Sender ID de Shortext pour vos communications. Sur un Sender ID partagé de communication, Shortext vérifie le contenu de vos messages avant leur envoi.
+
+## Envoyer un SMS
+
+Le SMS utilise la même API de messages que les autres canaux, avec un `message` au [format des messages](/fr/api-reference/message-format). Le canal SMS n'accepte que le **texte** :
+
+```json
+{
+  "type": "text",
+  "content": { "text": "Votre commande A-1042 a quitté notre entrepôt." }
+}
+```
+
+Tout autre type (modèle, interactif, média, position, contact) est refusé.
+
+{/* TODO après fusion : la valeur de channel et le channel_id à envoyer avec POST /conversations, l'identifiant du contact (format du numéro), les limites de longueur, le décompte des segments et les caractères qui allongent un message. */}
+
+## Ce qui revient
+
+- **Accusés de réception** : le statut de chaque SMS est mis à jour au fil des retours de l'opérateur (remis, ou non remis) et envoyé par le [webhook](/fr/api-reference/webhooks) `message.status`. Les accusés peuvent arriver dans le désordre : Shortext garde le statut le plus avancé.
+- **Réponses** : quand l'opérateur les transmet, les réponses de vos contacts entrent dans la conversation, comme sur tout canal : l'Inbox, l'agent et le webhook `message.received`. Dans beaucoup de pays, les réponses à un SMS envoyé sous un Sender ID ne parviennent pas à l'expéditeur : n'en dépendez pas.
+- **Désinscription** : un contact qui répond « Stop » est désabonné.
+
+{/* TODO après fusion : les statuts exposés, les pays qui transmettent les réponses, et l'affichage d'un contact désabonné. */}
+
+## Facturation
+
+Le SMS est facturé **par segment**, à un tarif propre au canal SMS. Voir [Solde et mouvements du portefeuille](/fr/api-reference/guides/balance).
+
+{/* TODO après fusion : longueur d'un segment et tarifs par pays et par type de message. */}
