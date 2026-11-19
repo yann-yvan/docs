@@ -11,13 +11,22 @@ Un agent répond à vos clients sur les canaux qui lui sont rattachés. Vous pou
   <Step title="Ouvrez les agents">
     Dans la barre latérale, ouvrez **Communication > Agents IA** et créez un nouvel agent.
 
-    {/* TODO capture : liste des agents IA et formulaire de création. */}
+    <Frame>
+      <img src="/images/dashboard/agents-list.webp" alt="La liste des agents IA" />
+    </Frame>
+
+    <Frame>
+      <img src="/images/dashboard/agent-create.webp" alt="Le formulaire de création d'un agent" />
+    </Frame>
   </Step>
 
   <Step title="Nommez-le et choisissez sa façon de répondre">
     - **Nom** : affiché à votre équipe dans la boîte de réception, les statistiques et l'API.
-    - **Agent enabled** (agent activé) : un agent désactivé continue d'enregistrer les messages mais ne répond pas.
-    - **Use AI** (utiliser l'IA) : l'IA répond en suivant les instructions. Quand elle est désactivée, l'agent envoie à la place le **message d'indisponibilité**, par exemple « Notre équipe vous répondra pendant nos heures d'ouverture. »
+    - **Enabled** (activé) : un agent désactivé ne répond plus sur aucun de ses canaux ; les messages sont toujours enregistrés.
+    - **Reply mode** (mode de réponse) :
+      - **AI** : l'agent répond avec sa personnalité, ses connaissances et ses outils.
+      - **Fixed message** (message fixe) : le même message à chaque client, sans IA, par exemple « Notre équipe vous répondra pendant nos heures d'ouverture. »
+      - **API only** (API seulement) : aucune réponse automatique ; votre application répond via le [webhook](/fr/api-reference/webhooks) `message.received`.
   </Step>
 
   <Step title="Rédigez les instructions">

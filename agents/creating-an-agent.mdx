@@ -11,13 +11,22 @@ An agent answers your customers on the channels attached to it. You can create a
   <Step title="Open the agents">
     In the sidebar, open **Communication > AI Agents** and create a new agent.
 
-    {/* TODO screenshot: AI Agents list and the creation form. */}
+    <Frame>
+      <img src="/images/dashboard/agents-list.webp" alt="The list of AI agents" />
+    </Frame>
+
+    <Frame>
+      <img src="/images/dashboard/agent-create.webp" alt="The agent creation form" />
+    </Frame>
   </Step>
 
   <Step title="Name it and choose how it answers">
     - **Name**: shown to your team in the Inbox, the analytics and the API.
-    - **Agent enabled**: an agent that is not enabled keeps storing messages but does not answer.
-    - **Use AI**: the AI answers by following the instructions. When it is off, the agent sends the **inactive message** instead, for example "Our team will get back to you during opening hours."
+    - **Enabled**: a disabled agent no longer answers on any of its channels; messages are still stored.
+    - **Reply mode**:
+      - **AI**: the agent answers with its personality, its knowledge and its tools.
+      - **Fixed message**: the same message to every customer, without AI, for example "Our team will get back to you during opening hours."
+      - **API only**: no automatic answer; your application replies through the `message.received` [webhook](/api-reference/webhooks).
   </Step>
 
   <Step title="Write the instructions">
