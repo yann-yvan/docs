@@ -14,7 +14,7 @@ Demande une clé avec **Envoyer des messages**.
 
 | Champ | Description |
 | --- | --- |
-| `channel` | `whatsapp`, `mail`, `shortext` ou `telegram`. |
+| `channel` | `whatsapp`, `mail`, `shortext`, `telegram`, `messenger` ou `instagram`. |
 | `channel_id` | Votre canal, issu de `GET /channels`. |
 | `contact` | La personne à qui vous écrivez, voir [Format des contacts](/fr/api-reference/contact-format). |
 | `message` | Ce que vous envoyez, voir [Format des messages](/fr/api-reference/message-format). |
@@ -34,7 +34,7 @@ WhatsApp n'accepte les messages libres (texte, média, interactif) que dans les 
 | `POST /conversations` avec un modèle | Envoyé. |
 | `POST /conversations/{id}/messages` (réponse) | Une réponse libre est envoyée sous forme de modèle de notification, pour qu'elle atteigne le contact. |
 
-Les boîtes mail, les endpoints Shortext, Telegram et le SMS n'ont pas de fenêtre de ce type ; le SMS n'accepte que les messages texte, voir [SMS](/fr/channels/sms#envoyer-un-sms). Sur Telegram, vous ne pouvez écrire qu'à un contact qui a déjà démarré votre bot, voir [Telegram](/fr/channels/telegram#comment-les-clients-vous-joignent).
+Messenger et Instagram ont leur propre fenêtre : 24 heures pour tout message, puis jusqu'à 7 jours pour une personne de votre équipe seulement, voir [Messenger et Instagram](/fr/channels/messenger-instagram#la-fenêtre-de-24-heures). Les boîtes mail, les endpoints Shortext, Telegram et le SMS n'ont pas de fenêtre de ce type ; le SMS n'accepte que les messages texte, voir [SMS](/fr/channels/sms#envoyer-un-sms). Sur Telegram, vous ne pouvez écrire qu'à un contact qui a déjà démarré votre bot, voir [Telegram](/fr/channels/telegram#comment-les-clients-vous-joignent).
 
 <Tip>Pour décider à l'avance, regardez le dernier message entrant de la conversation (`GET /conversations/{id}/messages`) ou gardez l'heure du dernier webhook `message.received`.</Tip>
 

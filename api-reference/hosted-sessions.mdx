@@ -37,6 +37,7 @@ Typical case: you build a product on Shortext, and each of your clients connects
 | --- | --- | --- |
 | `whatsapp` | Connect WhatsApp Business numbers with Meta embedded signup. | `agent_id`: the agent that answers on the numbers (default: your first agent). |
 | `mail` | Connect a mailbox with IMAP / SMTP; the connection is checked before saving. | `agent_id`: the agent that answers on the mailbox (default: your first agent). |
+| `meta` | Connect Facebook Pages (Messenger) and Instagram professional accounts with Facebook Login. See [Messenger and Instagram](/channels/messenger-instagram). | `agent_id`: the agent that answers on the channels. |
 | `template` | Write a WhatsApp template in the Shortext editor and submit it to Meta. | `channel_id` (required): a WhatsApp number, whose WhatsApp Business account owns the template. Optional: `name`, `category` (`MARKETING`, `UTILITY`, `AUTHENTICATION`), `language`, to prefill the editor. |
 
 ## Create a session
@@ -44,7 +45,7 @@ Typical case: you build a product on Shortext, and each of your clients connects
 Requires the **Manage integrations** permission.
 
 <ParamField body="purpose" type="string" required>
-  `whatsapp`, `mail` or `template`.
+  `whatsapp`, `mail`, `meta` or `template`.
 </ParamField>
 <ParamField body="context" type="object">
   Options of the purpose, for example `{ "agent_id": "AGI-XXXXX" }`. The agent must belong to your company.
@@ -103,7 +104,7 @@ The page shows how much time is left before `expires_at`; at zero, it reloads to
 
 ## Result
 
-For `whatsapp` and `mail`, `result` lists the connected channels, in the same format as `GET /channels`:
+For `whatsapp`, `mail` and `meta`, `result` lists the connected channels, in the same format as `GET /channels`:
 
 ```json
 {

@@ -18,6 +18,9 @@ A channel is where your customers write to you and where your agent answers. Man
   <Card title="Telegram" icon="telegram" href="/channels/telegram">
     A Telegram bot, connected with its token.
   </Card>
+  <Card title="Messenger and Instagram" icon="facebook-messenger" href="/channels/messenger-instagram">
+    Facebook Pages and Instagram professional accounts, connected with Facebook.
+  </Card>
   <Card title="SMS" icon="comment-sms" href="/channels/sms">
     Text messages by SMS, under your own Sender ID.
   </Card>
@@ -43,6 +46,8 @@ Every channel has an id, used by the API and the webhooks (`channel_id`):
 | Mailbox | `mbx_...`, given by Shortext when the mailbox is connected (not its email address) |
 | Shortext endpoint | `ste_...` |
 | Telegram | `tga_...` |
+| Messenger | `fbp_...` |
+| Instagram | `iga_...` |
 {/* TODO once the SMS channel is merged: add the SMS row (id format of a Sender ID). */}
 
 ## Deleting a channel
@@ -51,4 +56,4 @@ Deleting a channel is final: it stops receiving messages and its conversations l
 
 ## Coming soon
 
-Gmail and Outlook mailboxes connected in one click, and Instagram and Messenger. See [Coming soon](/channels/coming-soon).
+Gmail and Outlook mailboxes connected in one click. See [Coming soon](/channels/coming-soon).

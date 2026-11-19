@@ -21,7 +21,7 @@ Your plan sets how many agents your company can have.
 
 ## Channel
 
-A **channel** is where conversations happen. Shortext supports four types:
+A **channel** is where conversations happen. Shortext supports six types:
 
 | Type | What it is | Channel id |
 | --- | --- | --- |
@@ -29,6 +29,8 @@ A **channel** is where conversations happen. Shortext supports four types:
 | `mail` | A mailbox connected through IMAP / SMTP | `mbx_...` |
 | `shortext` | An endpoint your own server or app talks to through the API | `ste_...` |
 | `telegram` | A Telegram bot connected with its token | `tga_...` |
+| `messenger` | A Facebook Page, on Messenger | `fbp_...` |
+| `instagram` | An Instagram professional account | `iga_...` |
 
 The [SMS](/channels/sms) channel sends text messages under your own Sender ID. {/* TODO once merged: SMS row in this table (type and channel id). */}
 
@@ -36,7 +38,7 @@ Each channel is attached to **one agent**, which answers on it. A channel can al
 
 ## Contact
 
-A **contact** is a customer. It is identified by its **identifier** on the channel: a phone number on WhatsApp, an email address on a mailbox, your own user id on a Shortext endpoint, the Telegram user id on Telegram. On a Shortext endpoint you can also identify users by their phone number or email address: the same person is then one contact across your app, WhatsApp and email.
+A **contact** is a customer. It is identified by its **identifier** on the channel: a phone number on WhatsApp, an email address on a mailbox, your own user id on a Shortext endpoint, the Telegram user id on Telegram, the id Meta gives for your Page or account on Messenger and Instagram. On a Shortext endpoint you can also identify users by their phone number or email address: the same person is then one contact across your app, WhatsApp and email.
 
 ## Conversation and session
 

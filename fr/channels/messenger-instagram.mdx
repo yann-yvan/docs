@@ -1,0 +1,96 @@
+---
+title: Messenger et Instagram
+description: Connectez vos Pages Facebook et vos comptes Instagram professionnels pour qu'un agent réponde à vos messages Messenger et Instagram.
+---
+
+Connectez une Page Facebook et un agent répond aux clients qui lui écrivent sur **Messenger**. Connectez le compte **Instagram** professionnel lié à la Page et l'agent répond aussi à ses messages privés. Vous les connectez en vous identifiant sur Facebook depuis Shortext : aucun token à copier, aucun webhook à configurer.
+
+## Avant de commencer
+
+- Une **Page Facebook** que vous gérez, avec le droit d'en gérer les messages.
+- Pour Instagram : un compte Instagram **professionnel** (entreprise ou créateur) **lié à cette Page**.
+
+{/* TODO : confirmer le rôle exact demandé sur la Page. */}
+
+## Connecter une Page ou un compte Instagram
+
+<Steps>
+  <Step title="Lancer la connexion">
+    Ouvrez **Communication > Canaux > Messenger et Instagram** et cliquez sur **Connecter avec Facebook**.
+
+    {/* TODO capture d'écran : liste des canaux Messenger et Instagram avec le bouton de connexion Facebook. */}
+  </Step>
+  <Step title="Se connecter à Facebook">
+    Dans la fenêtre Facebook, connectez-vous et autorisez les Pages (et leurs comptes Instagram) que Shortext peut utiliser.
+  </Step>
+  <Step title="Choisir vos canaux">
+    De retour dans Shortext, cochez les Pages Messenger et les comptes Instagram à connecter, et choisissez l'agent qui y répond.
+
+    {/* TODO capture d'écran : choix des Pages et des comptes Instagram. */}
+  </Step>
+</Steps>
+
+Chaque Page connectée sur Messenger et chaque compte Instagram est un canal à part entière, avec son propre agent. Une Page ou un compte ne peut être connecté qu'à un seul compte Shortext.
+
+En cas de problème, l'erreur dit pourquoi, par exemple :
+
+- la Page n'a pas été autorisée dans la fenêtre Facebook : recommencez et sélectionnez-la ;
+- vous n'avez pas le droit de gérer les messages de la Page ;
+- aucun compte Instagram professionnel n'est lié à la Page ;
+- la Page ou le compte est déjà connecté à un autre compte Shortext ;
+- la connexion Facebook a expiré : recommencez.
+
+### Depuis votre produit
+
+Vos propres clients peuvent connecter leur Page et leur compte Instagram depuis votre produit grâce à une [session hébergée](/fr/api-reference/hosted-sessions) d'objectif `meta`, avec `context.agent_id` pour choisir l'agent. `result` liste les canaux connectés, au même format que `GET /channels`.
+
+## Comment les clients vous joignent
+
+C'est le client qui écrit en premier : il ouvre votre Page sur Messenger, ou envoie un message privé à votre compte Instagram. Partagez le lien pour vous écrire, donné dans le canal (`contact_url` dans l'API) : `https://m.me/<page>` pour Messenger, `https://ig.me/m/<compte>` pour Instagram, sur votre site, vos réseaux sociaux ou en QR code.
+
+{/* TODO : confirmer le paramètre ?ref= pour savoir d'où vient un contact. */}
+
+## La fenêtre de 24 heures
+
+Meta ne permet à une entreprise de répondre que dans une fenêtre ouverte par le dernier message du client :
+
+| Depuis le dernier message du client | Ce qui peut être envoyé |
+| --- | --- |
+| Moins de **24 heures** | Tout message, de l'agent, de votre équipe ou de l'API. |
+| De 24 heures à **7 jours** | Seulement une personne de votre équipe, depuis l'Inbox. |
+| Plus de 7 jours | Rien, jusqu'à ce que le client écrive à nouveau. |
+
+Hors de la fenêtre, un message est refusé avec un motif explicite. Il n'y a pas de modèles sur Messenger et Instagram.
+
+## Contacts
+
+Un contact est identifié par l'identifiant que Meta lui donne pour votre Page ou votre compte (`identifier_type` `messenger_psid` ou `instagram_igsid`). Une même personne a un identifiant différent sur chaque Page et chaque compte Instagram. Meta ne donne pas de numéro de téléphone.
+
+## Messages
+
+| Type | Sur Messenger et Instagram |
+| --- | --- |
+| Texte | Envoyé et reçu. Un texte long part en plusieurs messages : **2 000** caractères chacun sur Messenger, **1 000** octets sur Instagram. |
+| Images, vidéos, audio, documents | Envoyés et reçus. Une légende part en texte après le fichier. |
+| Stickers | Envoyés en image ; un sticker ou un cœur reçu arrive en sticker. |
+| Boutons de réponse et listes | Affichés en réponses rapides sous le message (13 au plus, titres de 20 caractères au plus). Un appui revient comme une réponse de bouton. |
+| Call-to-action, lien de paiement | Un bouton lien sous le texte. |
+| Carrousel | Des cartes avec une image, un texte et des boutons (10 au plus). |
+| Position, fiche contact | Envoyées en texte (nom, adresse et lien vers la carte, ou nom et numéros). Une position reçue arrive en message `location`. |
+| Modèles, Flows WhatsApp | Non disponibles : ils sont propres à WhatsApp. |
+
+Une publication partagée, une mention en story ou un lien arrive en texte avec son lien, pour que l'agent sache de quoi il s'agit. Les messages que Shortext ne sait pas lire arrivent comme « Message non pris en charge ».
+
+Voir [Format des messages](/fr/api-reference/message-format) pour le contenu de chaque message.
+
+## Facturation
+
+{/* TODO : confirmer la facturation (tarif service, sans frais fournisseur). */}
+
+## Désactiver ou supprimer un canal
+
+- **Désactivez-le** pour l'arrêter : les messages reçus sont ignorés et rien n'est envoyé. Réactivez-le pour reprendre.
+- Si Meta ne livre plus les messages d'une Page (`receiving` vaut `false`, `last_error` dit pourquoi), **reconnectez-la** ou **réinstallez la réception** depuis le canal.
+- **Supprimez-le** quand vous n'en avez plus besoin. C'est définitif : le canal ne reçoit plus rien sur Shortext et ses conversations quittent l'Inbox (elles sont gardées pour les audits). Votre Page et votre compte Instagram ne sont pas touchés.
+
+Avec l'API : `PATCH /channels/messenger/{id}` ou `/channels/instagram/{id}` modifie `name`, `agent_id` et `enabled` ; `DELETE` supprime le canal. Listez-les avec `GET /channels?type=messenger` ou `?type=instagram`.

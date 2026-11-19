@@ -24,7 +24,7 @@ Create endpoints in the dashboard (**Developer > Webhooks**) or with the API (`P
 | --- | --- |
 | `url` | A public **HTTPS** URL. Private and local addresses are refused. |
 | `events` | Exact types (`message.received`), a prefix wildcard (`message.*`) or `*` for everything. |
-| `filters` | Optional. Only receive events whose context matches: `app` (an agent id), `channel` (`whatsapp`, `mail`, `shortext`, `telegram`), `channel_id`; for `template.status_updated`, `template` (its name) and `language`. |
+| `filters` | Optional. Only receive events whose context matches: `app` (an agent id), `channel` (`whatsapp`, `mail`, `shortext`, `telegram`, `messenger`, `instagram`), `channel_id`; for `template.status_updated`, `template` (its name) and `language`. |
 | `description` | Optional, for you. |
 
 The response contains the signing **`secret`, shown only once**. Store it with your other secrets.
@@ -42,7 +42,7 @@ The response contains the signing **`secret`, shown only once**. Store it with y
 | `message.status` | A message status changed (delivered, read, failed...). |
 | `conversation.handover` | A human took a conversation over: the agent stops answering. |
 | `conversation.released` | A conversation was handed back to the agent. |
-| `channel.connected` | A channel (WhatsApp number, mailbox, Shortext endpoint, Telegram bot) was connected. |
+| `channel.connected` | A channel (WhatsApp number, mailbox, Shortext endpoint, Telegram bot, Facebook Page, Instagram account) was connected. |
 | `channel.agent_changed` | A channel was attached to an agent, moved to another one or detached. |
 | `agent.created` | An agent was created. |
 | `agent.updated` | An agent was updated (settings or instructions). |
