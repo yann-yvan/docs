@@ -3,7 +3,7 @@ title: SMS
 description: Send text messages by SMS under your own Sender ID, and receive delivery receipts and replies.
 ---
 
-{/* TODO once the SMS channel is merged: dashboard menu path, screenshots, channel type value and channel id format, Sender ID length and characters, message length and segments, prices, countries and operators covered. */}
+{/* TODO: screenshots, prices, countries and operators covered. */}
 
 The SMS channel sends your messages as SMS to your contacts' phones. Your messages are signed with your **Sender ID**, the name shown as the sender on the phone (for example `ACME`), and go through the same messaging API as the other channels.
 
@@ -13,11 +13,13 @@ Shortext opens SMS in **Cameroon** first, then in other African countries.
 
 The Sender ID is the name your contacts see as the sender of your SMS. You only manage this Sender ID: Shortext takes care of the routes to the mobile operators.
 
+A Sender ID has **3 to 11 characters**: letters, digits and spaces, with at least one letter, and no space at the start or the end (for example `ACME` or `ACME SHOP`).
+
 A Sender ID can only send to the customers of an operator (for example MTN or Orange) once **that operator has approved it**. Shortext handles the approvals for you, operator by operator.
 
 <Steps>
   <Step title="Request your Sender ID">
-    From the dashboard, request a Sender ID: the name to display, what you use it for (transactional messages, marketing, one-time codes), the countries you send to and a few sample messages.
+    In **Communication > Channels > Sender IDs**, request a Sender ID: the name to display, what you use it for (transactional messages, marketing, one-time codes), the countries you send to and a few sample messages.
 
     {/* TODO screenshot: Sender ID request form. */}
   </Step>
@@ -30,7 +32,7 @@ A Sender ID can only send to the customers of an operator (for example MTN or Or
     Shortext checks your documents and submits your Sender ID to the operators. You follow the progress operator by operator, and you are notified at each step.
   </Step>
   <Step title="Send">
-    Your Sender ID is active as soon as a first operator has approved it. A message to a contact whose operator has not approved it yet is refused, with an explicit reason.
+    Your Sender ID is active as soon as a first operator has approved it, and it answers with the agent you attach to it. A message to a contact whose operator has not approved it yet is refused, with an explicit reason.
   </Step>
 </Steps>
 
@@ -49,18 +51,27 @@ SMS uses the same messaging API as the other channels, with a `message` in the [
 
 Any other type (template, interactive, media, location, contact) is refused.
 
-{/* TODO once merged: the channel value and the channel_id to send with POST /conversations, the contact identifier (phone number format), the length limits, segment counting and the characters that make a message longer. */}
+In the API, the SMS channel is `sms` and the id of a Sender ID is `sms_...` (`GET /channels?type=sms`). The contact is identified by their phone number, in international format without `+`, as on WhatsApp.
+
+### Length and segments
+
+| Characters | One SMS | Each SMS beyond |
+| --- | --- | --- |
+| GSM alphabet (letters without accents, digits, usual signs, some accents such as `é`, `è`, `à`) | 160 | 153 |
+| Any other character (an emoji, `ê`, `ç`...) | 70 | 67 |
+
+One character outside the GSM alphabet is enough to switch the whole message to the second line. The characters `^ { } \ [ ~ ] | €` count twice. A text longer than the maximum the operators accept (today 5 SMS, or 7 with other characters) is refused, with the number of segments it takes.
 
 ## What comes back
 
-- **Delivery receipts**: the status of each SMS is updated as the operator reports it (delivered, or not delivered) and pushed by the `message.status` [webhook](/api-reference/webhooks). Receipts can arrive out of order: Shortext keeps the most advanced status.
+- **Delivery receipts**: the status of each SMS is updated as the operator reports it (`sent`, `delivered`, `failed`, sometimes `read`) and pushed by the `message.status` [webhook](/api-reference/webhooks). Receipts can arrive out of order: Shortext keeps the most advanced status.
 - **Replies**: when the operator passes them on, your contacts' replies come into the conversation, like on any channel: the Inbox, the agent and the `message.received` webhook. In many countries, replies to an SMS sent under a Sender ID do not reach the sender: do not rely on them.
 - **Unsubscribing**: a contact who answers "Stop" is unsubscribed.
 
-{/* TODO once merged: the statuses exposed, which countries pass replies on, and how an unsubscribed contact is shown. */}
+{/* TODO: which countries pass replies on. */}
 
 ## Billing
 
 SMS is billed **per segment**, at a price specific to the SMS channel. See [Balance and wallet movements](/api-reference/guides/balance).
 
-{/* TODO once merged: segment length and prices per country and message type. */}
+{/* TODO: prices per country and message type. */}

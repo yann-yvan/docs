@@ -344,13 +344,15 @@ Asks the contact to pay an amount. You give the amount; Shortext creates the pay
 
 | Field | Description |
 | --- | --- |
-| `body` | Required. Shortext adds the amount (and the order reference) to it. |
+| `body` | Required: what the payment is for. Shortext writes the message with it: the reason, the invoice number, the amount and the due date. |
 | `action.parameters.amount` | Required, a number. |
 | `action.parameters.currency` | Required, for example `XAF` or `EUR`. |
 | `action.parameters.order_id` | Optional, your order reference. |
 | `action.parameters.callback_url` | **Deprecated**, will be removed. Do not use it in new integrations. |
 
-The button reads "Pay {amount} {currency}". Without a header, Shortext adds an image header with the order reference. Do not send `display_text` or `url`: Shortext builds the button.
+The button reads "Pay {amount}" and opens the secure payment page. Without a header, Shortext adds an image it draws with the amount, the invoice number, the reason and your company name; without a footer, your company name. Do not send `display_text` or `url`: Shortext builds the button.
+
+The same request works on every channel: a button on WhatsApp and Messenger, a button under the message on Telegram, a button in the email, and the link in the text elsewhere.
 
 <Warning>`callback_url` is deprecated and will be removed: it no longer receives a signed notification. To be told when the contact pays, subscribe a [webhook endpoint](/api-reference/webhooks) to [`payment.succeeded`](/api-reference/webhooks#payment-received).</Warning>
 

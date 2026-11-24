@@ -21,7 +21,7 @@ Votre forfait fixe le nombre d'agents que votre entreprise peut avoir.
 
 ## Canal
 
-Un **canal** est l'endroit où ont lieu les conversations. Shortext prend en charge six types :
+Un **canal** est l'endroit où ont lieu les conversations. Shortext prend en charge sept types :
 
 | Type | Ce que c'est | Identifiant du canal |
 | --- | --- | --- |
@@ -31,8 +31,7 @@ Un **canal** est l'endroit où ont lieu les conversations. Shortext prend en cha
 | `telegram` | Un bot Telegram connecté avec son token | `tga_...` |
 | `messenger` | Une Page Facebook, sur Messenger | `fbp_...` |
 | `instagram` | Un compte Instagram professionnel | `iga_...` |
-
-Le canal [SMS](/fr/channels/sms) envoie des messages texte sous votre propre Sender ID. {/* TODO après fusion : ligne SMS dans ce tableau (type et identifiant du canal). */}
+| `sms` | Un Sender ID [SMS](/fr/channels/sms), pour les messages texte | `sms_...` |
 
 Chaque canal est rattaché à **un agent**, qui y répond. Un canal peut aussi être **détaché** : les messages sont toujours enregistrés, mais personne ne répond automatiquement.
 

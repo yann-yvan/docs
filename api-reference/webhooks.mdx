@@ -24,7 +24,7 @@ Create endpoints in the dashboard (**Developer > Webhooks**) or with the API (`P
 | --- | --- |
 | `url` | A public **HTTPS** URL. Private and local addresses are refused. |
 | `events` | Exact types (`message.received`), a prefix wildcard (`message.*`) or `*` for everything. |
-| `filters` | Optional. Only receive events whose context matches: `app` (an agent id), `channel` (`whatsapp`, `mail`, `shortext`, `telegram`, `messenger`, `instagram`), `channel_id`; for `template.status_updated`, `template` (its name) and `language`. |
+| `filters` | Optional. Only receive events whose context matches: `app` (an agent id), `channel` (`whatsapp`, `mail`, `shortext`, `telegram`, `messenger`, `instagram`, `sms`), `channel_id`; for `template.status_updated`, `template` (its name) and `language`. |
 | `description` | Optional, for you. |
 
 The response contains the signing **`secret`, shown only once**. Store it with your other secrets.

@@ -3,7 +3,7 @@ title: SMS
 description: Envoyez vos messages texte par SMS sous votre propre Sender ID, et recevez les accusés de réception et les réponses.
 ---
 
-{/* TODO quand le canal SMS sera fusionné : chemin du menu dans le tableau de bord, captures d'écran, valeur du type de canal et format de l'identifiant du canal, longueur et caractères du Sender ID, longueur des messages et segments, tarifs, pays et opérateurs couverts. */}
+{/* TODO : captures d'écran, tarifs, pays et opérateurs couverts. */}
 
 Le canal SMS envoie vos messages par SMS sur le téléphone de vos contacts. Vos messages sont signés de votre **Sender ID**, le nom affiché comme expéditeur sur le téléphone (par exemple `ACME`), et passent par la même API de messages que les autres canaux.
 
@@ -13,11 +13,13 @@ Shortext ouvre le SMS d'abord au **Cameroun**, puis dans d'autres pays d'Afrique
 
 Le Sender ID est le nom que vos contacts voient comme expéditeur de vos SMS. Vous ne gérez que ce Sender ID : Shortext s'occupe des routes vers les opérateurs mobiles.
 
+Un Sender ID compte **3 à 11 caractères** : lettres, chiffres et espaces, avec au moins une lettre, et sans espace au début ni à la fin (par exemple `ACME` ou `ACME SHOP`).
+
 Un Sender ID ne peut écrire aux clients d'un opérateur (par exemple MTN ou Orange) qu'une fois **validé par cet opérateur**. Shortext se charge des validations pour vous, opérateur par opérateur.
 
 <Steps>
   <Step title="Demandez votre Sender ID">
-    Depuis le tableau de bord, demandez un Sender ID : le nom à afficher, son usage (messages transactionnels, marketing, codes à usage unique), les pays visés et quelques exemples de messages.
+    Dans **Communication > Canaux > Sender IDs**, demandez un Sender ID : le nom à afficher, son usage (messages transactionnels, marketing, codes à usage unique), les pays visés et quelques exemples de messages.
 
     {/* TODO capture d'écran : formulaire de demande de Sender ID. */}
   </Step>
@@ -30,7 +32,7 @@ Un Sender ID ne peut écrire aux clients d'un opérateur (par exemple MTN ou Ora
     Shortext vérifie vos documents et soumet votre Sender ID aux opérateurs. Vous suivez l'avancement opérateur par opérateur, et vous êtes prévenu à chaque étape.
   </Step>
   <Step title="Envoyez">
-    Votre Sender ID est actif dès qu'un premier opérateur l'a validé. Un message vers un contact dont l'opérateur ne l'a pas encore validé est refusé, avec un motif explicite.
+    Votre Sender ID est actif dès qu'un premier opérateur l'a validé, et il répond avec l'agent que vous lui rattachez. Un message vers un contact dont l'opérateur ne l'a pas encore validé est refusé, avec un motif explicite.
   </Step>
 </Steps>
 
@@ -49,18 +51,27 @@ Le SMS utilise la même API de messages que les autres canaux, avec un `message`
 
 Tout autre type (modèle, interactif, média, position, contact) est refusé.
 
-{/* TODO après fusion : la valeur de channel et le channel_id à envoyer avec POST /conversations, l'identifiant du contact (format du numéro), les limites de longueur, le décompte des segments et les caractères qui allongent un message. */}
+Dans l'API, le canal SMS est `sms` et l'identifiant d'un Sender ID est `sms_...` (`GET /channels?type=sms`). Le contact est identifié par son numéro de téléphone, au format international sans `+`, comme sur WhatsApp.
+
+### Longueur et segments
+
+| Caractères | Un SMS | Chaque SMS au-delà |
+| --- | --- | --- |
+| Alphabet GSM (lettres sans accent, chiffres, signes courants, quelques accents comme `é`, `è`, `à`) | 160 | 153 |
+| Tout autre caractère (un emoji, `ê`, `ç`…) | 70 | 67 |
+
+Un seul caractère hors de l'alphabet GSM suffit à faire passer tout le message à la seconde ligne. Les caractères `^ { } \ [ ~ ] | €` comptent double. Un texte plus long que le maximum accepté par les opérateurs (aujourd'hui 5 SMS, ou 7 avec d'autres caractères) est refusé, avec le nombre de segments qu'il prend.
 
 ## Ce qui revient
 
-- **Accusés de réception** : le statut de chaque SMS est mis à jour au fil des retours de l'opérateur (remis, ou non remis) et envoyé par le [webhook](/fr/api-reference/webhooks) `message.status`. Les accusés peuvent arriver dans le désordre : Shortext garde le statut le plus avancé.
+- **Accusés de réception** : le statut de chaque SMS est mis à jour au fil des retours de l'opérateur (`sent`, `delivered`, `failed`, parfois `read`) et envoyé par le [webhook](/fr/api-reference/webhooks) `message.status`. Les accusés peuvent arriver dans le désordre : Shortext garde le statut le plus avancé.
 - **Réponses** : quand l'opérateur les transmet, les réponses de vos contacts entrent dans la conversation, comme sur tout canal : l'Inbox, l'agent et le webhook `message.received`. Dans beaucoup de pays, les réponses à un SMS envoyé sous un Sender ID ne parviennent pas à l'expéditeur : n'en dépendez pas.
 - **Désinscription** : un contact qui répond « Stop » est désabonné.
 
-{/* TODO après fusion : les statuts exposés, les pays qui transmettent les réponses, et l'affichage d'un contact désabonné. */}
+{/* TODO : les pays qui transmettent les réponses. */}
 
 ## Facturation
 
 Le SMS est facturé **par segment**, à un tarif propre au canal SMS. Voir [Solde et mouvements du portefeuille](/fr/api-reference/guides/balance).
 
-{/* TODO après fusion : longueur d'un segment et tarifs par pays et par type de message. */}
+{/* TODO : tarifs par pays et par type de message. */}

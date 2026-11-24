@@ -16,9 +16,14 @@ flowchart LR
     P -->|resume| A
     A -->|end_at passed| E[ended]
     S -.->|could not start| F[failed]
+    D -.->|launch, content to review| R[in_review]
+    R -.->|approved| S
+    R -.->|rejected| F
 ```
 
 A campaign is created as a **draft**. It ends when its `end_at` date has passed. A campaign that could not start is `failed`, with the reason in `failure_reason`; fix it and launch it again. You can edit a draft, a failed or a paused campaign; pause a scheduled or running campaign before editing it.
+
+A campaign sent on a channel Shortext lends you, such as a shared [SMS](/channels/sms) Sender ID for announcements, is `in_review` when you launch it: nothing is sent until Shortext has read its content. Approved, it starts as planned; rejected, it is `failed` with the reason in `failure_reason`. A message changed after the approval goes back in review.
 
 ## 1. Create the campaign
 

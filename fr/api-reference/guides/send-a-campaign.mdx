@@ -16,9 +16,14 @@ flowchart LR
     P -->|resume| A
     A -->|end_at dépassé| E[ended]
     S -.->|n'a pas pu démarrer| F[failed]
+    D -.->|launch, contenu à relire| R[in_review]
+    R -.->|approuvée| S
+    R -.->|refusée| F
 ```
 
 Une campagne est créée en **brouillon** (`draft`). Elle se termine (`ended`) une fois sa date `end_at` dépassée. Une campagne qui n'a pas pu démarrer est `failed`, avec la raison dans `failure_reason` ; corrigez-la et relancez-la. Vous pouvez modifier une campagne en brouillon, échouée ou en pause ; mettez en pause une campagne programmée ou en cours avant de la modifier.
+
+Une campagne envoyée sur un canal que Shortext vous prête, comme un Sender ID [SMS](/fr/channels/sms) partagé de communication, passe en `in_review` à son lancement : rien ne part tant que Shortext n'a pas relu son contenu. Approuvée, elle démarre comme prévu ; refusée, elle passe en `failed` avec la raison dans `failure_reason`. Un message modifié après l'approbation repart en relecture.
 
 ## 1. Créer la campagne
 

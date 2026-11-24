@@ -344,13 +344,15 @@ Demande au contact de payer un montant. Vous donnez le montant ; Shortext crée 
 
 | Champ | Description |
 | --- | --- |
-| `body` | Obligatoire. Shortext y ajoute le montant (et la référence de la commande). |
+| `body` | Obligatoire : l'objet du paiement. Shortext rédige le message avec : le motif, le numéro de facture, le montant et la date d'échéance. |
 | `action.parameters.amount` | Obligatoire, un nombre. |
 | `action.parameters.currency` | Obligatoire, par exemple `XAF` ou `EUR`. |
 | `action.parameters.order_id` | Facultatif, votre référence de commande. |
 | `action.parameters.callback_url` | **Déprécié**, sera retiré. Ne l'utilisez pas dans une nouvelle intégration. |
 
-Le bouton affiche « Pay {montant} {devise} ». Sans en-tête, Shortext ajoute un en-tête image avec la référence de la commande. N'envoyez ni `display_text` ni `url` : Shortext construit le bouton.
+Le bouton affiche « Payer {montant} » et ouvre la page de paiement sécurisée. Sans en-tête, Shortext ajoute une image qu'il dessine avec le montant, le numéro de facture, le motif et le nom de votre entreprise ; sans pied de page, le nom de votre entreprise. N'envoyez ni `display_text` ni `url` : Shortext construit le bouton.
+
+La même demande fonctionne sur tous les canaux : un bouton sur WhatsApp et Messenger, un bouton sous le message sur Telegram, un bouton dans l'e-mail, et le lien dans le texte ailleurs.
 
 <Warning>`callback_url` est déprécié et sera retiré : il ne reçoit plus de notification signée. Pour être prévenu quand le contact paie, abonnez un [endpoint webhook](/fr/api-reference/webhooks) à [`payment.succeeded`](/fr/api-reference/webhooks#paiement-reçu).</Warning>
 
