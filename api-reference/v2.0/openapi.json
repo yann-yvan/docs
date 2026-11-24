@@ -1193,7 +1193,8 @@
                                 "active",
                                 "paused",
                                 "ended",
-                                "failed"
+                                "failed",
+                                "in_review"
                             ]
                         }
                     },
@@ -2288,7 +2289,8 @@
                                 "shortext",
                                 "telegram",
                                 "messenger",
-                                "instagram"
+                                "instagram",
+                                "sms"
                             ]
                         }
                     },
@@ -2356,7 +2358,8 @@
                                 "shortext",
                                 "telegram",
                                 "messenger",
-                                "instagram"
+                                "instagram",
+                                "sms"
                             ]
                         }
                     },
@@ -2421,7 +2424,8 @@
                                 "shortext",
                                 "telegram",
                                 "messenger",
-                                "instagram"
+                                "instagram",
+                                "sms"
                             ]
                         }
                     },
@@ -2503,7 +2507,8 @@
                                 "shortext",
                                 "telegram",
                                 "messenger",
-                                "instagram"
+                                "instagram",
+                                "sms"
                             ]
                         }
                     },
@@ -2938,7 +2943,8 @@
                                 "shortext",
                                 "telegram",
                                 "messenger",
-                                "instagram"
+                                "instagram",
+                                "sms"
                             ]
                         }
                     },
@@ -7371,17 +7377,18 @@
                             "shortext",
                             "telegram",
                             "messenger",
-                            "instagram"
+                            "instagram",
+                            "sms"
                         ]
                     },
                     "channel_id": {
-                        "description": "Your channel id (`GET /channels`): WhatsApp phone id, mailbox id (mbx_...) or Shortext endpoint id (ste_...)",
+                        "description": "Your channel id (`GET /channels`): WhatsApp phone id, mailbox id (mbx_...), Shortext endpoint id (ste_...), Telegram bot id (tga_...), Messenger Page id (fbp_...), Instagram account id (iga_...) or SMS sender id (sms_...)",
                         "type": "string"
                     },
                     "contact": {
                         "properties": {
                             "identifier": {
-                                "description": "Phone (E.164 without +), email or, on Shortext, any identifier typed by identifier_type",
+                                "description": "Phone (E.164 without +, WhatsApp and SMS), email or, on Shortext, any identifier typed by identifier_type",
                                 "type": "string"
                             },
                             "identifier_type": {
@@ -7853,7 +7860,8 @@
                             "active",
                             "paused",
                             "ended",
-                            "failed"
+                            "failed",
+                            "in_review"
                         ]
                     },
                     "failure_reason": {
@@ -7877,7 +7885,8 @@
                                     "type": "string",
                                     "enum": [
                                         "whatsapp",
-                                        "mail"
+                                        "mail",
+                                        "sms"
                                     ]
                                 },
                                 "channel_id": {
@@ -8420,7 +8429,8 @@
                             "shortext",
                             "telegram",
                             "messenger",
-                            "instagram"
+                            "instagram",
+                            "sms"
                         ],
                         "example": "whatsapp"
                     },
@@ -8453,7 +8463,7 @@
                         ]
                     },
                     "settings": {
-                        "description": "Shortext: endpoint settings. Telegram: username, bot_url, receiving, last_error. Messenger and Instagram: page_id, page_name, username, contact_url, receiving, last_error. Null for the other channels",
+                        "description": "Shortext: endpoint settings. Telegram: username, bot_url, receiving, last_error. Messenger and Instagram: page_id, page_name, username, contact_url, receiving, last_error. Null for the other channels (WhatsApp, email, SMS)",
                         "properties": {
                             "client_type": {
                                 "type": "string",
@@ -8551,7 +8561,8 @@
                                     "shortext",
                                     "telegram",
                                     "messenger",
-                                    "instagram"
+                                    "instagram",
+                                    "sms"
                                 ]
                             },
                             "id": {
@@ -9379,7 +9390,8 @@
                             "shortext",
                             "telegram",
                             "messenger",
-                            "instagram"
+                            "instagram",
+                            "sms"
                         ]
                     },
                     "channel_id": {

@@ -605,7 +605,8 @@
                             "mail",
                             "telegram",
                             "messenger",
-                            "instagram"
+                            "instagram",
+                            "sms"
                         ],
                         "example": "whatsapp"
                     },
@@ -662,7 +663,7 @@
                         "type": "object"
                     },
                     "from": {
-                        "description": "Id of the sending channel: WhatsApp phone id, mailbox id (mbx_...), Shortext endpoint id (ste_...), Telegram bot id (tga_...), Messenger Page id (fbp_...) or Instagram account id (iga_...)",
+                        "description": "Id of the sending channel: WhatsApp phone id, mailbox id (mbx_...), Shortext endpoint id (ste_...), Telegram bot id (tga_...), Messenger Page id (fbp_...), Instagram account id (iga_...) or SMS sender id (sms_...)",
                         "type": "string",
                         "example": "1234567890"
                     },

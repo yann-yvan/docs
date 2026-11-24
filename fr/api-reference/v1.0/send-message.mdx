@@ -9,8 +9,8 @@ description: L'endpoint historique POST /messages/send et les types de messages 
 
 | Champ | Description |
 | --- | --- |
-| `channel` | `whatsapp`, `mail`, `telegram`, `messenger` ou `instagram`. |
-| `from` | L'identifiant du canal d'envoi : identifiant du numéro WhatsApp, identifiant de la boîte mail (`mbx_...`) identifiant du bot Telegram (`tga_...`), de la Page Messenger (`fbp_...`) ou du compte Instagram (`iga_...`), tels que listés par `GET /api/v2.0/channels`. |
+| `channel` | `whatsapp`, `mail`, `telegram`, `messenger`, `instagram` ou `sms`. |
+| `from` | L'identifiant du canal d'envoi : identifiant du numéro WhatsApp, identifiant de la boîte mail (`mbx_...`) identifiant du bot Telegram (`tga_...`), de la Page Messenger (`fbp_...`) du compte Instagram (`iga_...`) ou du Sender ID SMS (`sms_...`), tels que listés par `GET /api/v2.0/channels`. |
 | `contact` | `identifier` (WhatsApp : E.164 sans `+`) et `profile`, où `lastname` est **obligatoire**. Voir [Format des contacts](/fr/api-reference/contact-format). |
 | `message` | `type` et `content`, voir [Format des messages](/fr/api-reference/message-format). |
 
